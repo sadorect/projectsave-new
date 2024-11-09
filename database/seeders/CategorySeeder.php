@@ -3,23 +3,19 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
         $categories = [
-            'Devotional',
-            'Bible Study',
             'Missions',
-            'Youth Ministry',
-            'Community Outreach',
-            'Testimonies'
+            'Evangelism',
+            'Discipleship',
+            'Prayer',
+            'Community'
         ];
 
         foreach ($categories as $category) {

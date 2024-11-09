@@ -3,25 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Tag;
-use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Database\Seeder;
 
 class TagSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
         $tags = [
-            'Prayer',
             'Faith',
-            'Evangelism',
-            'Discipleship',
-            'Worship',
-            'Leadership',
-            'Service',
-            'Missions'
+            'Outreach',
+            'Youth',
+            'Training',
+            'Ministry',
+            'Service'
         ];
 
         foreach ($tags as $tag) {

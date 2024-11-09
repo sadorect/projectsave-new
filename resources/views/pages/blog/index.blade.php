@@ -43,7 +43,7 @@
                                     @if($post->subtitle)
                                         <h5>{{ $post->subtitle }}</h5>
                                     @endif
-                                    <p>{{ Str::limit($post->details, 150) }}</p>
+                                    <p>{!! Str::limit($post->details, 150) !!}</p>
                                 </div>
                                 <div class="blog-meta">
                                     <p><i class="fa fa-user"></i><a href="">{{ $post->author ?? 'Admin' }}</a></p>

@@ -6,9 +6,11 @@
                   <div class="col-lg-3 col-md-6">
                       <div class="footer-contact">
                           <h2>Our Head Office</h2>
-                          <p><i class="fa fa-map-marker-alt"></i>123 Street, New York, USA</p>
-                          <p><i class="fa fa-phone-alt"></i>+012 345 67890</p>
-                          <p><i class="fa fa-envelope"></i>info@example.com</p>
+                          <p><i class="fa fa-map-marker-alt"></i>P.O.Box 358,
+                            Ota- Ogun State
+                            Nigeria.</p>
+                          <p><i class="fa fa-phone-alt"></i>(+234) 07080100893</p>
+                          <p><i class="fa fa-envelope"></i>info@projectsaveng.org</p>
                           <div class="footer-social">
                               <a class="btn btn-custom" href=""><i class="fab fa-twitter"></i></a>
                               <a class="btn btn-custom" href=""><i class="fab fa-facebook-f"></i></a>
@@ -53,10 +55,10 @@
           <div class="container copyright">
               <div class="row">
                   <div class="col-md-6">
-                      <p>&copy; <a href="#">Your Site Name</a>, All Right Reserved.</p>
+                      <p>&copy; {{date('Y')}} <a href="#">Projectsave International</a>, All Right Reserved.</p>
                   </div>
                   <div class="col-md-6">
-                      <p>Designed By <a href="https://htmlcodex.com">HTML Codex</a></p>
+                      <p>Designed By <a href="https://sadorect.com">Sadorect</a></p>
                   </div>
               </div>
           </div>

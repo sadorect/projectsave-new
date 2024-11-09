@@ -36,7 +36,7 @@
                                     <p><i class="fa fa-map-marker-alt"></i>{{ $event->location }}</p>
                                 </div>
                                 <div class="event-text">
-                                    <h3>{{ $event->title }}</h3>
+                                    <a href="{{ route('events.show', $event) }}"><h3>{{ $event->title }}</h3></a>
                                     <p>{{ $event->description }}</p>
                                     <a class="btn btn-custom" href="">Join Now</a>
                                 </div>

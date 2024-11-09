@@ -36,7 +36,7 @@
                   <h4>{{ $post->subtitle }}</h4>
               @endif
               <div class="text-content my-4">
-                  {{ $post->details }}
+                {!! $post->details !!}
               </div>
               @if($post->action_point)
                   <div class="action-point mt-4">
@@ -241,7 +241,6 @@
             </div>
         </div>
         <!-- Single Post End-->   
-
 
 
 </x-layouts.app>
