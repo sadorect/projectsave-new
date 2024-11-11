@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Mail;
 use Illuminate\Http\Request;
+use App\Mail\ContactFormSubmission;
 
 class ContactController extends Controller
 {
@@ -10,18 +12,35 @@ class ContactController extends Controller
     {
         return view('pages.contact');
     }
-
+    
     public function submit(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|min:2',
             'email' => 'required|email',
-            'message' => 'required|min:10'
+            'message' => 'required|min:10',
+            'g-recaptcha-response' => 'required|recaptcha'
         ]);
 
-        // Handle form submission here
-        // You can add email notification, database storage, etc.
+        try {
+            $contact = new \App\Models\Contact();
+            $contact->name = $validated['name'];
+            $contact->email = $validated['email'];
+            $contact->message = $validated['message'];
+            $contact->save();
 
-        return redirect()->back()->with('success', 'Thank you for your message. We will get back to you soon!');
+            Mail::to(config('mail.admin_email', 'admin@example.com'))->send(
+                new ContactFormSubmission($contact)
+            );
+
+            \Log::info('New contact form submission', ['contact_id' => $contact->id]);
+
+            return redirect()->back()->with('success', 'Thank you for your message. We will get back to you soon!');
+            
+        } catch (\Exception $e) {
+            \Log::error('Contact form submission failed', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Something went wrong. Please try again later.');
+        }
+    
     }
 }

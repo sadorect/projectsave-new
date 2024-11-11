@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'recaptcha' => [
+    
+        'secret_key' => env('GOOGLE_RECAPTCHA_SECRET'),
+        'site_key' => env('GOOGLE_RECAPTCHA_KEY'),
+        'redirect' => 'http://localhost:8000/auth/google/callback',
+    ]
+
 ];

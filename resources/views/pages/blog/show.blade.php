@@ -27,9 +27,9 @@
                       <img src="{{ asset('storage/' . $post->image) }}" />
                   @endif
                   <h2>{{ $post->title }}</h2>
-                  @if($post->scripture)
-                      <div class="scripture-text my-3">
-                          <em>{{ $post->scripture }}</em>
+                  @if($post->bible_text)
+                      <div class="bible-text my-3">
+                          <em>{{ $post->bible_text }}</em>
                       </div>
                   @endif
                   @if($post->subtitle)
@@ -60,18 +60,17 @@
                         <div class="single-related">
                             <h2>Related Post</h2>
                             <div class="owl-carousel related-slider">
-                                @foreach($recentPosts as $recentPost)
+                                @foreach($relatedPosts as $relatedPost)
                                 <div class="post-item">
                                     <div class="post-text">
-                                        <a href="{{ route('posts.show', $recentPost) }}">{{ $recentPost->title }}</a>
+                                        <a href="{{ route('posts.show', $relatedPost) }}">{{ $relatedPost->title }}</a>
                                         <div class="post-meta">
-                                            <p>By<a href="">{{ $recentPost->author }}</a></p>
-                                            <p>In<a href="">{{ $recentPost->categories->first()->name ?? 'Uncategorized' }}</a></p>
+                                            <p>By<a href="">{{ $relatedPost->author }}</a></p>
+                                            <p>In<a href="">{{ $relatedPost->categories->first()->name ?? 'Uncategorized' }}</a></p>
                                         </div>
                                     </div>
                                 </div>
-                                @endforeach
-                            </div>
+                                @endforeach                            </div>
                         </div>
 
                         <!--div class="single-comment">

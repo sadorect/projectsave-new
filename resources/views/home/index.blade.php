@@ -68,35 +68,19 @@
         </div>
         <!-- Carousel End -->
 
-        <!-- Video Modal Start-->
-        <div class="modal fade" id="videoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>        
-                        <!-- 16:9 aspect ratio -->
-                        <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item" src="" id="video"  allowscriptaccess="always" allow="autoplay"></iframe>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> 
-        <!-- Video Modal End -->
-        
+        <!-- Add this right after the Carousel End comment -->
+       
 
         <!-- About Start -->
         <div class="about">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-6">
+                    <!--div class="col-lg-6">
                         <div class="about-img" data-parallax="scroll" data-image-src="{{ asset('frontend/img/about.jpg') }}"></div>
-                    </div>
+                    </div-->
                     <div class="col-lg-6">
                         <div class="section-header">
-                            <p>Learn About Us</p>
+                            <p>Welcome to </p>
                             <h2>Projectsave International</h2>
                         </div>
                         <div class="about-tab">
@@ -112,12 +96,12 @@
 
                             <div class="tab-content">
                                 <div id="tab-content-1" class="container tab-pane active">
-                                  ProjectSave Int&#39;l Ministry, a.k.a HarvestField Ministry is a non-
+                                  ProjectSave Int'l Ministry, a.k.a HarvestField Ministry is a non-
                                   denominational Christian ministry that is committed to preaching the
                                   gospel of our Lord Jesus Christ to the nations of the world as
                                   commanded in Mark 16:15 and also to build the saints of God with the
-                                  revealed truth of God&#39;s word (Acts 20:32). Our mission projects are
-                                  centred on evangelism and discipleship through the teaching of God’s
+                                  revealed truth of God's word (Acts 20:32). Our mission projects are
+                                  centred on evangelism and discipleship through the teaching of God's
                                   undiluted word. We have a message to the lost, unreached and to the
                                   dying world- THE GOSPEL.
                                 </div>
@@ -136,13 +120,63 @@
                                     </li>
                                 </ul>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div class="col-lg-6">
+                        <div class="news-ticker">
+                            <div class="section-header">
+                                <h4>Latest Updates</h4>
+                            </div>
+                             <div class="ticker-wrapper" style="height: 300px; overflow: hidden; position: relative;">
+
+                                <ul class="ticker-items">
+                                    <li class="ticker-item">
+
+                                        <span class="date" style="color: red;">Jan 15, 2024</span>
+                                        <p>New mission field opened in Southeast Asia reaching unreached people groups</p>
+                                    </li>
+                                    <li class="ticker-item">
+
+                                        <span class="date" style="color: red;">Jan 10, 2024</span>
+                                        <p>Youth discipleship program launches in local communities</p>
+                                    </li>
+                                    <li class="ticker-item">
+
+                                        <span class="date" style="color: red;">Jan 5, 2024</span>
+                                        <p>Successful completion of medical mission in rural areas</p>
+                                    </li>
+                                    <li class="ticker-item">
+
+                                        <span class="date" style="color: red;">Dec 28, 2023</span>
+                                        <p>Annual leadership conference announced for March 2024</p>
+                                    </li>
+                                    <li class="ticker-item">
+
+                                        <span class="date" style="color: red;">Dec 20, 2023</span>
+                                        <p>Christmas outreach program reaches over 1000 families</p>
+                                    </li>
+                                </ul>
+                                <style>
+                                    .ticker-items {
+                                        animation: scroll 20s linear infinite;
+                                        position: absolute;
+                                        width: 100%;
+                                    }
+                                    @keyframes scroll {
+                                        0% { transform: translateY(0); }
+                                        100% { transform: translateY(-100%); }
+                                    }
+                                    .ticker-wrapper:hover .ticker-items {
+                                        animation-play-state: paused;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div>                </div>    
             </div>
         </div>
+    </div>
         <!-- About End -->
 
        <!-- Mission Statistics Start -->
@@ -403,7 +437,11 @@
             </div>
         </div>
         <!-- Donate End -->
-        
+        @php
+         
+         $latestEvents = App\Models\Event::latest()->take(3)->get();
+
+        @endphp
         
         <!-- Event Start -->
         <div class="event">
@@ -413,50 +451,29 @@
                     <h2>Be ready for our upcoming charity events</h2>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6">
-                        <div class="event-item">
-                            <img src="{{ asset('frontend/img/event-1.jpg') }}" alt="Image">
-                            <div class="event-content">
-                                <div class="event-meta">
-                                    <p><i class="fa fa-calendar-alt"></i>01-Jan-45</p>
-                                    <p><i class="far fa-clock"></i>8:00 - 10:00</p>
-                                    <p><i class="fa fa-map-marker-alt"></i>New York</p>
-                                </div>
-                                <div class="event-text">
-                                    <h3>Lorem ipsum dolor sit</h3>
-                                    <p>
-                                        Lorem ipsum dolor sit amet elit. Neca pretim miura bitur facili ornare velit non vulpte liqum metus tortor
-                                    </p>
-                                    <a class="btn btn-custom" href="">Join Now</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="event-item">
-                            <img src="{{ asset('frontend/img/event-2.jpg') }}" alt="Image">
-                            <div class="event-content">
-                                <div class="event-meta">
-                                    <p><i class="fa fa-calendar-alt"></i>01-Jan-45</p>
-                                    <p><i class="far fa-clock"></i>8:00 - 10:00</p>
-                                    <p><i class="fa fa-map-marker-alt"></i>New York</p>
-                                </div>
-                                <div class="event-text">
-                                    <h3>Lorem ipsum dolor sit</h3>
-                                    <p>
-                                        Lorem ipsum dolor sit amet elit. Neca pretim miura bitur facili ornare velit non vulpte liqum metus tortor
-                                    </p>
-                                    <a class="btn btn-custom" href="">Join Now</a>
+                    @foreach($latestEvents as $event)
+                        <div class="col-lg-6">
+                            <div class="event-item">
+                                <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}">
+                                <div class="event-content">
+                                    <div class="event-meta">
+                                        <p><i class="fa fa-calendar-alt"></i>{{ $event->date ? $event->date->format('d-M-y') : 'Date TBA' }}</p>
+                                        <p><i class="far fa-clock"></i> {{ \Carbon\Carbon::parse($event->start_time)->format('H:i') }}  - {{ \Carbon\Carbon::parse($event->end_time)->format('H:i') }}</p>
+                                        <p><i class="fa fa-map-marker-alt"></i>{{ $event->location }}</p>
+                                    </div>
+                                    <div class="event-text">
+                                        <a class="" href="{{ route('events.show', $event->id) }}"><h3>{{ $event->title }}</h3></a>
+                                        <p>{{ Str::limit($event->description, 120) }}</p>
+                                        <a class="btn btn-custom" href="{{ route('events.show', $event->id) }}">Join Now</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
         <!-- Event End -->
-
-
         
         
         
@@ -604,5 +621,9 @@
             </div>
         </div>
         <!-- Blog End -->
-
+        <script type="text/javascript">
+        $(window).scroll(function() {
+            $('.about-img').parallax("50%", 0.1);
+        });
+        </script>
       </x-layouts.app>

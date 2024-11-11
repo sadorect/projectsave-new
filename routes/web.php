@@ -33,7 +33,7 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/posts/{post}', [BlogController::class, 'show'])->name('posts.show');
+Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 

@@ -14,13 +14,10 @@ class Event extends Model
         'location', 'image', 'start_date', 'end_date',
         'start_time', 'end_time', 'status', 'published_at'
     ];
+    protected $dates = ['date'];
 
     protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
-        'published_at' => 'datetime'
+        'date' => 'datetime'
     ];
 
     public function user()
