@@ -63,7 +63,7 @@
                                 @foreach($relatedPosts as $relatedPost)
                                 <div class="post-item">
                                     <div class="post-text">
-                                        <a href="{{ route('posts.show', $relatedPost) }}">{{ $relatedPost->title }}</a>
+                                        <a href="{{ route('blog.show', $relatedPost) }}">{{ $relatedPost->title }}</a>
                                         <div class="post-meta">
                                             <p>By<a href="">{{ $relatedPost->author }}</a></p>
                                             <p>In<a href="">{{ $relatedPost->categories->first()->name ?? 'Uncategorized' }}</a></p>
@@ -169,7 +169,7 @@
                                     @foreach($recentPosts as $recentPost)
                                 <div class="post-item">
                                     <div class="post-text">
-                                        <a href="{{ route('posts.show', $recentPost) }}">{{ $recentPost->title }}</a>
+                                        <a href="{{ route('blog.show', $recentPost) }}">{{ $recentPost->title }}</a>
                                         <div class="post-meta">
                                             <p>By<a href="">{{ $recentPost->author }}</a></p>
                                             <p>In<a href="">{{ $recentPost->categories->first()->name ?? 'Uncategorized' }}</a></p>

@@ -66,7 +66,8 @@
               </div>
           </div>
         </div>
-        <!-- Carousel End -->
+
+            <!-- Carousel End -->
 
         <!-- Add this right after the Carousel End comment -->
        
@@ -89,8 +90,12 @@
                                     <a class="nav-link active" data-toggle="pill" href="#tab-content-1">About</a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" data-toggle="pill" href="#tab-content-3">Vision</a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" data-toggle="pill" href="#tab-content-2">Our Beliefs</a>
                                 </li>
+                                
                             
                             </ul>
 
@@ -119,6 +124,10 @@
                                     Read more about our beliefs <a href="{{ route('about') }}">here</a>.
                                     </li>
                                 </ul>
+                                </div>
+                                <div id="tab-content-3" class="container tab-pane fade">
+                                    <h4>Vision: Winning The Lost Building The Saints</h4>
+                                    <p>The world needs Jesus. This is the reason for our vigorous engagement in evangelistic missions to the unreached and unevangelized.</p>
                                 </div>
                             </div>
                         </div>
@@ -178,6 +187,130 @@
         </div>
     </div>
         <!-- About End -->
+
+
+
+<!-- Add this before the Mission Statistics Start section -->
+<!-- Add this before the Mission Statistics Start section -->
+
+
+
+                <div class="video-reel-container">
+                    <div class="container position-relative">
+                        <div class="scroll-controls">
+                            <button class="scroll-btn scroll-left" onclick="scrollVideos('left')">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <button class="scroll-btn scroll-right" onclick="scrollVideos('right')">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="video-scroll-wrapper" id="videoWrapper">
+                            <div class="video-scroll-content">
+                                <div class="video-container">
+                                    <iframe width="240" height="200" src="https://www.youtube.com/embed/IGrlaKNJ4Zs" title="Top Christian Worship Music 2024" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+                                    <iframe width="240" height="200" src="https://www.youtube.com/embed/NVfPBgaJj00" title="The Journey to Okogbo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+                                    <iframe width="240" height="200" src="https://www.youtube.com/embed/A8Oq6HimvU4" title="Outreach to the Guoro Kingdom" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+                                    <iframe width="240" height="200" src="https://www.youtube.com/embed/IGrlaKNJ4Zs" title="Top Christian Worship Music 2024" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+                                    <iframe width="240" height="200" src="https://www.youtube.com/embed/NVfPBgaJj00" title="The Journey to Okogbo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+                                    <iframe width="240" height="200" src="https://www.youtube.com/embed/A8Oq6HimvU4" title="Outreach to the Guoro Kingdom" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+<style>
+    .video-reel-container {
+        width: 100%;
+        padding: 20px 0;
+        background: #ffffff;
+    }
+    
+    .video-scroll-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+    }
+    
+    .video-scroll-content {
+        display: flex;
+        gap: 20px;
+        padding: 0 20px;
+    }
+    
+    .video-container {
+        display: flex;
+        gap: 20px;
+        min-width: max-content;
+    }
+    
+    .scroll-controls {
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 10px;
+    }
+    
+    .scroll-btn {
+        background: rgb(255, 0, 0);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        color: white;
+        transition: background 0.3s;
+    }
+    
+    .scroll-btn:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    iframe {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+</style>
+    
+<script>
+    function scrollVideos(direction) {
+        const wrapper = document.getElementById('videoWrapper');
+        const scrollAmount = 260; // Width of video + gap
+        
+        if (direction === 'left') {
+            wrapper.scrollLeft -= scrollAmount;
+        } else {
+            wrapper.scrollLeft += scrollAmount;
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const wrapper = document.getElementById('videoWrapper');
+        
+        // Hide scroll buttons when at the start/end
+        wrapper.addEventListener('scroll', function() {
+            const leftBtn = document.querySelector('.scroll-left');
+            const rightBtn = document.querySelector('.scroll-right');
+            
+            leftBtn.style.opacity = wrapper.scrollLeft <= 0 ? '0.5' : '1';
+            rightBtn.style.opacity = 
+                (wrapper.scrollLeft + wrapper.clientWidth >= wrapper.scrollWidth) ? '0.5' : '1';
+        });
+    });
+</script>
+
+
+
 
        <!-- Mission Statistics Start -->
 <div class="service">
@@ -341,120 +474,64 @@
 <!-- Mission Call to Action End -->
 
 
-        
-        
-        <!-- Facts Start -->
-        <!--div class="facts" data-parallax="scroll" data-image-src="{{ asset('frontend/img/facts.jpg') }}">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="facts-item">
-                            <i class="flaticon-home"></i>
-                            <div class="facts-text">
-                                <h3 class="facts-plus" data-toggle="counter-up">150</h3>
-                                <p>Countries</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="facts-item">
-                            <i class="flaticon-charity"></i>
-                            <div class="facts-text">
-                                <h3 class="facts-plus" data-toggle="counter-up">400</h3>
-                                <p>Volunteers</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="facts-item">
-                            <i class="flaticon-kindness"></i>
-                            <div class="facts-text">
-                                <h3 class="facts-dollar" data-toggle="counter-up">10000</h3>
-                                <p>Our Goal</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="facts-item">
-                            <i class="flaticon-donation"></i>
-                            <div class="facts-text">
-                                <h3 class="facts-dollar" data-toggle="counter-up">5000</h3>
-                                <p>Raised</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div-->
-        <!-- Facts End -->
       
         
         
         <!-- Donate Start -->
-        <div class="donate" data-parallax="scroll" data-image-src="{{ asset('frontend/img/donate.jpg') }}">
+        <div class="donate" data-parallax="scroll" data-image-src="{{ asset('frontend/img/donate.jpeg') }}">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-7">
                         <div class="donate-content">
                             <div class="section-header">
                                 <p>Donate Now</p>
-                                <h2>Let's donate to needy people for better lives</h2>
+                                <h2>Partner with us to reach the nations</h2>
                             </div>
                             <div class="donate-text">
                                 <p>
-                                    Lorem ipsum dolor sit amet elit. Phasellus nec pretium mi. Curabitur facilisis ornare velit non. Aliquam metus tortor, auctor id gravida, viverra quis sem. Curabitur non nisl nec nisi maximus. Aenean convallis porttitor. Aliquam interdum at lacus non blandit.
-                                </p>
+                                    Now that you know what we do, we would be glad to have you join our 1
+million star partners that will use their finances to spread the Gospel to
+the nations of the earth proclaiming the power in the blood of Jesus to
+save, heal and deliver. Do not say "I will wait till I am super-rich before I
+make donations", the little in your hands that you can willingly give will
+make a whole lot of difference. You can send your money to the field of
+souls. Let the Holy Spirit lay it in your heart to partner with us:                                </p>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-5">
-                        <div class="donate-form">
-                            <form>
-                                <div class="control-group">
-                                    <input type="text" class="form-control" placeholder="Name" required="required" />
-                                </div>
-                                <div class="control-group">
-                                    <input type="email" class="form-control" placeholder="Email" required="required" />
-                                </div>
-                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-custom active">
-                                        <input type="radio" name="options" checked> $10
-                                    </label>
-                                    <label class="btn btn-custom">
-                                        <input type="radio" name="options"> $20
-                                    </label>
-                                    <label class="btn btn-custom">
-                                        <input type="radio" name="options"> $30
-                                    </label>
-                                </div>
-                                <div>
-                                    <button class="btn btn-custom" type="submit">Donate Now</button>
-                                </div>
-                            </form>
+                        <div class="donate-image">
+                            <img src="{{ asset('frontend/img/donate.jpeg') }}" alt="Donate" class="img-fluid">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Donate End -->
+        
+        
+        <!-- Event Start -->
         @php
          
          $latestEvents = App\Models\Event::latest()->take(3)->get();
 
         @endphp
-        
-        <!-- Event Start -->
         <div class="event">
             <div class="container">
                 <div class="section-header text-center">
                     <p>Upcoming Events</p>
-                    <h2>Be ready for our upcoming charity events</h2>
+                    <h2>Be ready for our upcoming impactful events</h2>
                 </div>
                 <div class="row">
                     @foreach($latestEvents as $event)
                         <div class="col-lg-6">
                             <div class="event-item">
-                                <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}">
+                                @if($event->image)
+                                <div class="blog-img">
+                                    <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}">
+                                </div>
+                                
+                                @endif
                                 <div class="event-content">
                                     <div class="event-meta">
                                         <p><i class="fa fa-calendar-alt"></i>{{ $event->date ? $event->date->format('d-M-y') : 'Date TBA' }}</p>
@@ -478,36 +555,37 @@
         
         
         <!-- Volunteer Start -->
-        <div class="volunteer" data-parallax="scroll" data-image-src="{{ asset('frontend/img/volunteer.jpg') }}">
+        <div class="volunteer" style="background-color: #fff; padding: 80px 0;">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-5">
-                        <div class="volunteer-form">
-                            <form>
-                                <div class="control-group">
-                                    <input type="text" class="form-control" placeholder="Name" required="required" />
-                                </div>
-                                <div class="control-group">
-                                    <input type="email" class="form-control" placeholder="Email" required="required" />
-                                </div>
-                                <div class="control-group">
-                                    <textarea class="form-control" placeholder="Why you want to become a volunteer?" required="required"></textarea>
-                                </div>
-                                <div>
-                                    <button class="btn btn-custom" type="submit">Become a volunteer</button>
-                                </div>
-                            </form>
+                        <div class="volunteer-options text-center" style="background-color: #f8f9fa; padding: 30px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
+                            <h3 class="mb-4" style="color: #343a40;">Join Our Team</h3>
+                            <div class="d-grid gap-3">
+                                <a href="{{ route('volunteer.prayer-force') }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
+                                    <i class="fas fa-pray mr-2"></i> Prayer Force Team
+                                </a>
+                                <a href="{{ route('volunteer.financial') }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
+                                    <i class="fas fa-hand-holding-usd mr-2"></i> Financial Partners
+                                </a>
+                                <a href="{{ route('volunteer.skilled') }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
+                                    <i class="fas fa-tools mr-2"></i> Skilled Volunteers
+                                </a>
+                                <a href="{{ route('volunteer.ground-force') }}" class="btn btn-custom btn-lg" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
+                                    <i class="fas fa-users mr-2"></i> Ground Force Team
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-7">
-                        <div class="volunteer-content">
+                        <div class="volunteer-content" style="padding-left: 30px;">
                             <div class="section-header">
-                                <p>Become A Volunteer</p>
-                                <h2>Let’s make a difference in the lives of others</h2>
+                                <p style="color: #FF4C4C;">Become A Volunteer</p>
+                                <h2 style="color: #343a40;">Let's make a difference in the lives of others</h2>
                             </div>
                             <div class="volunteer-text">
-                                <p>
-                                    Lorem ipsum dolor sit amet elit. Phasellus nec pretium mi. Curabitur facilisis ornare velit non. Aliquam metus tortor, auctor id gravida, viverra quis sem. Curabitur non nisl nec nisi maximus. Aenean convallis porttitor. Aliquam interdum at lacus non blandit.
+                                <p style="color: #6c757d; line-height: 1.8;">
+                                    Join our diverse team of volunteers and make a real impact in your community. Whether you can offer prayers, financial support, professional skills, or hands-on assistance, there's a perfect role for you in our mission to create positive change.
                                 </p>
                             </div>
                         </div>
@@ -517,106 +595,38 @@
         </div>
         <!-- Volunteer End -->
         
-             
-        
-        <!-- Contact Start -->
-        <div class="contact">
-            <div class="container">
-                <div class="section-header text-center">
-                    <p>Get In Touch</p>
-                    <h2>Contact for any query</h2>
-                </div>
-                <div class="contact-img">
-                    <img src="{{ asset('frontend/img/contact.jpg') }}" alt="Image">
-                </div>
-                <div class="contact-form">
-                        <div id="success"></div>
-                        <form name="sentMessage" id="contactForm" novalidate="novalidate">
-                            <div class="control-group">
-                                <input type="text" class="form-control" id="name" placeholder="Your Name" required="required" data-validation-required-message="Please enter your name" />
-                                <p class="help-block text-danger"></p>
-                            </div>
-                            <div class="control-group">
-                                <input type="email" class="form-control" id="email" placeholder="Your Email" required="required" data-validation-required-message="Please enter your email" />
-                                <p class="help-block text-danger"></p>
-                            </div>
-                            <div class="control-group">
-                                <input type="text" class="form-control" id="subject" placeholder="Subject" required="required" data-validation-required-message="Please enter a subject" />
-                                <p class="help-block text-danger"></p>
-                            </div>
-                            <div class="control-group">
-                                <textarea class="form-control" id="message" placeholder="Message" required="required" data-validation-required-message="Please enter your message"></textarea>
-                                <p class="help-block text-danger"></p>
-                            </div>
-                            <div>
-                                <button class="btn btn-custom" type="submit" id="sendMessageButton">Send Message</button>
-                            </div>
-                        </form>
-                    </div>
-            </div>
-        </div>
-        <!-- Contact End -->
-
-
+         
         <!-- Blog Start -->
+        @php
+         
+         $posts = App\Models\Post::latest()->take(3)->get();
+
+        @endphp
         <div class="blog">
             <div class="container">
                 <div class="section-header text-center">
                     <p>Our Blog</p>
-                    <h2>Latest news & articles directly from our blog</h2>
+                    <h2>Latest articles directly from our blog</h2>
                 </div>
                 <div class="row">
+                    @foreach($posts as $post)
                     <div class="col-lg-4">
                         <div class="blog-item">
+                            @if($post->image)
                             <div class="blog-img">
-                                <img src="{{ asset('frontend/img/blog-1.jpg') }}" alt="Image">
+                                <img src="{{ asset($post->image) }}" alt="{{ $post->title }}">
                             </div>
+                            @endif
                             <div class="blog-text">
-                                <h3><a href="#">Lorem ipsum dolor sit</a></h3>
+                                <h3><a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a></h3>
                                 <p>
-                                    Lorem ipsum dolor sit amet elit. Neca pretim miura bitur facili ornare velit non vulpte liqum metus tortor
+                                    {{ Str::limit($post->excerpt, 120) }}
                                 </p>
                             </div>
-                            <div class="blog-meta">
-                                <p><i class="fa fa-user"></i><a href="">Admin</a></p>
-                                <p><i class="fa fa-comments"></i><a href="">15 Comments</a></p>
-                            </div>
+                           
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="blog-item">
-                            <div class="blog-img">
-                                <img src="{{ asset('frontend/img/blog-2.jpg') }}" alt="Image">
-                            </div>
-                            <div class="blog-text">
-                                <h3><a href="#">Lorem ipsum dolor sit</a></h3>
-                                <p>
-                                    Lorem ipsum dolor sit amet elit. Neca pretim miura bitur facili ornare velit non vulpte liqum metus tortor
-                                </p>
-                            </div>
-                            <div class="blog-meta">
-                                <p><i class="fa fa-user"></i><a href="">Admin</a></p>
-                                <p><i class="fa fa-comments"></i><a href="">15 Comments</a></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="blog-item">
-                            <div class="blog-img">
-                                <img src="{{ asset('frontend/img/blog-3.jpg') }}" alt="Image">
-                            </div>
-                            <div class="blog-text">
-                                <h3><a href="#">Lorem ipsum dolor sit</a></h3>
-                                <p>
-                                    Lorem ipsum dolor sit amet elit. Neca pretim miura bitur facili ornare velit non vulpte liqum metus tortor
-                                </p>
-                            </div>
-                            <div class="blog-meta">
-                                <p><i class="fa fa-user"></i><a href="">Admin</a></p>
-                                <p><i class="fa fa-comments"></i><a href="">15 Comments</a></p>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
