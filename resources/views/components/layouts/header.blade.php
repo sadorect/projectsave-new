@@ -97,3 +97,15 @@
             </div>
         </div>
         <!-- Nav Bar End -->
+
+<div id="cookie-consent" class="cookie-consent">
+    <div class="container">
+        <div class="cookie-content">
+            <p>We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+            <div class="cookie-buttons">
+                <button class="btn btn-custom btn-sm" id="accept-cookies">Accept</button>
+                <a href="{{ route('privacy') }}" class="btn btn-outline-light btn-sm">Learn More</a>
+            </div>
+        </div>
+    </div>
+</div>

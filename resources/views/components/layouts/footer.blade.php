@@ -34,10 +34,10 @@
                       <div class="footer-link">
                           <h2>Useful Links</h2>
                           <a href="">Terms of use</a>
-                          <a href="">Privacy policy</a>
-                          <a href="">Cookies</a>
+                          <a href="{{route('privacy')}}">Privacy policy</a>
+                         
                           <a href="">Help</a>
-                          <a href="">FQAs</a>
+                          <a href="">FAQs</a>
                       </div>
                   </div>
                   <div class="col-lg-3 col-md-6">
@@ -87,8 +87,11 @@
       <!-- Template Javascript -->
       <script src="{{ asset('frontend/js/main.js') }}"></script>
       <script src="{{ asset('js/partner-form.js') }}"></script>
+      <script src="{{ asset('frontend/js/cookie-consent.js') }}"></script>
       @stack('scripts')
     </body>
 </html>
+
+
 
 

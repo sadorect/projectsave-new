@@ -2227,4 +2227,47 @@ a:focus {
         margin: 0 10px;
     }
     
+
+    /*******************************/   
+    /********* Cookie COnsent CSS **********/
+    /*******************************/
+    .cookie-consent {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(52, 58, 64, 0.95);
+        color: #fff;
+        padding: 1rem 0;
+        z-index: 999;
+        display: none;
+    }
+    
+    .cookie-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .cookie-content p {
+        margin: 0;
+        padding-right: 2rem;
+    }
+    
+    .cookie-buttons .btn {
+        margin-left: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .cookie-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .cookie-content p {
+            margin-bottom: 1rem;
+            padding-right: 0;
+        }
+    }
+    
 }

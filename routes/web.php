@@ -131,3 +131,5 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
