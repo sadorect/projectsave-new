@@ -3,7 +3,11 @@
     <head>
         <meta charset="utf-8">
         <title>Projectsave International</title>
-        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <!-- Update existing viewport tag and add new ones -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="MobileOptimized" content="320">
+        <meta name="format-detection" content="telephone=no">
         <meta property="og:title" content="@yield('og_title', config('app.name'))">
         <meta property="og:description" content="@yield('og_description', 'ProjectSave International Ministry - Winning the losts, building the saints.')">
         <meta property="og:image" content="@yield('og_image', asset('frontend/img/logo.png'))">
@@ -14,6 +18,9 @@
         <meta name="author" content="ProjectSave International Ministry">
         <link rel="canonical" href="{{ url()->current() }}" />
         <link rel="alternate" type="application/rss+xml" title="ProjectSave International Blog Feed" href="{{ route('feed') }}">
+        <!-- Add after existing meta tags -->
+<meta name="robots" content="@yield('meta_robots', 'index, follow')">
+
         <!-- Favicon -->
         <link href="{{ asset('frontend/img/psave_logo.png') }}" rel="icon">
 

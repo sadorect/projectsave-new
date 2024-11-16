@@ -2,6 +2,7 @@
     @section('og_title', $post->title)
     @section('og_description', Str::limit(strip_tags($post->details), 200))
     @section('og_image', asset('storage/' . $post->image))
+    @section('meta_robots', 'index, follow')
     
 
         <!-- Page Header Start -->
@@ -185,4 +186,6 @@
 
 
 </x-layouts.app>
+
+
 
