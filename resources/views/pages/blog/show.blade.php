@@ -102,7 +102,7 @@
                         <div class="sidebar">
                             <div class="sidebar-widget">
                                 <div class="search-widget">
-                                    <form>
+                                    <form method="GET" action="{{ route('search') }}">
                                         <input class="form-control" type="text" placeholder="Search Keyword">
                                         <button class="btn"><i class="fa fa-search"></i></button>
                                     </form>

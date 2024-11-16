@@ -74,7 +74,6 @@
                 <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
                 <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                     <div class="navbar-nav ml-auto">
                         <a href="{{ route('home') }}" class="nav-item nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
@@ -82,6 +81,17 @@
                         <a href="{{ route('events.index') }}" class="nav-item nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}">Events</a>
                         <a href="{{ route('blog.index') }}" class="nav-item nav-link {{ request()->routeIs('blog.*') ? 'active' : '' }}">Blog</a>
                         <a href="{{ route('contact.show') }}" class="nav-item nav-link {{ request()->routeIs('contact.*') ? 'active' : '' }}">Contact</a>
+                        
+                        <form class="form-inline my-2 my-lg-0 ml-4" action="{{ route('search') }}" method="GET">
+                            <div class="input-group">
+                                <input class="form-control" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ request('q') }}">
+                                <div class="input-group-append">
+                                    <button class="btn btn-custom" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
