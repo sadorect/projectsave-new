@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FeedController;
+
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AdminController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PartnerController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
@@ -37,8 +39,9 @@ use App\Http\Controllers\Admin\NotificationSettingsController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
-Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('events.show');
+Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/feed', [FeedController::class, 'index'])->name('feed');
 
 Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('posts.show');
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
@@ -135,4 +138,18 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
 
-Route::get('feed', [FeedController::class, 'index'])->name('feed');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
+
+Route::patch('/notification-preferences', [NotificationPreferenceController::class, 'update'])
+    ->middleware(['auth'])
+    ->name('notification-preferences.update');

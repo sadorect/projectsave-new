@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use App\Models\User;
+use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,9 +46,20 @@ class AdminController extends Controller
     }
 
     public function dashboard()
-{
-    return view('admin.dashboard');
-}
+        {$stats = [
+            'total_users' => User::count(),
+            'active_users' => User::where('email_verified_at', '!=', null)->count(),
+            'new_users_today' => User::whereDate('created_at', today())->count(),
+            'pending_partners' => Partner::where('status', 'pending')->count(),
+        ];
+
+        $recent_activity = Post::with('author')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'recent_activity'));
+        }
 }
 
 

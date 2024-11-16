@@ -31,6 +31,10 @@ class Post extends Model
         'published_at' => 'datetime'
     ];
 
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     public function categories()
     {
         return $this->belongsToMany(Category::class);
@@ -62,6 +66,7 @@ class Post extends Model
     });
 }
 }
+
 
 
 

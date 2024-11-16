@@ -64,9 +64,9 @@
         </li>
 
         <li>
-            <a href="{{route('admin.prayer-force.index')}}" class="nav-link text-white">
+            <a href="{{route('admin.partners.index')}}" class="nav-link text-white">
                 <i class="bi bi-raised-hands me-2"></i>
-                Prayer Force > {{ App\Models\PrayerForcePartner::where('status', 'pending')->count() }}
+                Prayer Force > {{ App\Models\Partner::where('status', 'pending')->count() }}
             </a>
             
         </li>
