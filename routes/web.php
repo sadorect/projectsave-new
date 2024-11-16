@@ -15,14 +15,15 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\PrayerForceController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\VideoReelController;
 use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\NewsUpdateController;
 use App\Http\Controllers\Admin\AdminPartnerController;
 use App\Http\Controllers\Admin\AdminPrayerForceController;
-use App\Http\Controllers\Admin\NotificationSettingsController;
 use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\Admin\NotificationSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,13 +59,14 @@ Route::get('/partners/{type}/{partner}', [PartnerController::class, 'show'])->na
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::patch('/notification-preferences', [NotificationPreferenceController::class, 'update'])
-        ->name('notification-preferences.update');
+    Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
+    Route::get('/user/profile', [UserDashboardController::class, 'profile'])->name('user.profile');
+    Route::get('/user/partnerships', [UserDashboardController::class, 'partnerships'])->name('user.partnerships');
+    Route::get('/user/notifications', [UserDashboardController::class, 'notifications'])->name('user.notifications');
+    Route::get('/user/settings', [UserDashboardController::class, 'settings'])->name('user.settings');
+    Route::patch('/user/profile', [UserDashboardController::class, 'updateProfile'])->name('user.profile.update');
+    Route::patch('/user/preferences', [UserDashboardController::class, 'updatePreferences'])->name('user.preferences.update');
 });
-
 /*
 |--------------------------------------------------------------------------
 | Admin Routes

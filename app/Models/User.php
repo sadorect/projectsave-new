@@ -3,10 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Partner;
+use App\Models\Activity;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -20,10 +23,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'notification_preferences',
+        'phone',
+        'birthday',
+        'bio',
+        'avatar',
+        'timezone',
+        'language',
+        'preferences'
     ];
-
-   
 
     /**
      * The attributes that should be hidden for serialization.
@@ -41,9 +48,22 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'notification_preferences' => 'array',
         'email_verified_at' => 'datetime',
-        'is_admin' => 'boolean',
-        'password' => 'hashed',
+        'birthday' => 'date',
+        'preferences' => 'array',
     ];
+
+
+public function activities()
+{
+    return $this->hasMany(Activity::class);
+}
+
+
+
+public function partnerships()
+{
+    return $this->hasMany(Partner::class);
+}
+
 }
