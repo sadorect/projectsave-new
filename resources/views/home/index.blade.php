@@ -66,6 +66,7 @@
               </div>
           </div>
         </div>
+       
 
             <!-- Carousel End -->
 
@@ -655,7 +656,7 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
                             </div>
                             @endif
                             <div class="blog-text">
-                                <h3><a href="{{ route('blog.show', $post->slug) }}">{{ $post->title }}</a></h3>
+                                <h3><a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a></h3>
                                 <p>
                                     {{ Str::limit($post->excerpt, 120) }}
                                 </p>

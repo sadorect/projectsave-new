@@ -1986,9 +1986,9 @@ a:focus {
 }
 
 .sidebar .category-widget ul li span {
-    display: inline-block;
-    float: right;
-}
+    /*display: inline-block;*/
+    display: block;
+    float: right;}
 
 .sidebar .sidebar-widget .tag-widget {
     position: relative;
@@ -2188,4 +2188,43 @@ a:focus {
             transform: translateX(-100%);
         }
     }
+
+    /*******************************/
+    /********* Error Page CSS **********/
+    /*******************************/
+    .error-page {
+        padding: 100px 0;
+        background: #f8f9fa;
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+    }
+    
+    .error-content {
+        background: #fff;
+        padding: 50px;
+        border-radius: 10px;
+        box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    }
+    
+    .error-content h1 {
+        font-size: 120px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .error-content h2 {
+        color: #343a40;
+        margin-bottom: 20px;
+    }
+    
+    .error-content p {
+        color: #6c757d;
+        margin-bottom: 30px;
+    }
+    
+    .error-actions .btn {
+        margin: 0 10px;
+    }
+    
 }

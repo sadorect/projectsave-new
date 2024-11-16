@@ -13,8 +13,9 @@
         <!-- Favicon -->
         <link href="{{ asset('frontend/img/psave_logo.png') }}" rel="icon">
 
-        <!-- Google Font -->
-        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <!-- Preload critical fonts -->
+
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         
         <!-- CSS Libraries -->
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
@@ -26,7 +27,7 @@
         <!-- Template Stylesheet -->
         <link href="{{ asset('frontend/css/style.css') }}" rel="stylesheet">
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        <link href="{{ asset('css/partner-form-steps.css') }}" rel="stylesheet">
+        
         <div id="fb-root"></div>
         <script async defer crossorigin="anonymous" 
                 src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0&appId=YOUR_APP_ID" 
