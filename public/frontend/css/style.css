@@ -2270,4 +2270,36 @@ a:focus {
         }
     }
     
+
+    /*******************************/
+    /********* Breadcrumb CSS **********/
+    /*******************************/
+    .breadcrumbs {
+        background: #f8f9fa;
+        padding: 15px 0;
+        margin-bottom: 30px;
+    }
+    
+    .breadcrumb-list {
+        list-style: none;
+        display: flex;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .breadcrumb-list li {
+        display: flex;
+        align-items: center;
+    }
+    
+    .breadcrumb-list li:not(:last-child)::after {
+        content: '/';
+        margin: 0 10px;
+        color: #6c757d;
+    }
+    
+    .breadcrumb-list a {
+        color: #FF4C4C;
+    }
+    
 }

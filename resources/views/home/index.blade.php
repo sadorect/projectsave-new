@@ -9,7 +9,7 @@
                             <img src="{{ asset('frontend/img/carousel-1.jpg') }}" alt="Image">
                         </div>
                         <div class="carousel-text">
-                            <h1>Reaching Hearts, Transforming Lives</h1>
+                            <h2>Reaching Hearts, Transforming Lives</h2>
                             <p>
                               Taking the message of hope to communities across the world through impactful outreach programs and life-changing encounters with Christ.
                             </p>
@@ -24,7 +24,7 @@
                             <img src="{{ asset('frontend/img/carousel-2.jpg') }}" alt="Image">
                         </div>
                         <div class="carousel-text">
-                            <h1>Building Strong Spiritual Foundations</h1>
+                            <h2>Building Strong Spiritual Foundations</h2>
                             <p>
                               Equipping believers with biblical knowledge and discipleship training to become effective ambassadors of Christ in their communities.
                             </p>
@@ -39,7 +39,7 @@
                             <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
                         </div>
                         <div class="carousel-text">
-                            <h1>Extending God's Love Through Service</h1>
+                            <h2>Extending God's Love Through Service</h2>
                             <p>
                               Demonstrating Christ's love through community development, youth empowerment, and humanitarian initiatives that meet both spiritual and physical needs.
                             </p>
@@ -55,7 +55,7 @@
                   <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
               </div>
               <div class="carousel-text">
-                  <h1>United in Purpose, Driven by Faith"</h1>
+                  <h2>United in Purpose, Driven by Faith"</h2>
                   <p>
                     Mobilizing believers to fulfill the Great Commission through strategic evangelistic missions and community transformation programs.
                   </p>
@@ -644,7 +644,7 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
             <div class="container">
                 <div class="section-header text-center">
                     <p>Our Blog</p>
-                    <h2>Latest articles directly from our blog</h2>
+                    <h3>Latest articles directly from our blog</h3>
                 </div>
                 <div class="row">
                     @foreach($posts as $post)
@@ -656,7 +656,7 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
                             </div>
                             @endif
                             <div class="blog-text">
-                                <h3><a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a></h3>
+                                <h4><a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a></h4>
                                 <p>
                                     {{ Str::limit($post->excerpt, 120) }}
                                 </p>

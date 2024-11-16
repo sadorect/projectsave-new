@@ -3,3 +3,5 @@
 {{$slot}}
 
 @include('components.layouts.footer')
+
+

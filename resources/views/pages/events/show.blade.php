@@ -63,4 +63,21 @@
             </div>
         </div>
     </div>
+
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "{{ $event->title }}",
+    "startDate": "{{ $event->start_date }}",
+    "endDate": "{{ $event->end_date }}",
+    "location": {
+        "@type": "Place",
+        "name": "{{ $event->location }}"
+    },
+    "description": "{{ $event->description }}"
+}
+</script>
+
 </x-layouts.app>

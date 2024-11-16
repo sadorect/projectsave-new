@@ -9,7 +9,11 @@
         <meta property="og:image" content="@yield('og_image', asset('frontend/img/logo.png'))">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:type" content="website">
-
+        <meta name="description" content="@yield('meta_description', 'ProjectSave International Ministry - Winning the lost, building the saints through evangelism and discipleship across nations.')">
+<meta name="keywords" content="@yield('meta_keywords', 'christian ministry, evangelism, missions, projectsave devotionals, discipleship, outreach, missions outreaches, winning the lost, building the saints nigeria, africa')">
+        <meta name="author" content="ProjectSave International Ministry">
+        <link rel="canonical" href="{{ url()->current() }}" />
+        <link rel="alternate" type="application/rss+xml" title="ProjectSave International Blog Feed" href="{{ route('feed') }}">
         <!-- Favicon -->
         <link href="{{ asset('frontend/img/psave_logo.png') }}" rel="icon">
 
@@ -109,3 +113,5 @@
         </div>
     </div>
 </div>
+
+

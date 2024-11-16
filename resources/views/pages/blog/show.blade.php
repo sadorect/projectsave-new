@@ -9,11 +9,12 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <h2>Detail Page</h2>
+                        <h2>{{ $post->title }}</h2>
                     </div>
                     <div class="col-12">
-                        <a href="">Home</a>
-                        <a href="">Detail</a>
+                        <a href="{{ route('home') }}">Home</a>
+                        <a href="{{ route('blog.index') }}">Blog</a>
+                        <a href="#">{{ $post->title }}</a>
                     </div>
                 </div>
             </div>
@@ -162,13 +163,7 @@
                             <div class="sidebar-widget">
                                 <h2 class="widget-title">Tags Cloud</h2>
                                 <div class="tag-widget">
-                                    <a href="">National</a>
-                                    <a href="">International</a>
-                                    <a href="">Economics</a>
-                                    <a href="">Politics</a>
-                                    <a href="">Lifestyle</a>
-                                    <a href="">Technology</a>
-                                    <a href="">Trades</a>
+                                    
                                 </div>
                             </div>
 
@@ -190,5 +185,4 @@
 
 
 </x-layouts.app>
-
 

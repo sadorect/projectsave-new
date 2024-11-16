@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Tag;
 use App\Models\Category;
+use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -51,4 +52,17 @@ class Post extends Model
                     ->whereNotNull('published_at')
                     ->where('published_at', '<=', now());
     }
+
+    protected static function boot()
+{
+    parent::boot();
+    
+    static::creating(function ($post) {
+        $post->slug = Str::slug($post->title);
+    });
 }
+}
+
+
+
+

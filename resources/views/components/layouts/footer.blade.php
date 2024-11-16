@@ -89,6 +89,22 @@
       <script src="{{ asset('js/partner-form.js') }}"></script>
       <script src="{{ asset('frontend/js/cookie-consent.js') }}"></script>
       @stack('scripts')
+
+      <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "ProjectSave International",
+            "url": "{{ config('app.url') }}",
+            "logo": "{{ asset('frontend/img/psave_logo.png') }}",
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+234-07080100893",
+                "email": "info@projectsaveng.org",
+                "contactType": "customer service"
+            }
+        }
+        </script>
     </body>
 </html>
 

@@ -30,11 +30,12 @@
                             <div class="blog-item">
                                 <div class="blog-img">
                                     @if($post->image)
-                                    <img src="{{ asset('storage/' . $post->image) }}" alt="Blog Image">
+                                    <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}: {{ Str::limit($post->excerpt, 100) }}" 
+                                    loading="lazy">
                                     @endif
                                 </div>
                                 <div class="blog-text">
-                                    <h3><a href="{{ route('posts.show', ['post' => $post, 'title' => Str::slug($post->title)]) }}">{{ $post->title }}</a></h3>
+                                    <h3><a href="{{ route('posts.show', ['post' => $post]) }}">{{ $post->title }}</a></h3>
                                     @if($post->scripture)
                                         <div class="scripture-text mb-2">
                                             <em>{{ $post->scripture }}</em>
