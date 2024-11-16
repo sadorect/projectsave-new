@@ -137,6 +137,19 @@
                             <div class="section-header">
                                 <h4>Latest Updates</h4>
                             </div>
+                            @if($newsUpdates && $newsUpdates->count() > 0)
+                            <div class="ticker-wrapper">
+                                <div class="ticker-content">
+                                    @foreach($newsUpdates as $update)
+                                        <div class="ticker-item">
+                                            <span class="date" style="color: red;">{{ \Carbon\Carbon::parse($update->date)->format('M d, Y') ?? 'Date not available' }}</span>
+                                            <p>{{ $update->title }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            @else
                              <div class="ticker-wrapper" style="height: 300px; overflow: hidden; position: relative;">
 
                                 <ul class="ticker-items">
@@ -181,8 +194,10 @@
                                     }
                                 </style>
                             </div>
+                            @endif
                         </div>
-                    </div>                </div>    
+                    </div> 
+                  </div>    
             </div>
         </div>
     </div>
@@ -194,6 +209,34 @@
 <!-- Add this before the Mission Statistics Start section -->
 
 
+    @if($videoReels && $videoReels->count() > 0)
+    
+    <div class="video-reel-container">
+        <div class="container position-relative">
+            <div class="scroll-controls">
+                <button class="scroll-btn scroll-left" onclick="scrollVideos('left')">
+                    <i class="fa fa-chevron-left"></i>
+                </button>
+                <button class="scroll-btn scroll-right" onclick="scrollVideos('right')">
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="video-scroll-wrapper" id="videoWrapper">
+                <div class="video-scroll-content">
+                    @foreach($videoReels as $video)
+                        <div class="video-container">
+                            <iframe class="reel-video" 
+                                src="https://www.youtube.com/embed/{{ $video->youtube_id }}?enablejsapi=1" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+                            </iframe>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+    @else
 
                 <div class="video-reel-container">
                     <div class="container position-relative">
@@ -224,6 +267,8 @@
                         </div>
                     </div>
                 </div>
+            
+        @endif
 
 <style>
     .video-reel-container {
@@ -511,11 +556,7 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
         
         
         <!-- Event Start -->
-        @php
-         
-         $latestEvents = App\Models\Event::latest()->take(3)->get();
-
-        @endphp
+       
         <div class="event">
             <div class="container">
                 <div class="section-header text-center">
@@ -597,11 +638,6 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
         
          
         <!-- Blog Start -->
-        @php
-         
-         $posts = App\Models\Post::latest()->take(3)->get();
-
-        @endphp
         <div class="blog">
             <div class="container">
                 <div class="section-header text-center">

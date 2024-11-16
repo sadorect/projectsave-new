@@ -1,0 +1,26 @@
+.info-item label {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.badge-lg {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+.leadership-timeline .card {
+    transition: all 0.3s ease;
+}
+
+.leadership-timeline .card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.section {
+    position: relative;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

@@ -83,12 +83,11 @@
       <script src="{{ asset('frontend/lib/parallax/parallax.min.js') }}"></script>
       
       <!-- Contact Javascript File -->
-      <script src="{{ asset('frontend/mail/jqBootstrapValidation.min.js') }}"></script>
-<script src="{{ asset('frontend/mail/contact.js') }}"></script>
-
+     
       <!-- Template Javascript -->
       <script src="{{ asset('frontend/js/main.js') }}"></script>
-      
+      <script src="{{ asset('js/partner-form.js') }}"></script>
+      @stack('scripts')
     </body>
 </html>
 

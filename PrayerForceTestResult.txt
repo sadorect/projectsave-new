@@ -1,0 +1,252 @@
+
+   FAIL  Tests\Feature\PrayerForceTest
+  ⨯ data format validation                                               6.14s  
+  ⨯ character limits                                                     0.02s  
+  ✓ special characters                                                   0.02s  
+  ⨯ leadership details json structure                                    0.03s  
+  ⨯ status assignment                                                    0.02s  
+  ⨯ xss prevention                                                       0.02s  
+  ⨯ csrf protection                                                      0.04s  
+  ⨯ conditional field clearing                                           0.02s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > data format validation               
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/PrayerForceTest.php:45
+     41▕         $response = $this->post(route('partners.prayer-force.store'), array_merge(
+     42▕             $this->validData(),
+     43▕             ['dob' => 'invalid-date']
+     44▕         ));
+  ➜  45▕         $response->assertSessionHasErrors('dob');
+     46▕ 
+     47▕         // Email format test
+     48▕         $response = $this->post(route('partners.prayer-force.store'), array_merge(
+     49▕             $this->validData(),
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > character limits                     
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/PrayerForceTest.php:62
+     58▕         $response = $this->post(route('partners.prayer-force.store'), array_merge(
+     59▕             $this->validData(),
+     60▕             ['name' => $longString]
+     61▕         ));
+  ➜  62▕         $response->assertSessionHasErrors('name');
+     63▕     }
+     64▕ 
+     65▕     public function test_special_characters()
+     66▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > leadership detail…  ErrorException   
+  Attempt to read property "leadership_details" on null
+
+  at tests/Feature/PrayerForceTest.php:87
+     83▕ 
+     84▕         $response = $this->post(route('partners.prayer-force.store'), $data);
+     85▕         $partner = PrayerForcePartner::where('email', 'john@example.com')->first();
+     86▕         
+  ➜  87▕         $this->assertIsArray($partner->leadership_details);
+     88▕         $this->assertCount(2, $partner->leadership_details);
+     89▕     }
+     90▕ 
+     91▕     public function test_status_assignment()
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > status assignment                    
+  Failed asserting that a row in the table [prayer_force_partners] matches the attributes {
+    "email": "john@example.com",
+    "status": "pending"
+}.
+
+The table is empty.
+
+  at tests/Feature/PrayerForceTest.php:94
+     90▕ 
+     91▕     public function test_status_assignment()
+     92▕     {
+     93▕         $this->post(route('partners.prayer-force.store'), $this->validData());
+  ➜  94▕         $this->assertDatabaseHas('prayer_force_partners', [
+     95▕             'email' => 'john@example.com',
+     96▕             'status' => 'pending'
+     97▕         ]);
+     98▕     }
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > xss prevention      ErrorException   
+  Attempt to read property "name" on null
+
+  at tests/Feature/PrayerForceTest.php:108
+    104▕             ['name' => '<script>alert("xss")</script>John']
+    105▕         ));
+    106▕         
+    107▕         $partner = PrayerForcePartner::where('email', 'john@example.com')->first();
+  ➜ 108▕         $this->assertStringNotContainsString('<script>', $partner->name);
+    109▕     }
+    110▕ 
+    111▕     public function test_csrf_protection()
+    112▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > csrf protection                      
+  Expected response status code [419] but received 302.
+Failed asserting that 302 is identical to 419.
+
+  at tests/Feature/PrayerForceTest.php:115
+    111▕     public function test_csrf_protection()
+    112▕     {
+    113▕         $this->withoutMiddleware();
+    114▕         $response = $this->post(route('partners.prayer-force.store'), $this->validData());
+  ➜ 115▕         $response->assertStatus(419);
+    116▕     }
+    117▕ 
+    118▕     public function test_conditional_field_clearing()
+    119▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > conditional field…  ErrorException   
+  Attempt to read property "leadership_details" on null
+
+  at tests/Feature/PrayerForceTest.php:125
+    121▕         $data['leadership_experience'] = 'no';
+    122▕         $response = $this->post(route('partners.prayer-force.store'), $data);
+    123▕         
+    124▕         $partner = PrayerForcePartner::where('email', 'john@example.com')->first();
+  ➜ 125▕         $this->assertNull($partner->leadership_details);
+    126▕     }
+    127▕ }
+    128▕
+
+
+  Tests:    7 failed, 1 passed (5 assertions)
+  Duration: 6.39s
+
+
+   FAIL  Tests\Feature\PrayerForceTest
+  ⨯ data format validation                                               5.80s  
+  ⨯ character limits                                                     0.03s  
+  ✓ special characters                                                   0.03s  
+  ⨯ leadership details json structure                                    0.03s  
+  ⨯ status assignment                                                    0.02s  
+  ⨯ xss prevention                                                       0.04s  
+  ⨯ csrf protection                                                      0.04s  
+  ⨯ conditional field clearing                                           0.02s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > data format validation               
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/PrayerForceTest.php:45
+     41▕         $response = $this->post(route('partners.prayer-force.store'), array_merge(
+     42▕             $this->validData(),
+     43▕             ['dob' => 'invalid-date']
+     44▕         ));
+  ➜  45▕         $response->assertSessionHasErrors('dob');
+     46▕ 
+     47▕         // Email format test
+     48▕         $response = $this->post(route('partners.prayer-force.store'), array_merge(
+     49▕             $this->validData(),
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > character limits                     
+  Session is missing expected key [errors].
+Failed asserting that false is true.
+
+  at tests/Feature/PrayerForceTest.php:62
+     58▕         $response = $this->post(route('partners.prayer-force.store'), array_merge(
+     59▕             $this->validData(),
+     60▕             ['name' => $longString]
+     61▕         ));
+  ➜  62▕         $response->assertSessionHasErrors('name');
+     63▕     }
+     64▕ 
+     65▕     public function test_special_characters()
+     66▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > leadership detail…  ErrorException   
+  Attempt to read property "leadership_details" on null
+
+  at tests/Feature/PrayerForceTest.php:87
+     83▕ 
+     84▕         $response = $this->post(route('partners.prayer-force.store'), $data);
+     85▕         $partner = PrayerForcePartner::where('email', 'john@example.com')->first();
+     86▕         
+  ➜  87▕         $this->assertIsArray($partner->leadership_details);
+     88▕         $this->assertCount(2, $partner->leadership_details);
+     89▕     }
+     90▕ 
+     91▕     public function test_status_assignment()
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > status assignment                    
+  Failed asserting that a row in the table [prayer_force_partners] matches the attributes {
+    "email": "john@example.com",
+    "status": "pending"
+}.
+
+The table is empty.
+
+  at tests/Feature/PrayerForceTest.php:94
+     90▕ 
+     91▕     public function test_status_assignment()
+     92▕     {
+     93▕         $this->post(route('partners.prayer-force.store'), $this->validData());
+  ➜  94▕         $this->assertDatabaseHas('prayer_force_partners', [
+     95▕             'email' => 'john@example.com',
+     96▕             'status' => 'pending'
+     97▕         ]);
+     98▕     }
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > xss prevention      ErrorException   
+  Attempt to read property "name" on null
+
+  at tests/Feature/PrayerForceTest.php:108
+    104▕             ['name' => '<script>alert("xss")</script>John']
+    105▕         ));
+    106▕         
+    107▕         $partner = PrayerForcePartner::where('email', 'john@example.com')->first();
+  ➜ 108▕         $this->assertStringNotContainsString('<script>', $partner->name);
+    109▕     }
+    110▕ 
+    111▕     public function test_csrf_protection()
+    112▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > csrf protection                      
+  Expected response status code [419] but received 302.
+Failed asserting that 302 is identical to 419.
+
+  at tests/Feature/PrayerForceTest.php:115
+    111▕     public function test_csrf_protection()
+    112▕     {
+    113▕         $this->withoutMiddleware();
+    114▕         $response = $this->post(route('partners.prayer-force.store'), $this->validData());
+  ➜ 115▕         $response->assertStatus(419);
+    116▕     }
+    117▕ 
+    118▕     public function test_conditional_field_clearing()
+    119▕     {
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > conditional field…  ErrorException   
+  Attempt to read property "leadership_details" on null
+
+  at tests/Feature/PrayerForceTest.php:125
+    121▕         $data['leadership_experience'] = 'no';
+    122▕         $response = $this->post(route('partners.prayer-force.store'), $data);
+    123▕         
+    124▕         $partner = PrayerForcePartner::where('email', 'john@example.com')->first();
+  ➜ 125▕         $this->assertNull($partner->leadership_details);
+    126▕     }
+    127▕ }
+    128▕
+
+
+  Tests:    7 failed, 1 passed (5 assertions)
+  Duration: 6.08s
+

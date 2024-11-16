@@ -1,0 +1,82 @@
+
+   FAIL  Tests\Feature\PrayerForceTest
+  ⨯ data format validation                                               7.16s  
+  ⨯ leadership details json structure                                    0.02s  
+  ⨯ xss prevention                                                       0.02s  
+  ⨯ conditional field clearing                                           0.02s  
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > data form…  RouteNotFoundException   
+  Route [volunteer.prayer-force.store] not defined.
+
+  at vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:477
+    473▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    474▕             return $url;
+    475▕         }
+    476▕ 
+  ➜ 477▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    478▕     }
+    479▕ 
+    480▕     /**
+    481▕      * Get the URL for a given route instance.
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/PrayerForceTest.php:42
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > leadershi…  RouteNotFoundException   
+  Route [volunteer.prayer-force.store] not defined.
+
+  at vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:477
+    473▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    474▕             return $url;
+    475▕         }
+    476▕ 
+  ➜ 477▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    478▕     }
+    479▕ 
+    480▕     /**
+    481▕      * Get the URL for a given route instance.
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/PrayerForceTest.php:59
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > xss preve…  RouteNotFoundException   
+  Route [volunteer.prayer-force.store] not defined.
+
+  at vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:477
+    473▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    474▕             return $url;
+    475▕         }
+    476▕ 
+  ➜ 477▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    478▕     }
+    479▕ 
+    480▕     /**
+    481▕      * Get the URL for a given route instance.
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/PrayerForceTest.php:66
+
+  ────────────────────────────────────────────────────────────────────────────  
+   FAILED  Tests\Feature\PrayerForceTest > condition…  RouteNotFoundException   
+  Route [volunteer.prayer-force.store] not defined.
+
+  at vendor/laravel/framework/src/Illuminate/Routing/UrlGenerator.php:477
+    473▕             ! is_null($url = call_user_func($this->missingNamedRouteResolver, $name, $parameters, $absolute))) {
+    474▕             return $url;
+    475▕         }
+    476▕ 
+  ➜ 477▕         throw new RouteNotFoundException("Route [{$name}] not defined.");
+    478▕     }
+    479▕ 
+    480▕     /**
+    481▕      * Get the URL for a given route instance.
+
+      [2m+2 vendor frames [22m
+  3   tests/Feature/PrayerForceTest.php:81
+
+
+  Tests:    4 failed (0 assertions)
+  Duration: 7.39s
+

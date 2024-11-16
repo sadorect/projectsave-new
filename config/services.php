@@ -36,6 +36,25 @@ return [
         'secret_key' => env('GOOGLE_RECAPTCHA_SECRET'),
         'site_key' => env('GOOGLE_RECAPTCHA_KEY'),
         'redirect' => 'http://localhost:8000/auth/google/callback',
-    ]
+    ],
+    'facebook' => [
+        'client_id' => env('FACEBOOK_CLIENT_ID'),
+        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+        'page_id' => env('FACEBOOK_PAGE_ID'),
+        'access_token' => env('FACEBOOK_PAGE_ACCESS_TOKEN'),
+    ],
 
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+
+    'africas_talking' => [
+        'username' => env('AT_USERNAME'),
+        'api_key' => env('AT_API_KEY'),
+        'from' => env('AT_FROM'),
+    ],
 ];
+
+

@@ -1,0 +1,123 @@
+/* Button States */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading:after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin: -8px 0 0 -8px;
+    border: 2px solid #fff;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: button-loading-spinner 0.75s linear infinite;
+}
+
+/* Navigation Buttons */
+.form-navigation .btn {
+    min-width: 120px;
+    transition: all 0.3s ease;
+}
+
+.form-navigation .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Progress Bar Animation */
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+/* Step Transitions */
+.step-content {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease-out;
+}
+
+.step-content.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@keyframes button-loading-spinner {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.steps-indicator {
+    position: relative;
+    margin-bottom: 40px;
+}
+
+.progress {
+    height: 4px;
+    position: absolute;
+    width: 100%;
+    top: 20px;
+    z-index: 1;
+}
+
+.progress-bar {
+    background-color: #28a745;
+    transition: width 0.6s ease-in-out;
+}
+
+.step-labels {
+    position: relative;
+    z-index: 2;
+}
+
+.step-indicator {
+    text-align: center;
+    position: relative;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #dee2e6;
+    color: #6c757d;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.step-title {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active .step-number {
+    background: #28a745;
+    border-color: #28a745;
+    color: #fff;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+.step-indicator.active .step-title {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.step-indicator.completed .step-number {
+    background: #fff;
+    border-color: #28a745;
+    color: #28a745;
+}
+
+.step-indicator.completed .step-number:after {
+    content: '✓';
+}

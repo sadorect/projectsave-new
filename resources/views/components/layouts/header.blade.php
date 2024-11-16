@@ -23,6 +23,7 @@
         <!-- Template Stylesheet -->
         <link href="{{ asset('frontend/css/style.css') }}" rel="stylesheet">
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <link href="{{ asset('css/partner-form-steps.css') }}" rel="stylesheet">
 
     </head>
 

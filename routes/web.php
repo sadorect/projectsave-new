@@ -1,17 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\PrayerForceController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\VideoReelController;
 use App\Http\Controllers\Admin\AdminEventController;
+use App\Http\Controllers\Admin\NewsUpdateController;
+use App\Http\Controllers\Admin\AdminPartnerController;
+use App\Http\Controllers\Admin\AdminPrayerForceController;
+use App\Http\Controllers\Admin\NotificationSettingsController;
 
 
 /*
@@ -25,10 +32,7 @@ use App\Http\Controllers\Admin\AdminEventController;
 |
 */
 
-Route::get('/', function () {
-    return view('home.index');
-})->name('home');
-
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
@@ -70,6 +74,33 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function() {
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::resource('news', NewsUpdateController::class);
+    Route::resource('videos', VideoReelController::class);
+    Route::post('videos/reorder', [VideoReelController::class, 'reorder'])->name('videos.reorder');
+    Route::get('news/create', [NewsUpdateController::class, 'create'])->name('news.create');
+    Route::get('videos/create', [VideoReelController::class, 'create'])->name('videos.create');
+    Route::get('/prayer-force', [AdminPrayerForceController::class, 'index'])->name('admin.prayer-force.index');
+    Route::patch('/prayer-force/{partner}/status', [AdminPrayerForceController::class, 'updateStatus'])
+    ->name('admin.prayer-force.status.update');
+    Route::get('/prayer-force/{partner}', [AdminPrayerForceController::class, 'show'])
+    ->name('admin.prayer-force.show');
+
+    Route::get('/notification-settings', [NotificationSettingsController::class, 'edit'])
+        ->name('admin.notification-settings.edit');
+    
+    Route::patch('/notification-settings', [NotificationSettingsController::class, 'update'])
+        ->name('admin.notification-settings.update');
+
+    Route::patch('/prayer-force/{partner}/approve', [AdminPrayerForceController::class, 'approve'])
+        ->name('admin.prayer-force.approve');
+    
+    Route::patch('/prayer-force/{partner}/reject', [AdminPrayerForceController::class, 'reject'])
+        ->name('admin.prayer-force.reject');
+});
+
+
 Route::get('/volunteer/prayer-force', [PrayerForceController::class, 'index'])->name('volunteer.prayer-force');
 Route::post('/partners/prayer-force', [PrayerForceController::class, 'store'])->name('partners.prayer-force.store');
 
@@ -86,3 +117,20 @@ Route::get('/volunteer/skilled-force', function() {
 Route::get('/volunteer/ground-force', function() {
     return view('partners.ground-team');
 })->name('volunteer.ground-force');
+
+
+
+
+
+
+Route::get('/partners/{type}/{partner}', [PartnerController::class, 'show'])
+    ->name('partners.show');
+Route::get('/partners/{type}', [PartnerController::class, 'create'])->name('partners.create');
+Route::post('/partners/{type}', [PartnerController::class, 'store'])->name('partners.store');
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/partners', [AdminPartnerController::class, 'index'])->name('admin.partners.index');
+    Route::get('/partners/{partner}', [AdminPartnerController::class, 'show'])->name('admin.partners.show');
+    Route::patch('/partners/{partner}/approve', [AdminPartnerController::class, 'approve'])->name('admin.partners.approve');
+    Route::patch('/partners/{partner}/reject', [AdminPartnerController::class, 'reject'])->name('admin.partners.reject');
+});

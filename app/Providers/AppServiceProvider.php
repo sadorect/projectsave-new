@@ -2,9 +2,10 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Http;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,5 +31,6 @@ class AppServiceProvider extends ServiceProvider
 
             return $response->json()['success'];
         });
+        View::addNamespace('mail', resource_path('views/emails'));
     }
 }
