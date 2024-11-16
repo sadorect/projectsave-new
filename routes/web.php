@@ -37,8 +37,8 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
-//Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('posts.show');
+
+Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('posts.show');
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
@@ -106,17 +106,11 @@ Route::post('/partners/prayer-force', [PrayerForceController::class, 'store'])->
 
 
 
-Route::get('/volunteer/financial', function() {
-    return view('partners.financial');
-})->name('volunteer.financial');
+Route::get('/partners/{type}',  [PartnerController::class, 'create'])->name('volunteer.prayer');
 
-Route::get('/volunteer/skilled-force', function() {
-    return view('partners.skilled-force');
-})->name('volunteer.skilled');
+Route::get('/partners/{type}',  [PartnerController::class, 'create'])->name('volunteer.skilled');
 
-Route::get('/volunteer/ground-force', function() {
-    return view('partners.ground-team');
-})->name('volunteer.ground-force');
+Route::get('/partners/{type}',  [PartnerController::class, 'create'])->name('volunteer.ground');
 
 
 

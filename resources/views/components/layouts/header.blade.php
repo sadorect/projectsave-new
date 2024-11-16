@@ -4,8 +4,11 @@
         <meta charset="utf-8">
         <title>Projectsave International</title>
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
-        <meta content="Free Website Template" name="keywords">
-        <meta content="Free Website Template" name="description">
+        <meta property="og:title" content="@yield('og_title', config('app.name'))">
+        <meta property="og:description" content="@yield('og_description', 'ProjectSave International Ministry - Winning the losts, building the saints.')">
+        <meta property="og:image" content="@yield('og_image', asset('frontend/img/logo.png'))">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:type" content="website">
 
         <!-- Favicon -->
         <link href="{{ asset('frontend/img/psave_logo.png') }}" rel="icon">
@@ -24,7 +27,11 @@
         <link href="{{ asset('frontend/css/style.css') }}" rel="stylesheet">
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
         <link href="{{ asset('css/partner-form-steps.css') }}" rel="stylesheet">
-
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous" 
+                src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0&appId=YOUR_APP_ID" 
+                nonce="NONCE_VALUE">
+        </script>
     </head>
 
     <body>

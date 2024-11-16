@@ -603,19 +603,20 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
                         <div class="volunteer-options text-center" style="background-color: #f8f9fa; padding: 30px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
                             <h3 class="mb-4" style="color: #343a40;">Join Our Team</h3>
                             <div class="d-grid gap-3">
-                                <a href="{{ route('volunteer.prayer-force') }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
+                                <a href="{{ route('partners.create', ['type' => 'prayer']) }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
                                     <i class="fas fa-pray mr-2"></i> Prayer Force Team
                                 </a>
-                                <a href="{{ route('volunteer.financial') }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
-                                    <i class="fas fa-hand-holding-usd mr-2"></i> Financial Partners
-                                </a>
-                                <a href="{{ route('volunteer.skilled') }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
+                            
+                                <a href="{{ route('partners.create', ['type' => 'skilled']) }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
                                     <i class="fas fa-tools mr-2"></i> Skilled Volunteers
                                 </a>
-                                <a href="{{ route('volunteer.ground-force') }}" class="btn btn-custom btn-lg" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
+                            
+                                <a href="{{ route('partners.create', ['type' => 'ground']) }}" class="btn btn-custom btn-lg" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
                                     <i class="fas fa-users mr-2"></i> Ground Force Team
                                 </a>
                             </div>
+                            
+                            
                         </div>
                     </div>
                     <div class="col-lg-7">

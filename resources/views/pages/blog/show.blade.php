@@ -1,5 +1,8 @@
 <x-layouts.app>
-
+    @section('og_title', $post->title)
+    @section('og_description', Str::limit(strip_tags($post->details), 200))
+    @section('og_image', asset('storage/' . $post->image))
+    
 
         <!-- Page Header Start -->
         <div class="page-header">
@@ -57,99 +60,42 @@
                                 <p>Posted on {{ $post->created_at->format('M d, Y') }}</p>
                             </div>
                         </div>
+
+                        <div class="social-share mt-4">
+                            <div class="fb-share-button" 
+                                 data-href="{{ url()->current() }}" 
+                                 data-layout="button_count"
+                                 data-size="large">
+                            </div>
+                        </div>
+                        <style>
+                            .social-share {
+    margin: 20px 0;
+    padding: 15px;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+                        </style>
+
                         <div class="single-related">
                             <h2>Related Post</h2>
                             <div class="owl-carousel related-slider">
                                 @foreach($relatedPosts as $relatedPost)
                                 <div class="post-item">
                                     <div class="post-text">
-                                        <a href="{{ route('blog.show', $relatedPost) }}">{{ $relatedPost->title }}</a>
+                                        <a href="{{ route('posts.show', $relatedPost) }}">{{ $relatedPost->title }}</a>
                                         <div class="post-meta">
                                             <p>By<a href="">{{ $relatedPost->author }}</a></p>
                                             <p>In<a href="">{{ $relatedPost->categories->first()->name ?? 'Uncategorized' }}</a></p>
                                         </div>
                                     </div>
                                 </div>
-                                @endforeach                            </div>
+                                @endforeach   
+                             </div>
                         </div>
 
-                        <!--div class="single-comment">
-                            <h2>3 Comments</h2>
-                            <ul class="comment-list">
-                                <li class="comment-item">
-                                    <div class="comment-body">
-                                        <div class="comment-img">
-                                            <img src="img/user.jpg" />
-                                        </div>
-                                        <div class="comment-text">
-                                            <h3><a href="">Josh Dunn</a></h3>
-                                            <span>01 Jan 2045 at 12:00pm</span>
-                                            <p>
-                                                Lorem ipsum dolor sit amet elit. Integer lorem augue purus mollis sapien, non eros leo in nunc. Donec a nulla vel turpis tempor ac vel justo. In hac platea dictumst. 
-                                            </p>
-                                            <a class="btn" href="">Reply</a>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="comment-item">
-                                    <div class="comment-body">
-                                        <div class="comment-img">
-                                            <img src="img/user.jpg" />
-                                        </div>
-                                        <div class="comment-text">
-                                            <h3><a href="">Josh Dunn</a></h3>
-                                            <p><span>01 Jan 2045 at 12:00pm</span></p>
-                                            <p>
-                                                Lorem ipsum dolor sit amet elit. Integer lorem augue purus mollis sapien, non eros leo in nunc. Donec a nulla vel turpis tempor ac vel justo. In hac platea dictumst. 
-                                            </p>
-                                            <a class="btn" href="">Reply</a>
-                                        </div>
-                                    </div>
-                                    <ul class="comment-child">
-                                        <li class="comment-item">
-                                            <div class="comment-body">
-                                                <div class="comment-img">
-                                                    <img src="img/user.jpg" />
-                                                </div>
-                                                <div class="comment-text">
-                                                    <h3><a href="">Josh Dunn</a></h3>
-                                                    <p><span>01 Jan 2045 at 12:00pm</span></p>
-                                                    <p>
-                                                        Lorem ipsum dolor sit amet elit. Integer lorem augue purus mollis sapien, non eros leo in nunc. Donec a nulla vel turpis tempor ac vel justo. In hac platea dictumst. 
-                                                    </p>
-                                                    <a class="btn" href="">Reply</a>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="comment-form">
-                            <h2>Leave a comment</h2>
-                            <form>
-                                <div class="form-group">
-                                    <label for="name">Name *</label>
-                                    <input type="text" class="form-control" id="name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email *</label>
-                                    <input type="email" class="form-control" id="email">
-                                </div>
-                                <div class="form-group">
-                                    <label for="website">Website</label>
-                                    <input type="url" class="form-control" id="website">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="message">Message *</label>
-                                    <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" value="Post Comment" class="btn btn-custom">
-                                </div>
-                            </form>
-                        </div-->
+                       
                     </div>
 
                     <div class="col-lg-4">
@@ -169,7 +115,7 @@
                                     @foreach($recentPosts as $recentPost)
                                 <div class="post-item">
                                     <div class="post-text">
-                                        <a href="{{ route('blog.show', $recentPost) }}">{{ $recentPost->title }}</a>
+                                        <a href="{{ route('posts.show', $recentPost) }}">{{ $recentPost->title }}</a>
                                         <div class="post-meta">
                                             <p>By<a href="">{{ $recentPost->author }}</a></p>
                                             <p>In<a href="">{{ $recentPost->categories->first()->name ?? 'Uncategorized' }}</a></p>
@@ -230,7 +176,7 @@
                                 <h2 class="widget-title">Text Widget</h2>
                                 <div class="text-widget">
                                     <p>
-                                        Lorem ipsum dolor sit amet elit. Integer lorem augue purus mollis sapien, non eros leo in nunc. Donec a nulla vel turpis tempor ac vel justo. In hac platea nec eros. Nunc eu enim non turpis id augue.
+                                        Stay informed with our latest insights and updates. This widget provides a space for important announcements, featured content highlights, or a brief description of our blog's mission. Follow us for thoughtful analysis and engaging stories across various topics.
                                     </p>
                                 </div>
                             </div>
@@ -239,7 +185,10 @@
                 </div>
             </div>
         </div>
-        <!-- Single Post End-->   
+
+            <!-- Single Post End-->   
 
 
 </x-layouts.app>
+
+
