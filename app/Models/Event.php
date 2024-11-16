@@ -41,4 +41,11 @@ class Event extends Model
                     ->where('status', 'published')
                     ->orderBy('start_date');
     }
+
+
+public function reminderLogs()
+{
+    return $this->hasMany(ReminderLog::class);
+}
+
 }

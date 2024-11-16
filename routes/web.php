@@ -105,7 +105,19 @@ Route::prefix('admin')->group(function() {
         // Settings
         Route::get('/notification-settings', [NotificationSettingsController::class, 'edit'])->name('admin.notification-settings.edit');
         Route::patch('/notification-settings', [NotificationSettingsController::class, 'update'])->name('admin.notification-settings.update');
-    });
-});
+        Route::get('/notification-settings/event-reminders', [NotificationSettingsController::class, 'editEventReminders'])
+            ->name('admin.notification-settings.event-reminders');
+        Route::patch('/notification-settings/event-reminders', [NotificationSettingsController::class, 'updateEventReminders'])
+            ->name('admin.notification-settings.event-reminders.update');
+        Route::get('/notification-settings/reminder-logs', [NotificationSettingsController::class, 'viewReminderLogs'])
+            ->name('admin.notification-settings.reminder-logs');
+        Route::post('/admin/notification-settings/event-reminders/send/{event}', 
+        [NotificationSettingsController::class, 'sendManualReminder'])
+        ->name('admin.notification-settings.event-reminders.send');
 
+        Route::get('/admin/notification-settings/event-reminders/preview/{event}', 
+            [NotificationSettingsController::class, 'previewReminder'])
+            ->name('admin.notification-settings.event-reminders.preview');
+        });
+});
 require __DIR__.'/auth.php';

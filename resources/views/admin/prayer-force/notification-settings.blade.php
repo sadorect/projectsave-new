@@ -62,6 +62,21 @@
                             </div>
                         </div>
                     </div>
+
+
+                <!-- Add this section after the existing SMS settings -->
+                <div class="card mt-4">
+                  <div class="card-header">
+                      <h5>Event Reminders</h5>
+                  </div>
+                  <div class="card-body">
+                      <a href="{{ route('admin.notification-settings.event-reminders') }}" 
+                        class="btn btn-primary">
+                          Manage Event Reminders
+                      </a>
+                  </div>
+                </div>
+
                 </div>
 
                 <div class="form-group mt-4">

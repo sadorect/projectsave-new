@@ -55,6 +55,11 @@ return [
         'api_key' => env('AT_API_KEY'),
         'from' => env('AT_FROM'),
     ],
+
+'reminders' => [
+    'enabled' => env('EVENT_REMINDERS_ENABLED', false),
+    'days_before' => env('EVENT_REMINDERS_DAYS', 2),
+    'send_at' => env('EVENT_REMINDERS_TIME', '06:00'),
+],
+
 ];
-
-

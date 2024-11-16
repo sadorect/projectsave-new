@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Models\Event;
 use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,7 +59,13 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recent_activity'));
+            $upcomingEvents = Event::where('date', '>', now())
+        ->with(['reminderLogs'])
+        ->orderBy('date')
+        ->take(5)
+        ->get();
+
+        return view('admin.dashboard', compact('stats', 'recent_activity','upcomingEvents'));
         }
 }
 

@@ -88,6 +88,122 @@
                 </div>
             </div>
         </div>
+
+        <!-- Add this after the Quick Actions card -->
+<div class="col-md-12 mt-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">Upcoming Events & Reminders</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Reminder Status</th>
+                            <th>Recipients</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($upcomingEvents as $event)
+                            <tr>
+                                <td>{{ $event->title }}</td>
+                                <td>{{ $event->date ? \Carbon\Carbon::parse($event->date)->format('M d, Y') : 'Date not set' }}</td>
+
+                                <td>
+                                    @if($event->reminderLogs->count() > 0)
+                                        <span class="badge bg-success">Sent</span>
+                                    @else
+                                        <span class="badge bg-warning">Pending</span>
+                                    @endif
+                                </td>
+                                <td>{{ $event->reminderLogs->sum('recipients_count') }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info me-2" onclick="previewReminder({{ $event->id }})">
+                                        <i class="bi bi-eye"></i> Preview
+                                    </button>
+                                    <button class="btn btn-sm btn-primary" onclick="sendReminder({{ $event->id }})">
+                                        Send Now
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">No upcoming events</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
     </div>
 </div>
 @endsection
+
+<script>
+function sendReminder(eventId) {
+    fetch(`/admin/notification-settings/event-reminders/send/${eventId}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+</script>
+
+<!-- Add this at the bottom of the file -->
+<div class="modal fade" id="reminderPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reminder Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-tabs">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#emailPreview">Email</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#databasePreview">In-App</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content mt-3">
+                        <div class="tab-pane fade show active" id="emailPreview">
+                            <div class="email-preview-content"></div>
+                        </div>
+                        <div class="tab-pane fade" id="databasePreview">
+                            <div class="notification-preview-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewReminder(eventId) {
+    fetch(`/admin/notification-settings/event-reminders/preview/${eventId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('.email-preview-content').innerHTML = data.emailPreview;
+            document.querySelector('.notification-preview-content').innerHTML = data.notificationPreview;
+            new bootstrap.Modal(document.getElementById('reminderPreviewModal')).show();
+        });
+}
+</script>
