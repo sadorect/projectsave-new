@@ -12,7 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('sitemap:generate')->daily();
+        $schedule->command('check:anniversaries')
+            ->dailyAt('00:01')
+            ->timezone('UTC');
     }
 
     /**

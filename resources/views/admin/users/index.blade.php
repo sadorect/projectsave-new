@@ -59,12 +59,24 @@
                     </tr>
                     @endforeach
                 </tbody>
+         
             </table>
-
-            <div class="mt-4">
-                {{ $users->links() }}
+       <!-- Update the pagination section -->
+      
+            
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} entries
             </div>
+           
+        </div>
+        <div class="mt-4 d-flex justify-content-center">
+            <nav aria-label="Page navigation">
+                {{ $users->links('pagination::bootstrap-4') }}
+            </nav>
         </div>
     </div>
 </div>
+
 @endsection

@@ -47,6 +47,58 @@
             </div>
         </div>
     </div>
+
+    <!-- Add after existing stats cards -->
+<div class="col-md-12 mt-4">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Today's Celebrations</h5>
+            <div class="btn-group">
+                <button class="btn btn-outline-primary btn-sm" onclick="filterCelebrations('birthday')">Birthdays</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="filterCelebrations('wedding')">Anniversaries</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Celebration</th>
+                            <th>Years</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($todayCelebrants as $celebrant)
+                            <tr data-celebration="{{ $celebrant->celebration_type }}">
+                                <td>{{ $celebrant->name }}</td>
+                                <td>
+                                    @if($celebrant->celebration_type === 'birthday')
+                                        🎂 Birthday
+                                    @else
+                                        💑 Wedding Anniversary
+                                    @endif
+                                </td>
+                                <td>{{ $celebrant->years }} years</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="sendWishes({{ $celebrant->id }})">
+                                        Send Wishes
+                                    </button>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center">No celebrations today</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
     <div class="row">
         <!-- Recent Activity Section -->
         <div class="col-md-8">
@@ -207,3 +259,23 @@ function previewReminder(eventId) {
         });
 }
 </script>
+
+<script>
+    // Add this to your existing dashboard scripts
+    function filterCelebrations(type) {
+        const rows = document.querySelectorAll('[data-celebration]');
+        rows.forEach(row => {
+            if (type === 'all' || row.dataset.celebration === type) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Initialize with all celebrations visible
+    document.addEventListener('DOMContentLoaded', () => {
+        filterCelebrations('all');
+    });
+    </script>
+    

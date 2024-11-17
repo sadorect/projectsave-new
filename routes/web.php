@@ -119,5 +119,30 @@ Route::prefix('admin')->group(function() {
             [NotificationSettingsController::class, 'previewReminder'])
             ->name('admin.notification-settings.event-reminders.preview');
         });
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/celebrations/logs', [AdminController::class, 'viewWishLogs'])
+        ->name('admin.celebrations.logs');
+        });
+
+        
+        Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+            Route::get('/dashboard/celebrants', [AdminController::class, 'showCelebrants'])
+                ->name('admin.dashboard.celebrants');
+        });
+        
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/celebrations/statistics', [AdminController::class, 'celebrationStats'])
+        ->name('admin.celebrations.statistics');
+});
+
+
+
+
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/celebrations/calendar', [AdminController::class, 'celebrationCalendar'])
+        ->name('admin.celebrations.calendar');
+});
+
 });
 require __DIR__.'/auth.php';

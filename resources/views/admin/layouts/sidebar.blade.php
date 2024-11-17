@@ -55,6 +55,35 @@
         Users
       </a>
 
+      <li class="nav-item">
+        <a class="nav-link {{ request()->routeIs('admin.celebrations.*') ? 'active' : '' }}" 
+           href="#celebrationsSubmenu" 
+           data-bs-toggle="collapse">
+            <i class="bi bi-gift"></i>
+            <span>Celebrations</span>
+        </a>
+        <div class="collapse {{ request()->routeIs('admin.celebrations.*') ? 'show' : '' }}" 
+             id="celebrationsSubmenu">
+            <ul class="nav flex-column pl-3">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.celebrations.calendar') }}">
+                        <i class="bi bi-calendar-event"></i> Calendar
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.celebrations.statistics') }}">
+                        <i class="bi bi-graph-up"></i> Statistics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.celebrations.logs') }}">
+                        <i class="bi bi-journal-text"></i> Wish Logs
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </li>
+    
       </li>
         <li>
             <a href="#" class="nav-link text-white">

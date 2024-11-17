@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use App\Models\Partner;
 use App\Models\Activity;
 use Laravel\Sanctum\HasApiTokens;
@@ -23,13 +24,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'phone',
         'birthday',
-        'bio',
-        'avatar',
-        'timezone',
-        'language',
-        'preferences'
+        'wedding_anniversary'
     ];
 
     /**
@@ -48,9 +44,8 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
         'birthday' => 'date',
-        'preferences' => 'array',
+        'wedding_anniversary' => 'date'
     ];
 
 
@@ -64,6 +59,31 @@ public function activities()
 public function partnerships()
 {
     return $this->hasMany(Partner::class);
+}
+
+
+
+public function getNextCelebrationDateAttribute()
+{
+    $nextBirthday = $this->birthday ? Carbon::parse($this->birthday)->setYear(now()->year) : null;
+    $nextAnniversary = $this->wedding_anniversary ? Carbon::parse($this->wedding_anniversary)->setYear(now()->year) : null;
+    
+    if ($nextBirthday && $nextBirthday->isPast()) {
+        $nextBirthday->addYear();
+    }
+    
+    if ($nextAnniversary && $nextAnniversary->isPast()) {
+        $nextAnniversary->addYear();
+    }
+    
+    if (!$nextBirthday && !$nextAnniversary) {
+        return null;
+    }
+    
+    if (!$nextBirthday) return $nextAnniversary;
+    if (!$nextAnniversary) return $nextBirthday;
+    
+    return $nextBirthday->min($nextAnniversary);
 }
 
 }
