@@ -177,3 +177,17 @@
     
 })(jQuery);
 
+
+document.addEventListener('DOMContentLoaded', function() {
+    const cookieNotice = document.querySelector('.cookie-notice');
+    if (cookieNotice) {
+        if (!localStorage.getItem('cookiesAccepted')) {
+            cookieNotice.style.display = 'block';
+        }
+
+        document.querySelector('.accept-cookies').addEventListener('click', function() {
+            localStorage.setItem('cookiesAccepted', 'true');
+            cookieNotice.style.display = 'none';
+        });
+    }
+});
