@@ -505,12 +505,7 @@
               </div>
           </div>
 
-          <div class="col-lg-12 text-center mt-4">
-              <div class="donate-btn">
-                  <a href="{{ route('contact.show') }}" class="btn btn-custom">Join Our Mission</a>
-                  <a href="#" class="btn btn-custom">Support Us</a>
-              </div>
-          </div>
+         
       </div>
       
   </div>
@@ -520,7 +515,94 @@
 <!-- Mission Call to Action End -->
 
 
-      
+        <!-- Volunteer Start -->
+<div class="volunteer" style="background-color: #fff; padding: 80px 0;">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <p>Join Our Mission</p>
+            <h2>Make an Impact with Your Unique Gift</h2>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="partner-card text-center h-100">
+                    <div class="icon-wrapper mb-4">
+                        <i class="fas fa-pray fa-3x"></i>
+                    </div>
+                    <h3 class="mb-3">Prayer Force</h3>
+                    <p class="mb-4">Soul-winning without intercession is like pouring water into a basket. According to Ezek22:30, God is looking for men that will stand in the gap, take territories, shake kingdoms and rake in a bountiful harvest into His Kingdom through heart-felt prayers.</p>
+                    <a href="{{ route('partners.create', ['type' => 'prayer']) }}" class="btn btn-custom">
+                        Join Prayer Force
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="partner-card text-center h-100">
+                    <div class="icon-wrapper mb-4">
+                        <i class="fas fa-hands-helping fa-3x"></i>
+                    </div>
+                    <h3 class="mb-3">Skilled Partners</h3>
+                    <p class="mb-4">If you are a doctor, nurse, pharmacist, medical laboratory scientist, microbiologist, psychologist, linguist, graphic artist, musician or maybe there are skills you possess that can glorify God, join our skilled partners team.</p>
+                    <a href="{{ route('partners.create', ['type' => 'skilled']) }}" class="btn btn-custom">
+                        Partner with Skills
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mb-4">
+                <div class="partner-card text-center h-100">
+                    <div class="icon-wrapper mb-4">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h3 class="mb-3">Ground Force</h3>
+                    <p class="mb-4">If you would love to be part of our ministry as a volunteer that will join us in our trips, meetings or use your talent to serve the master, join our ground force team.</p>
+                    <a href="{{ route('partners.create', ['type' => 'ground']) }}" class="btn btn-custom">
+                        Join Ground Force
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .partner-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .partner-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .icon-wrapper {
+            color: #FF4C4C;
+            height: 80px;
+            width: 80px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,76,76,0.1);
+            border-radius: 50%;
+        }
+        .btn-custom {
+            background: linear-gradient(to right, #FF4C4C, #FF6B6B);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,76,76,0.4);
+            color: white;
+        }
+    </style>
+</div>
+<!-- Volunteer End -->
         
         
         <!-- Donate Start -->
@@ -596,47 +678,8 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
         
         
         
-        <!-- Volunteer Start -->
-        <div class="volunteer" style="background-color: #fff; padding: 80px 0;">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-5">
-                        <div class="volunteer-options text-center" style="background-color: #f8f9fa; padding: 30px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
-                            <h3 class="mb-4" style="color: #343a40;">Join Our Team</h3>
-                            <div class="d-grid gap-3">
-                                <a href="{{ route('partners.create', ['type' => 'prayer']) }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
-                                    <i class="fas fa-pray mr-2"></i> Prayer Force Team
-                                </a>
-                            
-                                <a href="{{ route('partners.create', ['type' => 'skilled']) }}" class="btn btn-custom btn-lg mb-3" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
-                                    <i class="fas fa-tools mr-2"></i> Skilled Volunteers
-                                </a>
-                            
-                                <a href="{{ route('partners.create', ['type' => 'ground']) }}" class="btn btn-custom btn-lg" style="background: linear-gradient(to right, #FF4C4C, #FF6B6B); border: none; transition: all 0.3s;">
-                                    <i class="fas fa-users mr-2"></i> Ground Force Team
-                                </a>
-                            </div>
-                            
-                            
-                        </div>
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="volunteer-content" style="padding-left: 30px;">
-                            <div class="section-header">
-                                <p style="color: #FF4C4C;">Become A Volunteer</p>
-                                <h2 style="color: #343a40;">Let's make a difference in the lives of others</h2>
-                            </div>
-                            <div class="volunteer-text">
-                                <p style="color: #6c757d; line-height: 1.8;">
-                                    Join our diverse team of volunteers and make a real impact in your community. Whether you can offer prayers, financial support, professional skills, or hands-on assistance, there's a perfect role for you in our mission to create positive change.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Volunteer End -->
+      
+
         
          
         <!-- Blog Start -->

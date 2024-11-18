@@ -62,6 +62,11 @@ public function partnerships()
     return $this->hasMany(Partner::class);
 }
 
+public function partners()
+{
+    return $this->hasMany(Partner::class);
+}
+
 
 
 public function getNextCelebrationDateAttribute()

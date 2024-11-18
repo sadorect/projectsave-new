@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\VideoReelController;
 use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\NewsUpdateController;
 use App\Http\Controllers\Admin\AdminPartnerController;
+use App\Http\Controllers\Admin\DeletionRequestController;
 use App\Http\Controllers\Admin\AdminPrayerForceController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\Admin\NotificationSettingsController;
@@ -66,7 +67,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/settings', [UserDashboardController::class, 'settings'])->name('user.settings');
     Route::patch('/user/profile', [UserDashboardController::class, 'updateProfile'])->name('user.profile.update');
     Route::patch('/user/preferences', [UserDashboardController::class, 'updatePreferences'])->name('user.preferences.update');
+    Route::get('/account/deletion', [UserDashboardController::class, 'showDeletionForm'])
+        ->name('user.account.deletion');
+    Route::post('/account/deletion', [UserDashboardController::class, 'requestDeletion'])
+        ->name('user.account.deletion.request');
 });
+
 /*
 |--------------------------------------------------------------------------
 | Admin Routes
@@ -134,6 +140,13 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/celebrations/statistics', [AdminController::class, 'celebrationStats'])
         ->name('admin.celebrations.statistics');
+
+        Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])
+    ->name('admin.deletion-requests.index');
+    Route::get('/deletion-requests/{request}', [DeletionRequestController::class, 'show'])
+    ->name('admin.deletion-requests.show');
+Route::post('/deletion-requests/{request}/process', [DeletionRequestController::class, 'process'])
+    ->name('admin.deletion-requests.process');
 });
 
 
@@ -146,3 +159,4 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
 });
 require __DIR__.'/auth.php';
+

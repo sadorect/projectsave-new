@@ -83,29 +83,40 @@
             </ul>
         </div>
     </li>
-    
+    <li>
+        <a href="{{route('admin.partners.index')}}" class="nav-link text-white">
+            <i class="bi bi-raised-hands me-2"></i>
+            Partners ( <span style="color: yellow">{{ App\Models\Partner::where('status', 'pending')->count() }} </span> )
+        </a>
+        
+    </li>
       </li>
         <li>
-            <a href="#" class="nav-link text-white">
+            <a href="#settingsSubmenu" class="nav-link text-white" data-bs-toggle="collapse">
                 <i class="bi bi-gear me-2"></i>
                 Settings
             </a>
+            <div class="collapse {{ request()->routeIs('admin.notification-settings.*') ? 'show' : '' }}" id="settingsSubmenu">
+                <ul class="nav flex-column pl-3">
+                    <li class="nav-item">
+                        <a href="{{ route('admin.notification-settings.edit') }}" class="nav-link text-white {{ request()->routeIs('admin.notification-settings.*') ? 'active' : '' }}">
+                            <i class="bi bi-bell me-2"></i>
+                            Notification Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
 
-        <li>
-            <a href="{{route('admin.partners.index')}}" class="nav-link text-white">
-                <i class="bi bi-raised-hands me-2"></i>
-                Prayer Force > {{ App\Models\Partner::where('status', 'pending')->count() }}
+        <div class="nav-item">
+            <a href="{{ route('admin.deletion-requests.index') }}" class="nav-link">
+                <i class="bi bi-trash"></i>
+                <span>Deletion Requests</span>
+                @if($pendingDeletions = \App\Models\DeletionRequest::where('status', 'pending')->count())
+                    <span class="badge bg-danger">{{ $pendingDeletions }}</span>
+                @endif
             </a>
-            
-        </li>
-
-        <li>
-            <a href="{{ route('admin.notification-settings.edit') }}" class="nav-link text-white">
-                <i class="bi bi-bell me-2"></i>
-                Notification Settings 
-            </a>
-            
-        </li>
-
+        </div>
     </ul>
+
+
