@@ -403,6 +403,10 @@ a:focus {
     margin-bottom: 20px;
 }
 
+.carousel .carousel-text h2{
+    color: #ffffff;
+}
+
 .carousel .carousel-text p {
     color: #ffffff;
     text-align: center;

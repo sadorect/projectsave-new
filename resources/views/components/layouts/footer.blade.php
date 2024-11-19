@@ -5,7 +5,7 @@
               <div class="row">
                   <div class="col-lg-3 col-md-6">
                       <div class="footer-contact">
-                          <h2>Our Head Office</h2>
+                          <h2>Contact Us</h2>
                           <p><i class="fa fa-map-marker-alt"></i>P.O.Box 358,
                             Ota- Ogun State
                             Nigeria.</p>

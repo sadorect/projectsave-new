@@ -14,8 +14,8 @@
                               Taking the message of hope to communities across the world through impactful outreach programs and life-changing encounters with Christ.
                             </p>
                             <div class="carousel-btn">
-                                <a class="btn btn-custom" href="">Join Us</a>
-                                <a class="btn btn-custom btn-play" data-toggle="modal" data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-target="#videoModal">See More </a>
+                                <a class="btn btn-custom" href="#partnership">Join Us</a>
+                                <a class="btn btn-custom btn-play"  href="#videoReel">See More </a>
                             </div>
                         </div>
                     </div>
@@ -24,13 +24,13 @@
                             <img src="{{ asset('frontend/img/carousel-2.jpg') }}" alt="Image">
                         </div>
                         <div class="carousel-text">
-                            <h2>Building Strong Spiritual Foundations</h2>
+                            <h2 style="color: white;">Building Strong Spiritual Foundations</h2>
                             <p>
                               Equipping believers with biblical knowledge and discipleship training to become effective ambassadors of Christ in their communities.
                             </p>
                             <div class="carousel-btn">
-                              <a class="btn btn-custom" href="">Join Us</a>
-                              <a class="btn btn-custom btn-play" data-toggle="modal" data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-target="#videoModal">See More </a>
+                              <a class="btn btn-custom" href="#partnership">Join Us</a>
+                              <a class="btn btn-custom btn-play"  href="#videoReel">See More </a>
                           </div>
                         </div>
                     </div>
@@ -44,8 +44,8 @@
                               Demonstrating Christ's love through community development, youth empowerment, and humanitarian initiatives that meet both spiritual and physical needs.
                             </p>
                             <div class="carousel-btn">
-                              <a class="btn btn-custom" href="">Join Us</a>
-                              <a class="btn btn-custom btn-play" data-toggle="modal" data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-target="#videoModal">See More </a>
+                              <a class="btn btn-custom" href="#partnership">Join Us</a>
+                              <a class="btn btn-custom btn-play"  href="#videoReel">See More </a>
                           </div>
                         </div>
                     </div>
@@ -60,8 +60,8 @@
                     Mobilizing believers to fulfill the Great Commission through strategic evangelistic missions and community transformation programs.
                   </p>
                   <div class="carousel-btn">
-                    <a class="btn btn-custom" href="">Join Us</a>
-                    <a class="btn btn-custom btn-play" data-toggle="modal" data-src="https://www.youtube.com/embed/DWRcNpR6Kdc" data-target="#videoModal">See More </a>
+                    <a class="btn btn-custom" href="#partnership">Join Us</a>
+                    <a class="btn btn-custom btn-play"  href="#videoReel">See More </a>
                 </div>
               </div>
           </div>
@@ -212,7 +212,7 @@
 
     @if($videoReels && $videoReels->count() > 0)
     
-    <div class="video-reel-container">
+    <div id="videoReel" class="video-reel-container">
         <div class="container position-relative">
             <div class="scroll-controls">
                 <button class="scroll-btn scroll-left" onclick="scrollVideos('left')">
@@ -516,7 +516,7 @@
 
 
         <!-- Volunteer Start -->
-<div class="volunteer" style="background-color: #fff; padding: 80px 0;">
+<div id="partnership" class="volunteer" style="background-color: #fff; padding: 80px 0;">
     <div class="container">
         <div class="section-header text-center mb-5">
             <p>Join Our Mission</p>
@@ -606,7 +606,7 @@
         
         
         <!-- Donate Start -->
-        <div class="donate" data-parallax="scroll" data-image-src="{{ asset('frontend/img/donate.jpeg') }}">
+        <div class="donate" data-parallax="scroll">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-7">

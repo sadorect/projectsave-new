@@ -66,10 +66,10 @@
                     <div class="col-md-4">
                         <div class="top-bar-right">
                             <div class="social">
-                                <a href=""><i class="fab fa-twitter"></i></a>
-                                <a href=""><i class="fab fa-facebook-f"></i></a>
-                                <a href=""><i class="fab fa-linkedin-in"></i></a>
-                                <a href=""><i class="fab fa-instagram"></i></a>
+                                
+                                <a href="https://facebook.com/projectsave02"><i class="fab fa-facebook-f"></i></a>
+                                
+                                <a href="https://instagram.com/projectsave_ministries"><i class="fab fa-instagram"></i></a>
                             </div>
                         </div>
                     </div>
@@ -103,6 +103,15 @@
                                 </div>
                             </div>
                         </form>
+                        @if(!auth()->check())
+                        <a href="{{ route('login') }}" class="nav-item nav-link {{ request()->routeIs('login.*') ? 'active' : '' }}">Login</a> |
+                        <a href="{{ route('register') }}" class="nav-item nav-link {{ request()->routeIs('register.*') ? 'active' : '' }}">Register</a>
+                        @else
+                                            <form class="form-inline my-2 my-lg-0 ml-4" action="{{ route('logout') }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="nav-link btn btn-link">Logout</button>
+                                            </form>
+                        @endif
                     </div>
                 </div>
             </div>
