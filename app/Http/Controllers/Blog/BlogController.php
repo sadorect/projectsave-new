@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Blog;
 
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use App\Models\Tag;
 use App\Models\Post;
 use App\Models\Category;
-use App\Models\Tag;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 /**
  * Handles the blog-related functionality in the application.
@@ -94,7 +95,13 @@ class BlogController extends Controller
         ->take(3)
         ->get();
         
-        return view('pages.blog.show', compact('post', 'recentPosts', 'categories', 'relatedPosts'));
+        $postDates = Post::whereMonth('created_at', Carbon::now()->month)
+        ->whereYear('created_at', Carbon::now()->year)
+        ->pluck('created_at')
+        ->map(fn($date) => $date->format('Y-m-d'))
+        ->toArray();
+
+        return view('pages.blog.show', compact('postDates', 'post', 'recentPosts', 'categories', 'relatedPosts'));
     }
 
     /**

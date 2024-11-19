@@ -127,6 +127,33 @@
                                 @endforeach
                                 </div>
                             </div>
+<!-- Add this in the sidebar section -->
+<div class="sidebar-widget">
+    <h2 class="widget-title">Blog Calendar</h2>
+    <div class="calendar-widget">
+        <div class="calendar-header">
+            <a href="#" class="prev-month">&lt;</a>
+            <span class="current-month">{{ now()->format('F Y') }}</span>
+            <a href="#" class="next-month">&gt;</a>
+        </div>
+        <table class="calendar-table">
+            <thead>
+                <tr>
+                    <th>Su</th>
+                    <th>Mo</th>
+                    <th>Tu</th>
+                    <th>We</th>
+                    <th>Th</th>
+                    <th>Fr</th>
+                    <th>Sa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Calendar days will be populated via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
 
                             <div class="sidebar-widget">
                                 <div class="image-widget">
@@ -189,3 +216,146 @@
 
 
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendar = {
+            currentDate: new Date(),
+            postsData: @json($postDates), // We'll pass this from controller
+    
+            init() {
+                            this.renderCalendar();
+                            this.bindEvents();
+                            this.initTooltips();
+                        },
+
+                        initTooltips() {
+                            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                                return new bootstrap.Tooltip(tooltipTriggerEl);
+                            });
+                        },
+            renderCalendar() {
+                const today = new Date();
+                const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+                const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+                
+                let html = '';
+                let date = 1;
+                
+                for (let i = 0; i < 6; i++) {
+                    html += '<tr>';
+                    for (let j = 0; j < 7; j++) {
+                        if (i === 0 && j < firstDay.getDay()) {
+                            html += '<td></td>';
+                        } else if (date > lastDay.getDate()) {
+                            break;
+                        } else {
+                            const currentDate = `${this.currentDate.getFullYear()}-${(this.currentDate.getMonth() + 1).toString().padStart(2, '0')}-${date.toString().padStart(2, '0')}`;
+                            const hasPost = this.postsData.find(post => post.date === currentDate);
+                            const isToday = date === today.getDate() && 
+                                           this.currentDate.getMonth() === today.getMonth() && 
+                                           this.currentDate.getFullYear() === today.getFullYear();
+                            
+                            const classes = [];
+                            if (hasPost) classes.push('has-post');
+                            if (isToday) classes.push('today');
+                            
+                            html += `<td class="${classes.join(' ')}" 
+                                        data-date="${currentDate}"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="${hasPost ? hasPost.title : ''}">${date}</td>`;
+                            date++;
+                        }
+                    }
+                    html += '</tr>';
+                }
+                
+                document.querySelector('.calendar-table tbody').innerHTML = html;
+                document.querySelector('.current-month').textContent = 
+                    this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                
+                this.initTooltips();
+            },
+            async fetchPostDates() {
+                const response = await fetch(`/blog/dates/${this.currentDate.getFullYear()}/${this.currentDate.getMonth() + 1}`);
+                this.postsData = await response.json();
+                this.renderCalendar();
+                },
+    
+            bindEvents() {
+                document.querySelector('.prev-month').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                    this.renderCalendar();
+                });
+    
+                document.querySelector('.next-month').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                    this.renderCalendar();
+                });
+    
+                document.querySelector('.calendar-table').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('has-post')) {
+                        window.location.href = `/blog?date=${e.target.dataset.date}`;
+                    }
+                });
+            }
+        };
+
+     
+// Initialize the calendar
+    
+        calendar.init();
+    });
+    </script>
+    
+    <style>
+    .calendar-widget {
+        background: #fff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .calendar-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .calendar-table th,
+    .calendar-table td {
+        text-align: center;
+        padding: 8px;
+    }
+    
+    .calendar-table td.has-post {
+        background: #FF4C4C;
+        color: white;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .calendar-table td.has-post:hover {
+        background: #FF6B6B;
+    }
+
+    .calendar-table td.today {
+    border: 2px solid #FF4C4C;
+    font-weight: bold;
+}
+
+.calendar-table td.today.has-post {
+    border: 2px solid #0000ff;
+}
+
+    </style>
+    

@@ -160,3 +160,5 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 });
 require __DIR__.'/auth.php';
 
+
+Route::get('/blog/dates/{year}/{month}', [BlogController::class, 'getDates'])->name('blog.dates');
