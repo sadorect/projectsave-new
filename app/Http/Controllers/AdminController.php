@@ -164,12 +164,11 @@ class AdminController extends Controller
 
 private function getMonthlyStats()
 {
-    return User::selectRaw("strftime('%m', birthday) as month, COUNT(*) as count")
-        ->whereNotNull('birthday')
+    return User::selectRaw("MONTH(birthday) as month, COUNT(*) as count")        ->whereNotNull('birthday')
         ->groupBy('month')
         ->get()
         ->concat(
-            User::selectRaw("strftime('%m', wedding_anniversary) as month, COUNT(*) as count")
+            User::selectRaw("MONTH(wedding_anniversary) as month, COUNT(*) as count")
                 ->whereNotNull('wedding_anniversary')
                 ->groupBy('month')
                 ->get()
@@ -181,13 +180,13 @@ private function getUpcomingCelebrations()
     $thirtyDaysFromNow = now()->addDays(30);
     
     return User::where(function($query) use ($thirtyDaysFromNow) {
-        $query->whereRaw("strftime('%m-%d', birthday) BETWEEN ? AND ?", [
+        $query->whereRaw("DATE_FORMAT(birthday, '%m-%d') BETWEEN ? AND ?", [
             now()->format('m-d'),
             $thirtyDaysFromNow->format('m-d')
         ]);
     })
     ->orWhere(function($query) use ($thirtyDaysFromNow) {
-        $query->whereRaw("strftime('%m-%d', wedding_anniversary) BETWEEN ? AND ?", [
+        $query->whereRaw("DATE_FORMAT(wedding_anniversary, '%m-%d') BETWEEN ? AND ?", [
             now()->format('m-d'),
             $thirtyDaysFromNow->format('m-d')
         ]);
@@ -263,5 +262,4 @@ public function celebrationCalendar()
 
 
 }
-
 
