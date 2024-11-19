@@ -9,7 +9,7 @@
                             <img src="{{ asset('frontend/img/carousel-1.jpg') }}" alt="Image">
                         </div>
                         <div class="carousel-text">
-                            <h2>Reaching Hearts, Transforming Lives</h2>
+                            <h2 style="color: white;">Reaching Hearts, Transforming Lives</h2>
                             <p>
                               Taking the message of hope to communities across the world through impactful outreach programs and life-changing encounters with Christ.
                             </p>
@@ -39,7 +39,7 @@
                             <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
                         </div>
                         <div class="carousel-text">
-                            <h2>Extending God's Love Through Service</h2>
+                            <h2 style="color: white;">Extending God's Love Through Service</h2>
                             <p>
                               Demonstrating Christ's love through community development, youth empowerment, and humanitarian initiatives that meet both spiritual and physical needs.
                             </p>
@@ -55,7 +55,7 @@
                   <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
               </div>
               <div class="carousel-text">
-                  <h2>United in Purpose, Driven by Faith"</h2>
+                  <h2 style="color: white;">United in Purpose, Driven by Faith"</h2>
                   <p>
                     Mobilizing believers to fulfill the Great Commission through strategic evangelistic missions and community transformation programs.
                   </p>
