@@ -3,6 +3,7 @@
 namespace App\Rules;
 
 use Closure;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Contracts\Validation\ValidationRule;
 
 class Recaptcha implements ValidationRule
