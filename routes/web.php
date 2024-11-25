@@ -36,8 +36,8 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/privacy-policy', [PageController::class, 'privacy'])->name('privacy');
 
 // Blog Routes
-Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('posts.show');
+Route::get('/devotional', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/devotional/{post:slug}', [BlogController::class, 'show'])->name('posts.show');
 Route::get('/feed', [FeedController::class, 'index'])->name('feed');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 
