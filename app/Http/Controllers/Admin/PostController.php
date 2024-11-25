@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use App\Models\Tag;
 use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\FacebookService;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 class PostController extends Controller
@@ -27,7 +29,7 @@ class PostController extends Controller
         return view('admin.posts.create', compact('categories', 'tags'));
     }
     public function store(Request $request)
-    {
+    { 
         $validated = $request->validate([
             'title' => 'required|max:255',
             'scripture' => 'nullable',
@@ -39,19 +41,21 @@ class PostController extends Controller
             'author' => 'nullable',
             'category_ids' => 'array',
             'tag_ids' => 'array',
-            'post_date' => 'required|date',
-'post_time' => 'required|date_format:H:i',
+            'published_at' => 'required|date_format:Y-m-d\TH:i',
+
 
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
         $validated['user_id'] = auth()->id();
+        $validated['published_at'] = Carbon::parse($request->published_at);
         
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('posts', 'public');
         }
-
+        //DB::enableQueryLog();
         $post = Post::create($validated);
+        //dd(DB::getQueryLog());
         $post->categories()->sync($request->category_ids);
         $post->tags()->sync($request->tag_ids);
 
@@ -91,10 +95,12 @@ class PostController extends Controller
             'author' => 'nullable',
             'category_ids' => 'array',
             'tag_ids' => 'array',
-            'post_date' => 'required|date',
-'post_time' => 'required|date_format:H:i',
+            'published_at' => 'required|date_format:Y-m-d\TH:i',
+
 
         ]);
+
+        //$validated['published_at'] = Carbon::parse($request->published_at);
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('posts', 'public');

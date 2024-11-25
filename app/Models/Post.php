@@ -24,7 +24,8 @@ class Post extends Model
         'author',
         'user_id',
         'comments_count',
-        'slug'
+        'slug',
+        'published_at',
     ];
 
     protected $casts = [

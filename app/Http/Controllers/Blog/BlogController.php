@@ -29,7 +29,7 @@ class BlogController extends Controller
     public function index()
     {
         $posts = Post::with(['categories', 'tags'])
-            ->latest()
+            ->orderBy('published_at', 'desc')
             ->paginate(6);
         return view('pages.blog.index', compact('posts'));
     }
@@ -43,12 +43,13 @@ class BlogController extends Controller
         $tags = Tag::all();
         return view('pages.blog.create', compact('categories', 'tags'));
     }
-
     /**
-     * Store a newly created resource in storage.
-     */
+      * Store a newly created resource in storage.
+      */
     public function store(Request $request)
     {
+        //dd($request->all());
+
         $validated = $request->validate([
             'title' => 'required|max:255',
             'scripture' => 'nullable',
@@ -58,7 +59,8 @@ class BlogController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'author' => 'nullable',
             'category_ids' => 'array',
-            'tag_ids' => 'array'
+            'tag_ids' => 'array',
+            'published_at' => 'required|date'
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
@@ -72,14 +74,14 @@ class BlogController extends Controller
         $post->categories()->sync($request->category_ids);
         $post->tags()->sync($request->tag_ids);
 
-        return redirect()->route('posts.index')->with('success', 'Post created successfully');
+        return redirect()->route('admin.posts.index')->with('success', 'Post created successfully');
     }
-
     /**
      * Display the specified resource.
      */
     public function show(Post $post)
     {
+
         $recentPosts = Post::latest()
             ->where('id', '!=', $post->id)
             ->take(5)
@@ -94,14 +96,26 @@ class BlogController extends Controller
         ->latest()
         ->take(3)
         ->get();
-        
-        $postDates = Post::whereMonth('created_at', Carbon::now()->month)
-        ->whereYear('created_at', Carbon::now()->year)
-        ->pluck('created_at')
+
+          // Get dates that have posts
+          $calendar = $this->generateCalendar();
+          $currentMonth = Carbon::now()->format('F Y');
+
+        $postDates = Post::whereMonth('published_at', Carbon::now()->month)
+        ->whereYear('published_at', Carbon::now()->year)
+        ->pluck('published_at')
         ->map(fn($date) => $date->format('Y-m-d'))
         ->toArray();
 
-        return view('pages.blog.show', compact('postDates', 'post', 'recentPosts', 'categories', 'relatedPosts'));
+        return view('pages.blog.show', compact(
+        'post', 
+        'recentPosts', 
+        'categories', 
+        'relatedPosts',
+        'calendar',
+        'currentMonth',
+        'postDates'
+    ));
     }
 
     /**
@@ -150,4 +164,35 @@ class BlogController extends Controller
         $post->delete();
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully');
     }
+
+
+private function generateCalendar($month = null, $year = null)
+{
+    $month = $month ?? Carbon::now()->month;
+    $year = $year ?? Carbon::now()->year;
+    
+    $date = Carbon::createFromDate($year, $month, 1);
+    $calendar = collect();
+    
+    // Add empty days for the start of the month
+    for ($i = 0; $i < $date->dayOfWeek; $i++) {
+        $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
+    }
+    
+    // Add all days of the month
+    while ($date->month === (int) $month) {
+        $calendar->push(clone $date);
+        $date->addDay();
+    }
+    
+    // Add remaining days to complete the grid
+    $remainingDays = 42 - $calendar->count(); // 6 rows * 7 days
+    for ($i = 0; $i < $remainingDays; $i++) {
+        $calendar->push(clone $date);
+        $date->addDay();
+    }
+    
+    return $calendar;
+}
+
 }

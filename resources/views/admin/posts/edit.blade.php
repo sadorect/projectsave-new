@@ -74,20 +74,13 @@
 
 
                         <div class="mb-3">
-                            <label class="form-label">Post Date</label>
-                            <input type="date" name="post_date" class="form-control @error('post_date') is-invalid @enderror" value="{{ old('post_date', now()->format('Y-m-d')) }}">
-                            @error('post_date')
+                            <label class="form-label">Publication Date & Time</label>
+                            <input type="datetime-local" name="published_at" class="form-control @error('published_at') is-invalid @enderror" value="{{ old('published_at', now()->format('Y-m-d\TH:i')) }}">
+                            @error('published_at')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label">Post Time</label>
-                            <input type="time" name="post_time" class="form-control @error('post_time') is-invalid @enderror" value="{{ old('post_time', now()->format('H:i')) }}">
-                            @error('post_time')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
                         
                         
                         <div class="mb-3">
