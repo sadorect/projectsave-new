@@ -6,7 +6,11 @@
                 <div class="owl-carousel">
                     <div class="carousel-item">
                         <div class="carousel-img">
-                            <img src="{{ asset('frontend/img/carousel-1.jpg') }}" alt="Image">
+                            <picture>
+                                <source srcset="{{ asset('frontend/img/carousel-1.webp') }}" type="image/webp">
+                                <img src="{{ asset('frontend/img/carousel-1.jpg') }}" alt="Image">
+                            </picture>
+                            
                         </div>
                         <div class="carousel-text">
                             <h2 style="color: white;">Reaching Hearts, Transforming Lives</h2>
@@ -21,7 +25,10 @@
                     </div>
                     <div class="carousel-item">
                         <div class="carousel-img">
-                            <img src="{{ asset('frontend/img/carousel-2.jpg') }}" alt="Image">
+                            <picture>
+                                <source srcset="{{ asset('frontend/img/carousel-2.webp') }}" type="image/webp">
+                                <img src="{{ asset('frontend/img/carousel-2.jpg') }}" alt="Image">
+                            </picture>
                         </div>
                         <div class="carousel-text">
                             <h2 style="color: white;">Building Strong Spiritual Foundations</h2>
@@ -36,7 +43,10 @@
                     </div>
                     <div class="carousel-item">
                         <div class="carousel-img">
-                            <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
+                            <picture>
+                                <source srcset="{{ asset('frontend/img/carousel-3.webp') }}" type="image/webp">
+                                <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
+                            </picture>
                         </div>
                         <div class="carousel-text">
                             <h2 style="color: white;">Extending God's Love Through Service</h2>
@@ -52,7 +62,10 @@
                     
             <div class="carousel-item">
               <div class="carousel-img">
-                  <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
+                <picture>
+                    <source srcset="{{ asset('frontend/img/carousel-3.webp') }}" type="image/webp">
+                    <img src="{{ asset('frontend/img/carousel-3.jpg') }}" alt="Image">
+                </picture>
               </div>
               <div class="carousel-text">
                   <h2 style="color: white;">United in Purpose, Driven by Faith"</h2>
@@ -359,90 +372,13 @@
 
 
        <!-- Mission Statistics Start -->
-<div class="service">
-  <div class="container">
-      <div class="section-header text-center">
-          <p>Global Impact</p>
-          <h2>Mission Statistics</h2>
-      </div>
-      <div class="row">
-          <div class="col-lg-4 col-md-6">
-              <div class="service-item">
-                  <div class="service-icon">
-                      <i class="fa fa-globe"></i>
-                  </div>
-                  <div class="service-text">
-                      <h3>World Population</h3>
-                      <p><span class="facts-plus">8.12</span>B+<br>Current world population and growing</p>
-                  </div>
-              </div>
-          </div>
+       {!! Cache::remember('mission-stats', now()->addDay(), function() {
+        return view('components.mission-stats')->render();
+    }) !!}
+    
 
-          <div class="col-lg-4 col-md-6">
-              <div class="service-item">
-                  <div class="service-icon">
-                      <i class="fa fa-users"></i>
-                  </div>
-                  <div class="service-text">
-                      <h3>People Groups</h3>
-                      <p><span class="facts-plus">17,281</span><br>Total distinct people groups worldwide</p>
-                  </div>
-              </div>
-          </div>
 
-          <div class="col-lg-4 col-md-6">
-              <div class="service-item">
-                  <div class="service-icon">
-                      <i class="fa fa-heart"></i>
-                  </div>
-                  <div class="service-text">
-                      <h3>Unreached Groups</h3>
-                      <p><span class="facts-plus">7,246</span><br>People groups with less than 2% evangelical Christians</p>
-                  </div>
-              </div>
-          </div>
 
-          <div class="col-lg-4 col-md-6">
-              <div class="service-item">
-                  <div class="service-icon">
-                      <i class="fa fa-percentage"></i>
-                  </div>
-                  <div class="service-text">
-                      <h3>UPG Population</h3>
-                      <p><span class="facts-plus">41.8</span>%<br>Of world population (3.39 billion people)</p>
-                  </div>
-              </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6">
-              <div class="service-item">
-                  <div class="service-icon">
-                      <i class="fa fa-church"></i>
-                  </div>
-                  <div class="service-text">
-                      <h3>Global Christians</h3>
-                      <p><span class="facts-plus">2.63</span>B<br>Total Christians worldwide (all denominations)</p>
-                  </div>
-              </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6">
-              <div class="service-item">
-                  <div class="service-icon">
-                      <i class="fa fa-cross"></i>
-                  </div>
-                  <div class="service-text">
-                      <h3>Evangelical Ratio</h3>
-                      <p><span class="facts-plus">57,000</span>:1<br>Evangelical Christians per unreached people group</p>
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="footnote text-muted mt-3">
-        <small>Source: <a href="https://www.thetravelingteam.org/stats" target="_blank">https://www.thetravelingteam.org/stats</a></small>
-      </div>
-  </div>
-</div>
 <!-- Mission Statistics End -->
 
 <!-- Mission Call to Action Start -->
@@ -629,7 +565,10 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
                     </div>
                     <div class="col-lg-5">
                         <div class="donate-image">
-                            <img src="{{ asset('frontend/img/donate.jpeg') }}" alt="Donate" class="img-fluid">
+                            <picture>
+                                <source srcset="{{ asset('frontend/img/donate.webp') }}" type="image/webp">
+                                <img src="{{ asset('frontend/img/donate.jpeg') }}" alt="Donate" class="img-fluid">
+                            </picture>
                         </div>
                     </div>
                 </div>
@@ -652,8 +591,10 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
                             <div class="event-item">
                                 @if($event->image)
                                 <div class="blog-img">
-                                    <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}">
-                                </div>
+                                    <picture>
+                                        <source srcset="{{ asset('storage/' . str_replace(['.jpg','.jpeg','.png'], '.webp', $event->image)) }}" type="image/webp">
+                                        <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}">
+                                    </picture>                                </div>
                                 
                                 @endif
                                 <div class="event-content">
@@ -695,7 +636,10 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
                         <div class="blog-item">
                             @if($post->image)
                             <div class="blog-img">
-                                <img src="{{ asset($post->image) }}" alt="{{ $post->title }}">
+                                <picture>
+                                    <source srcset="{{ asset(str_replace(['.jpg','.jpeg','.png'], '.webp', $post->image)) }}" type="image/webp">
+                                    <img src="{{ asset($post->image) }}" alt="{{ $post->title }}">
+                                </picture>
                             </div>
                             @endif
                             <div class="blog-text">

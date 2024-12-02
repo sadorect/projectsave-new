@@ -40,7 +40,8 @@
                                         <span class="badge bg-secondary">{{ $tag->name }}</span>
                                     @endforeach
                                 </td>
-                                <td>{{ $post->created_at->format('M d, Y') }}</td>
+
+                                <td>{{ $post->published_at ? $post->published_at->format('M d, Y') : 'N/A' }}</td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('admin.posts.edit', $post) }}" class="btn btn-sm btn-outline-primary">

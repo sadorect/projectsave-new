@@ -128,32 +128,10 @@
                                 </div>
                             </div>
 <!-- Add this in the sidebar section -->
-<div class="sidebar-widget">
-    <h2 class="widget-title">Blog Calendar</h2>
-    <div class="calendar-widget">
-        <div class="calendar-header">
-            <a href="#" class="prev-month">&lt;</a>
-            <span class="current-month">{{ now()->format('F Y') }}</span>
-            <a href="#" class="next-month">&gt;</a>
-        </div>
-        <table class="calendar-table">
-            <thead>
-                <tr>
-                    <th>Su</th>
-                    <th>Mo</th>
-                    <th>Tu</th>
-                    <th>We</th>
-                    <th>Th</th>
-                    <th>Fr</th>
-                    <th>Sa</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Calendar days will be populated via JavaScript -->
-            </tbody>
-        </table>
-    </div>
+<div class="blog-sidebar">
+    <x-blog.calendar :calendar="$calendar" :currentMonth="$currentMonth" :postDates="$postDates" />
 </div>
+
 
                             <div class="sidebar-widget">
                                 <div class="image-widget">
