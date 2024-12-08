@@ -28,3 +28,65 @@
 .pagination li a:hover {
     background-color: #f8f9fa;
 }
+
+.blog-calendar {
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.calendar-table th {
+    padding: 8px;
+    text-align: center;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #666;
+}
+
+.calendar-table td {
+    padding: 6px;
+    text-align: center;
+    font-size: 0.9em;
+    border: 1px solid #eee;
+}
+
+.calendar-table td.today {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    border: 2px solid #FF6F61;
+}
+
+.calendar-table td.has-post {
+    background-color: #FF6F61;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.calendar-header button {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.current-month {
+    font-weight: 600;
+    font-size: 1.1em;
+}

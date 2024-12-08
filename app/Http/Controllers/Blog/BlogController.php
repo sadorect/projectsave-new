@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Blog;
 
+use console;
 use Carbon\Carbon;
 use App\Models\Tag;
 use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
 /**
@@ -101,12 +103,14 @@ class BlogController extends Controller
           $calendar = $this->generateCalendar();
           $currentMonth = Carbon::now()->format('F Y');
 
-        $postDates = Post::whereMonth('published_at', Carbon::now()->month)
-        ->whereYear('published_at', Carbon::now()->year)
-        ->pluck('published_at')
-        ->map(fn($date) => $date->format('Y-m-d'))
-        ->toArray();
-
+          $postDates = Post::whereRaw('MONTH(created_at) = ?', [11])
+          ->whereRaw('YEAR(created_at) = ?', [now()->year])
+          ->get(['created_at'])
+          ->map(fn($post) => $post->created_at->format('Y-m-d'))
+          ->toArray();
+      
+   
+        
         return view('pages.blog.show', compact(
         'post', 
         'recentPosts', 
@@ -118,6 +122,39 @@ class BlogController extends Controller
     ));
     }
 
+    private function generateCalendar($month = null, $year = null)
+{
+    $month = 11;//$month ?? Carbon::now()->month;
+    $year = 2024;//$year ?? Carbon::now()->year;
+    
+    $date = Carbon::createFromDate($year, $month, 1);
+    Log::info("Initial date:", ['date' => $date->format('Y-m-d')]);
+    $calendar = collect();
+    
+    // Add empty days for the start of the month
+    for ($i = 0; $i < $date->dayOfWeek; $i++) {
+        
+         $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
+    
+        $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
+    }
+    
+    // Add all days of the month
+    while ($date->month === (int) $month) {
+        $calendar->push(clone $date);
+        $date->addDay();
+        Log::info("Adding current month date:", ['date' => $calendar->last()->format('Y-m-d')]);
+    }
+    
+    // Add remaining days to complete the grid
+    $remainingDays = 42 - $calendar->count(); // 6 rows * 7 days
+    for ($i = 0; $i < $remainingDays; $i++) {
+        $calendar->push(clone $date);
+        $date->addDay();
+    }
+    
+    return $calendar;
+}
     /**
      * Show the form for editing the specified resource.
      */
@@ -166,33 +203,6 @@ class BlogController extends Controller
     }
 
 
-private function generateCalendar($month = null, $year = null)
-{
-    $month = $month ?? Carbon::now()->month;
-    $year = $year ?? Carbon::now()->year;
-    
-    $date = Carbon::createFromDate($year, $month, 1);
-    $calendar = collect();
-    
-    // Add empty days for the start of the month
-    for ($i = 0; $i < $date->dayOfWeek; $i++) {
-        $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
-    }
-    
-    // Add all days of the month
-    while ($date->month === (int) $month) {
-        $calendar->push(clone $date);
-        $date->addDay();
-    }
-    
-    // Add remaining days to complete the grid
-    $remainingDays = 42 - $calendar->count(); // 6 rows * 7 days
-    for ($i = 0; $i < $remainingDays; $i++) {
-        $calendar->push(clone $date);
-        $date->addDay();
-    }
-    
-    return $calendar;
-}
+
 
 }

@@ -281,14 +281,14 @@
                 });
             }
         };
-
-     
+        
+        console.log(document.querySelectorAll('.has-post').length);
 // Initialize the calendar
     
         calendar.init();
     });
-    </script>
-    
+
+    </script>    
     <style>
     .calendar-widget {
         background: #fff;
