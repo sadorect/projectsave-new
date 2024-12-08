@@ -56,7 +56,9 @@
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        {{ $posts->links() }}
+                        <div class="pagination-wrapper">
+                            {{ $posts->links() }}
+                        </div>
                     </div>
                 </div>
             </div>
