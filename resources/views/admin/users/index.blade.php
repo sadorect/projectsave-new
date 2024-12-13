@@ -38,7 +38,9 @@
                             @if($user->is_admin)
                                 <span class="badge bg-primary">Admin</span>
                             @else
-                                <span class="badge bg-secondary">User</span>
+                                @foreach($user->roles as $role)
+                                <span class="badge bg-secondary">{{ $role->name }}</span>
+                            @endforeach
                             @endif
                         </td>
                         <td>{{ $user->created_at->format('M d, Y') }}</td>

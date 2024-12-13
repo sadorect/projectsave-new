@@ -16,6 +16,15 @@ class UserDashboardController extends Controller
         $partnerships = $user->partnerships()->get();
         $notifications = $user->notifications()->latest()->take(3)->get();
 
+        if ($user->hasPermission('edit-content')) {
+            return view('user.dashboard', [
+                'showContentManagement' => true,
+                'activities' => $activities,
+                'partnerships' => $partnerships,
+                'notifications' => $notifications,
+            ]);
+        }
+
         return view('user.dashboard', compact('activities', 'partnerships', 'notifications'));
     }
 

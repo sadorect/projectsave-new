@@ -79,23 +79,22 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->group(function() {
-    // Public admin routes
+    // Authentication Routes
     Route::get('/login', [AdminController::class, 'loginForm'])->name('admin.login.form');
     Route::post('/login', [AdminController::class, 'login'])->name('admin.login');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
     
-    // Protected admin routes
-    Route::middleware(['admin'])->group(function() {
+    // Protected Admin Routes
+    Route::middleware(['auth', 'admin'])->group(function() {
+        // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-        Route::resource('posts', PostController::class)->names('admin.posts');
-        Route::resource('events', AdminEventController::class)->names('admin.events');
-        Route::resource('categories', CategoryController::class)->names('admin.categories');
-        Route::resource('tags', TagController::class)->names('admin.tags');
-        Route::resource('news', NewsUpdateController::class);
-        Route::resource('videos', VideoReelController::class);
-        
+        Route::get('/dashboard/celebrants', [AdminController::class, 'showCelebrants'])->name('admin.dashboard.celebrants');
+                
         // User Management
         Route::resource('users', AdminUserController::class)->names('admin.users');
+        Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('admin.deletion-requests.index');
+        Route::get('/deletion-requests/{request}', [DeletionRequestController::class, 'show'])->name('admin.deletion-requests.show');
+        Route::post('/deletion-requests/{request}/process', [DeletionRequestController::class, 'process'])->name('admin.deletion-requests.process');
         
         // Partner Management
         Route::get('/partners', [AdminPartnerController::class, 'index'])->name('admin.partners.index');
@@ -108,56 +107,33 @@ Route::prefix('admin')->group(function() {
         Route::get('/prayer-force/{partner}', [AdminPrayerForceController::class, 'show'])->name('admin.prayer-force.show');
         Route::patch('/prayer-force/{partner}/status', [AdminPrayerForceController::class, 'updateStatus'])->name('admin.prayer-force.status.update');
         
-        // Settings
+        // Celebrations Management
+        Route::get('/celebrations/logs', [AdminController::class, 'viewWishLogs'])->name('admin.celebrations.logs');
+        Route::get('/celebrations/statistics', [AdminController::class, 'celebrationStats'])->name('admin.celebrations.statistics');
+        Route::get('/celebrations/calendar', [AdminController::class, 'celebrationCalendar'])->name('admin.celebrations.calendar');
+        
+        // Notification Settings
         Route::get('/notification-settings', [NotificationSettingsController::class, 'edit'])->name('admin.notification-settings.edit');
         Route::patch('/notification-settings', [NotificationSettingsController::class, 'update'])->name('admin.notification-settings.update');
-        Route::get('/notification-settings/event-reminders', [NotificationSettingsController::class, 'editEventReminders'])
-            ->name('admin.notification-settings.event-reminders');
-        Route::patch('/notification-settings/event-reminders', [NotificationSettingsController::class, 'updateEventReminders'])
-            ->name('admin.notification-settings.event-reminders.update');
-        Route::get('/notification-settings/reminder-logs', [NotificationSettingsController::class, 'viewReminderLogs'])
-            ->name('admin.notification-settings.reminder-logs');
-        Route::post('/admin/notification-settings/event-reminders/send/{event}', 
-        [NotificationSettingsController::class, 'sendManualReminder'])
-        ->name('admin.notification-settings.event-reminders.send');
-
-        Route::get('/admin/notification-settings/event-reminders/preview/{event}', 
-            [NotificationSettingsController::class, 'previewReminder'])
-            ->name('admin.notification-settings.event-reminders.preview');
-        });
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/celebrations/logs', [AdminController::class, 'viewWishLogs'])
-        ->name('admin.celebrations.logs');
-        });
-
-        
-        Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
-            Route::get('/dashboard/celebrants', [AdminController::class, 'showCelebrants'])
-                ->name('admin.dashboard.celebrants');
-        });
-        
-
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/celebrations/statistics', [AdminController::class, 'celebrationStats'])
-        ->name('admin.celebrations.statistics');
-
-        Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])
-    ->name('admin.deletion-requests.index');
-    Route::get('/deletion-requests/{request}', [DeletionRequestController::class, 'show'])
-    ->name('admin.deletion-requests.show');
-Route::post('/deletion-requests/{request}/process', [DeletionRequestController::class, 'process'])
-    ->name('admin.deletion-requests.process');
+        Route::get('/notification-settings/event-reminders', [NotificationSettingsController::class, 'editEventReminders'])->name('admin.notification-settings.event-reminders');
+        Route::patch('/notification-settings/event-reminders', [NotificationSettingsController::class, 'updateEventReminders'])->name('admin.notification-settings.event-reminders.update');
+        Route::get('/notification-settings/reminder-logs', [NotificationSettingsController::class, 'viewReminderLogs'])->name('admin.notification-settings.reminder-logs');
+        Route::post('/notification-settings/event-reminders/send/{event}', [NotificationSettingsController::class, 'sendManualReminder'])->name('admin.notification-settings.event-reminders.send');
+        Route::get('/notification-settings/event-reminders/preview/{event}', [NotificationSettingsController::class, 'previewReminder'])->name('admin.notification-settings.event-reminders.preview');
+    });
 });
 
 
-
-
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/celebrations/calendar', [AdminController::class, 'celebrationCalendar'])
-        ->name('admin.celebrations.calendar');
+// Content Management
+Route::prefix('content')->middleware(['auth', 'permission:edit-content'])->group(function() {
+Route::resource('posts', PostController::class)->names('admin.posts');
+Route::resource('events', AdminEventController::class)->names('admin.events');
+Route::resource('categories', CategoryController::class)->names('admin.categories');
+Route::resource('tags', TagController::class)->names('admin.tags');
+Route::resource('news', NewsUpdateController::class);
+Route::resource('videos', VideoReelController::class);
 });
 
-});
 require __DIR__.'/auth.php';
 
 

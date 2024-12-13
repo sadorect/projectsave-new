@@ -11,6 +11,14 @@ use App\Notifications\AnniversaryReminderNotification;
 
 class AdminController extends Controller
 {
+    protected function getAppropriateLayout()
+    {
+        if (auth()->user()->hasPermission('edit-content') && !auth()->user()->is_admin) {
+            return 'layouts.content.app';
+        }
+        return 'admin.layouts.app';
+    }
+
     public function index()
     {
         $stats = [
@@ -25,7 +33,9 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recent_activity'));
+        //$layout = $this->getAppropriateLayout();
+
+        return view('admin.dashboard', compact('stats', 'recent_activity', 'layout'));
     }
 
    

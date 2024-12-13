@@ -92,4 +92,21 @@ public function getNextCelebrationDateAttribute()
     return $nextBirthday->min($nextAnniversary);
 }
 
+
+
+public function roles()
+{
+    return $this->belongsToMany(Role::class);
+}
+
+public function hasRole($role)
+{
+    return $this->roles->contains('slug', $role);
+}
+
+public function hasPermission($permission)
+{
+    return $this->roles->flatMap->permissions->contains('slug', $permission);
+}
+
 }

@@ -1,6 +1,6 @@
 <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px; min-height: 100vh;">
     <a href="{{ route('admin.dashboard') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <span class="fs-4">Admin Panel</span>
+        <span class="fs-4">You're Here!</span>
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">

@@ -20,12 +20,39 @@
                     </a>
 
                     <!-- Add to sidebar menu -->
-            <li class="nav-item">
-              <a href="{{ route('user.account.deletion') }}" class="nav-link">
-                  <i class="bi bi-trash"></i>
-                  <span>Delete Account</span>
-              </a>
-            </li>
+                    <!-- Add this where you want in the nav section -->
+@if(isset($showContentManagement) && $showContentManagement)
+<a class="nav-link text-white" data-bs-toggle="collapse" href="#contentManagement" role="button" aria-expanded="false">
+    <i class="bi bi-pencil-square me-2"></i> Manage Posts
+    <i class="bi bi-chevron-down float-end"></i>
+</a>
+
+<div class="collapse" id="contentManagement">
+    <nav class="nav flex-column ms-3">
+        <a class="nav-link text-white {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}" 
+           href="{{ route('admin.posts.index') }}">
+            <i class="bi bi-file-text me-2"></i> Posts
+        </a>
+        
+        <a class="nav-link text-white {{ request()->routeIs('admin.events.*') ? 'active' : '' }}" 
+           href="{{ route('admin.events.index') }}">
+            <i class="bi bi-calendar-event me-2"></i> Events
+        </a>
+        
+        <a class="nav-link text-white {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" 
+           href="{{ route('admin.categories.index') }}">
+            <i class="bi bi-folder me-2"></i> Categories
+        </a>
+        
+        <a class="nav-link text-white {{ request()->routeIs('admin.tags.*') ? 'active' : '' }}" 
+           href="{{ route('admin.tags.index') }}">
+            <i class="bi bi-tags me-2"></i> Tags
+        </a>
+    </nav>
+</div>
+@endif
+
+                
             
             <a class="nav-link text-white {{ request()->routeIs('user.partnerships.*') ? 'active' : '' }}" 
                href="#partnerships">
@@ -41,6 +68,12 @@
                href="#settings">
                 <i class="bi bi-gear me-2"></i> Settings
             </a>
+            <li class="nav-item">
+                <a href="{{ route('user.account.deletion') }}" class="nav-link">
+                    <i class="bi bi-trash"></i>
+                    <span>Delete Account</span>
+                </a>
+              </li>
         </nav>
 
         <div class="mt-auto pt-3 border-top">

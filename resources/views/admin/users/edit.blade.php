@@ -40,11 +40,17 @@
                         </div>
 
                         <div class="mb-3">
-                            <div class="form-check">
-                                <input type="checkbox" name="is_admin" class="form-check-input" value="1" {{ old('is_admin', $user->is_admin) ? 'checked' : '' }}>
-                                <label class="form-check-label">Admin User</label>
-                            </div>
+                            <label for="roles">User Roles</label>
+                            <select name="roles[]" id="roles" class="form-control" multiple>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id }}" 
+                                        {{ $user->roles->contains($role->id) ? 'selected' : '' }}>
+                                        {{ $role->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
+                        
 
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancel</a>
