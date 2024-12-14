@@ -22,6 +22,13 @@
               Events
           </a>
       </li>
+      <!-- Add this within your existing sidebar navigation -->
+    <li class="nav-item">
+        <a href="{{ route('admin.faqs.index') }}" class="nav-link text-white {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-question-circle"></i>
+            <p>FAQs</p>
+        </a>
+    </li>
       <li>
           <a href="{{ route('admin.categories.index') }}" class="nav-link text-white {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
               <i class="bi bi-folder me-2"></i>
@@ -118,5 +125,7 @@
             </a>
         </div>
     </ul>
+
+
 
 

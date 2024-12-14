@@ -1,0 +1,80 @@
+Route::prefix('courses')->middleware(['auth'])->group(function() {
+    Route::get('/', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/{course}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/{course}/lessons/{lesson}', [LessonController::class, 'show'])->name('lessons.show');
+    Route::post('/enrollments', [EnrollmentController::class, 'store'])->name('enrollments.store');
+    Route::get('/my-learning', [StudentDashboardController::class, 'index'])->name('student.dashboard');
+});
+
+
+Core Resources to Build:
+- courses (id, title, description, duration, price, thumbnail, status)
+- lessons (id, course_id, title, video_url, duration, order)
+- assignments (id, lesson_id, title, instructions, due_date)
+- quizzes (id, lesson_id, title, passing_score)
+- quiz_questions (id, quiz_id, question, options, correct_answer)
+- enrollments (id, user_id, course_id, progress, completed_at)
+- certificates (id, user_id, course_id, issued_at)
+- announcements (id, course_id, title, content, published_at)
+
+
+Key Components:
+Models:
+
+Course
+Lesson
+Assignment
+Quiz
+Enrollment
+Certificate
+Announcement
+
+Controllers:
+
+CourseController (listing, details)
+LessonController (video delivery, progress tracking)
+AssignmentController (submission, grading)
+QuizController (taking quizzes, scoring)
+CertificateController (generation, verification)
+AnnouncementController (announcement management)
+
+
+Features to Implement:
+
+Course Management:
+
+Course creation with video uploads
+Curriculum structuring
+Progress tracking
+
+
+Student Experience:
+
+Course enrollment
+Video lesson playback
+Assignment submissions
+Quiz taking
+Progress dashboard
+
+
+Assessment System:
+
+Auto-graded quizzes
+Assignment submissions
+Progress tracking
+
+Certification:
+
+Certificate template design
+Automatic generation
+Verification system
+
+Additional Considerations:
+
+Video Hosting: Integrate with services like Vimeo or AWS S3
+Payment Integration: For paid courses
+Progress Tracking: Implement completion criteria
+Certificate Generation: PDF generation using libraries like DOMPDF
+Analytics Dashboard: Track student performance
+
+This integration will enhance your existing project while maintaining your current authentication and user management system. The LMS can be gradually built and released in phases.

@@ -628,7 +628,7 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
             <div class="container">
                 <div class="section-header text-center">
                     <p>Our Blog</p>
-                    <h3>Latest articles directly from our blog</h3>
+                    <h3>Latest articles directly from our Devotional</h3>
                 </div>
                 <div class="row">
                     @foreach($posts as $post)

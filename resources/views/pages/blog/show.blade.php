@@ -59,7 +59,7 @@
                         <div class="single-bio">
                             <div class="single-bio-text">
                                 <h3>{{ $post->author }}</h3>
-                                <p>Posted on {{ $post->created_at->format('M d, Y') }}</p>
+                                <p>Posted on {{ $post->published_at->format('M d, Y') }}</p>
                             </div>
                         </div>
 

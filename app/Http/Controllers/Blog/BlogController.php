@@ -36,6 +36,16 @@ class BlogController extends Controller
         return view('pages.blog.index', compact('posts'));
     }
 
+    public function indexFaqs()
+    {
+        $posts = Post::with(['categories', 'tags'])
+            ->whereHas('categories', function($query) {
+                $query->where('name', 'faqs');
+            })
+            ->orderBy('published_at', 'desc')
+            ->paginate(6);
+        return view('pages.faqs.index', compact('posts'));
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -111,15 +121,56 @@ class BlogController extends Controller
       
    
         
-        return view('pages.blog.show', compact(
-        'post', 
-        'recentPosts', 
-        'categories', 
-        'relatedPosts',
-        'calendar',
-        'currentMonth',
-        'postDates'
-    ));
+            return view('pages.blog.show', compact(
+            'post', 
+            'recentPosts', 
+            'categories', 
+            'relatedPosts',
+            'calendar',
+            'currentMonth',
+            'postDates'
+        ));
+    }
+
+    public function showFaqs(Post $post)
+    {
+
+        $recentPosts = Post::latest()
+            ->where('id', '!=', $post->id)
+            ->take(5)
+            ->get();
+            
+        $categories = Category::withCount('posts')->get();
+        
+        $relatedPosts = Post::whereHas('categories', function($query) use ($post) {
+            $query->whereIn('categories.id', $post->categories->pluck('id'));
+        })
+        ->where('id', '!=', $post->id)
+        ->latest()
+        ->take(3)
+        ->get();
+
+          // Get dates that have posts
+          $calendar = $this->generateCalendar();
+          $currentMonth = Carbon::now()->format('F Y');
+
+          $postDates = Post::whereRaw('MONTH(created_at) = ?', [11])
+          ->whereRaw('YEAR(created_at) = ?', [now()->year])
+          ->get(['created_at'])
+          ->map(fn($post) => $post->created_at->format('Y-m-d'))
+          ->toArray();
+      
+   
+        
+            return view('pages.faqs.show', compact(
+            'post', 
+            'recentPosts', 
+            'categories', 
+            'relatedPosts',
+            'calendar',
+            'currentMonth',
+            'postDates'
+        ));
     }
 
     private function generateCalendar($month = null, $year = null)

@@ -10,6 +10,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
@@ -40,6 +41,10 @@ Route::get('/devotional', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/devotional/{post:slug}', [BlogController::class, 'show'])->name('posts.show');
 Route::get('/feed', [FeedController::class, 'index'])->name('feed');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+        // Add this route for public FAQ display
+ Route::get('/faqs/{faqs:slug}', [FaqController::class, 'show'])->name('faqs.show');
+ Route::get('/faqs', [FaqController::class, 'list'])->name('faqs.list');
 
 // Event Routes
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
@@ -89,7 +94,11 @@ Route::prefix('admin')->group(function() {
         // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::get('/dashboard/celebrants', [AdminController::class, 'showCelebrants'])->name('admin.dashboard.celebrants');
-                
+             
+        Route::resource('faqs', \App\Http\Controllers\FaqController::class)->names('admin.faqs');
+
+
+
         // User Management
         Route::resource('users', AdminUserController::class)->names('admin.users');
         Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('admin.deletion-requests.index');
@@ -125,13 +134,14 @@ Route::prefix('admin')->group(function() {
 
 
 // Content Management
-Route::prefix('content')->middleware(['auth', 'permission:edit-content'])->group(function() {
+Route::prefix('content')->middleware(['auth', 'permission:edit-content|manage-users|'])->group(function() {
 Route::resource('posts', PostController::class)->names('admin.posts');
 Route::resource('events', AdminEventController::class)->names('admin.events');
 Route::resource('categories', CategoryController::class)->names('admin.categories');
 Route::resource('tags', TagController::class)->names('admin.tags');
 Route::resource('news', NewsUpdateController::class);
 Route::resource('videos', VideoReelController::class);
+
 });
 
 require __DIR__.'/auth.php';
