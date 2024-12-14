@@ -119,6 +119,15 @@ class BlogController extends Controller
           ->map(fn($post) => $post->created_at->format('Y-m-d'))
           ->toArray();
       
+          $previous = Post::where('status', 'published')
+                   ->where('published_at', '<', $post->published_at)
+                   ->orderBy('published_at', 'desc')
+                   ->first();
+                   
+    $next = Post::where('status', 'published')
+               ->where('published_at', '>', $post->published_at)
+               ->orderBy('published_at', 'asc')
+               ->first();
    
         
             return view('pages.blog.show', compact(
@@ -128,7 +137,9 @@ class BlogController extends Controller
             'relatedPosts',
             'calendar',
             'currentMonth',
-            'postDates'
+            'postDates',
+            'previous',
+            'next'
         ));
     }
 

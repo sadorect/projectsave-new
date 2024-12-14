@@ -54,7 +54,26 @@
                             @foreach($post->tags as $tag)
                             <a href="">{{ $tag->name }}</a>
                         @endforeach
-                            
+                            <!-- Add after the article content -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    @if($previous)
+                        <a href="{{ route('posts.show', $previous->slug) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left"></i> Previous Article
+                        </a>
+                    @else
+                        <div></div>
+                    @endif
+  
+                    @if($next)
+                        <a href="{{ route('posts.show', $next->slug) }}" class="btn btn-outline-primary">
+                            Next Article <i class="fas fa-arrow-right"></i>
+                        </a>
+                    @endif
+                </div>
+            </div>
+          </div>
                         </div>
                         <div class="single-bio">
                             <div class="single-bio-text">
