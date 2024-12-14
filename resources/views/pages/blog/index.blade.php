@@ -62,10 +62,10 @@
                                     </p>
                                     
                                     <div class="d-flex align-items-center mt-3">
-                                        <img src="{{ asset('images/author-avatar.png') }}" alt="Author" class="rounded-circle me-2" width="30">
+                                        <img src="{{ asset('frontend/img/psave_logo.png') }}" alt="Author" class="rounded-circle me-2" width="30">
                                         <small class="text-muted">{{ $post->author }}</small>
                                         <span class="mx-2">•</span>
-                                        <small class="text-muted">{{ $post->created_at->format('M d, Y') }}</small>
+                                        <small class="text-muted">{{ $post->published_at->format('M d, Y') }}</small>
                                     </div>
                                 </div>
                                 <div class="card-footer bg-transparent border-top-0">
