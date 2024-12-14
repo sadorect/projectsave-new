@@ -134,15 +134,17 @@ Route::prefix('admin')->group(function() {
 
 
 // Content Management
-Route::prefix('content')->middleware(['auth', 'permission:edit-content|manage-users|'])->group(function() {
-Route::resource('posts', PostController::class)->names('admin.posts');
-Route::resource('events', AdminEventController::class)->names('admin.events');
-Route::resource('categories', CategoryController::class)->names('admin.categories');
-Route::resource('tags', TagController::class)->names('admin.tags');
-Route::resource('news', NewsUpdateController::class);
-Route::resource('videos', VideoReelController::class);
-
+Route::prefix('content')->middleware(['auth'])->group(function() {
+    Route::middleware('permission:edit-content,admin')->group(function() {
+        Route::resource('posts', PostController::class)->names('admin.posts');
+        Route::resource('events', AdminEventController::class)->names('admin.events');
+        Route::resource('categories', CategoryController::class)->names('admin.categories');
+        Route::resource('tags', TagController::class)->names('admin.tags');
+        Route::resource('news', NewsUpdateController::class);
+        Route::resource('videos', VideoReelController::class);
+    });
 });
+
 
 require __DIR__.'/auth.php';
 
