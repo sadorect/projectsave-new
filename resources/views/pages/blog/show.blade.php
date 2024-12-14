@@ -10,11 +10,11 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12">
-                        <h2>{{ $post->title }}</h2>
+                        <h2>Devotional</h2>
                     </div>
                     <div class="col-12">
                         <a href="{{ route('home') }}">Home</a>
-                        <a href="{{ route('blog.index') }}">Blog</a>
+                        <a href="{{ route('blog.index') }}">Devotional</a>
                         <a href="#">{{ $post->title }}</a>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                         <div class="single-bio">
                             <div class="single-bio-text">
                                 <h3>{{ $post->author }}</h3>
-                                <p>Posted on {{ $post->published_at->format('M d, Y') }}</p>
+                                <p>Posted on {{ $post->published_at ? $post->published_at->format('M d, Y') : '' }}</p>
                             </div>
                         </div>
 
