@@ -97,9 +97,9 @@
                         
                         <form class="form-inline my-2 my-lg-0 ml-4" action="{{ route('search') }}" method="GET">
                             <div class="input-group">
-                                <input class="form-control" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ request('q') }}">
+                                <input class="form-control" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ request('q') }}" style="height: 38px;">
                                 <div class="input-group-append">
-                                    <button class="btn btn-custom" type="submit">
+                                    <button class="btn btn-custom py-0" type="submit" style="height: 38px;">
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
@@ -109,11 +109,13 @@
                         <a href="{{ route('login') }}" class="nav-item nav-link {{ request()->routeIs('login.*') ? 'active' : '' }}">Login</a> |
                         <a href="{{ route('register') }}" class="nav-item nav-link {{ request()->routeIs('register.*') ? 'active' : '' }}">Register</a>
                         @else
-                        <a href="{{ route('user.dashboard') }}" class="nav-item nav-link {{ request()->routeIs('user.dashboard') ? 'active' : '' }}">Dashboard</a>
-                        <form class="form-inline my-2 my-lg-0 ml-4" action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="nav-link btn btn-link">Logout</button>
-                        </form>
+                        <div class="d-flex align-items-center">
+                            <a href="{{ route('user.dashboard') }}" class="nav-item nav-link {{ request()->routeIs('user.dashboard') ? 'active' : '' }}">Dashboard</a>
+                            <form class="form-inline m-0" action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="nav-link btn btn-link">Logout</button>
+                            </form>
+                        </div>
                         @endif  
                     </div>
                 </div>

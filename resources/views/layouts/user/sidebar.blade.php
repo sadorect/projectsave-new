@@ -1,13 +1,15 @@
 <div class="sidebar bg-dark text-white" style="width: 250px; min-height: 100vh;">
-    <div class="p-3">
-        <div class="text-center mb-4">
-            <img src="{{ auth()->user()->avatar ?? asset('frontend/img/default-avatar.png') }}" 
-                 alt="Profile" 
-                 class="rounded-circle mb-3" 
-                 style="width: 80px; height: 80px;">
-            <h6 class="mb-0">{{ auth()->user()->name }}</h6>
-            <small class="text-muted">Member</small>
-        </div>
+     <div class="p-3">
+         <div class="text-center mb-4">
+             <a href="{{ route('home') }}">
+                 <img src="{{ auth()->user()->avatar ?? asset('frontend/img/default-avatar.png') }}" 
+                      alt="Profile" 
+                      class="rounded-circle mb-3" 
+                      style="width: 80px; height: 80px;">
+             </a>
+             <h6 class="mb-0">{{ auth()->user()->name }}</h6>
+             <small class="text-muted">Member</small>
+         </div>
 
         <nav class="nav flex-column">
             <a class="nav-link text-white {{ request()->routeIs('user.dashboard') ? 'active' : '' }}" 
