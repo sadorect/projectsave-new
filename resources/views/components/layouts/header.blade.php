@@ -110,10 +110,10 @@
                         <a href="{{ route('register') }}" class="nav-item nav-link {{ request()->routeIs('register.*') ? 'active' : '' }}">Register</a>
                         @else
                         <a href="{{ route('user.dashboard') }}" class="nav-item nav-link {{ request()->routeIs('user.dashboard') ? 'active' : '' }}">Dashboard</a>
-                                            <form class="form-inline my-2 my-lg-0 ml-4" action="{{ route('logout') }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="nav-link btn btn-link">Logout</button>
-                                            </form>
+                        <form class="form-inline my-2 my-lg-0 ml-4" action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="nav-link btn btn-link">Logout</button>
+                        </form>
                         @endif  
                     </div>
                 </div>
