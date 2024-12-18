@@ -1,0 +1,108 @@
+Claude 3.5 Sonnet (New)
+Here are the key features we can integrate into an LMS for this application:
+
+Course Management
+- Course creation and organization
+- Curriculum builder
+- Lesson/module structuring 
+- Content uploading (videos, documents, quizzes)
+
+Copy
+
+Apply
+
+User Management & Roles
+- Student profiles
+- Teacher/instructor accounts
+- Admin dashboard
+- Progress tracking
+- Enrollment management
+
+Copy
+
+Apply
+
+Interactive Learning Features
+- Live video sessions
+- Discussion forums
+- Assignment submissions
+- Quiz/assessment system
+- Progress certificates
+
+Copy
+
+Apply
+
+Content Delivery
+- Video streaming
+- Document viewing
+- Interactive content
+- Mobile responsive design
+
+Copy
+
+Apply
+
+Analytics & Reporting
+- Student progress tracking
+- Course completion rates
+- Assessment results
+- Engagement metrics
+
+Copy
+
+Apply
+
+Communication Tools
+- Messaging system
+- Announcements
+- Email notifications
+- Discussion boards
+
+Copy
+
+Apply
+
+To implement this, we'll need to:
+
+Create new database migrations for:
+- courses
+- lessons
+- enrollments
+- assignments
+- quiz_questions
+- student_progress
+
+Copy
+
+Apply
+
+create_courses_table.php
+Set up models with relationships:
+- Course
+- Lesson
+- Enrollment
+- Assignment
+- Quiz
+
+Copy
+
+Apply
+
+Course.php
+Build controllers for:
+- CourseController
+- LessonController
+- EnrollmentController
+- QuizController
+
+Copy
+
+Apply
+
+app/Http/Controllers/
+Design views for:
+- course listing
+- lesson viewer
+- quiz interface
+- progress dashboard
