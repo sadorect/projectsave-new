@@ -90,6 +90,27 @@
             </ul>
         </div>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="collapse" href="#lms" role="button" aria-expanded="false" aria-controls="lms">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span class="menu-title">LMS Management</span>
+            <i class="menu-arrow"></i>
+        </a>
+        <div class="collapse" id="lms">
+            <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.courses.index') }}">Courses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.lessons.index') }}">Lessons</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.enrollments.index') }}">Enrollments</a>
+                </li>
+            </ul>
+        </div>
+    </li>
+    
     <li>
         <a href="{{route('admin.partners.index')}}" class="nav-link text-white">
             <i class="bi bi-raised-hands me-2"></i>

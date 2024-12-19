@@ -97,7 +97,12 @@ Route::prefix('admin')->group(function() {
              
         Route::resource('faqs', \App\Http\Controllers\FaqController::class)->names('admin.faqs');
 
-
+        Route::prefix('lms')->group(function () {
+            Route::resource('courses', AdminCourseController::class);
+            Route::resource('lessons', AdminLessonController::class);
+            Route::get('enrollments', [AdminEnrollmentController::class, 'index'])->name('enrollments.index');
+        });
+        
 
         // User Management
         Route::resource('users', AdminUserController::class)->names('admin.users');
