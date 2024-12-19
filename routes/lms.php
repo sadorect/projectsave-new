@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LMS\CourseController;
 use App\Http\Controllers\LMS\LessonController;
+use App\Http\Controllers\LMS\ProgressController;
 use App\Http\Controllers\LMS\DashboardController;
 use App\Http\Controllers\LMS\EnrollmentController;
 
@@ -19,6 +20,10 @@ Route::middleware(['auth'])->prefix('learn')->group(function () {
 
     // Dashboard routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('lms.dashboard');
+
+    Route::post('/lessons/{lesson}/complete', [ProgressController::class, 'markComplete'])
+    ->name('lessons.complete');
+
 
     
      // Enrollment routes

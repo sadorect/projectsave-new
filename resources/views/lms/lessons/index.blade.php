@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.lms>
     <div class="container py-8">
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -61,4 +61,4 @@
             </div>
         </div>
     </div>
-</x-layouts.app>
+</x-layouts.lms>

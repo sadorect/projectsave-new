@@ -1,30 +1,40 @@
-<x-layouts.app>
-    <div class="container py-8">
+<x-layouts.lms>
+    <div class="container">
         <div class="row">
             <!-- Main Content -->
             <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>My Courses</h2>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">My Enrolled Courses</h4>
                     </div>
-                    <div class="card-body">
+                    
+                    <div class="card-body p-0">
                         @forelse($enrolledCourses as $course)
-                            <div class="course-item border-bottom p-4">
-                                <div class="row">
+                            <div class="course-item p-4 border-bottom">
+                                <div class="row align-items-center">
                                     <div class="col-md-4">
-                                        @if($course->featured_image)
-                                            <img src="{{ $course->featured_image }}" 
-                                                 class="img-fluid rounded" 
-                                                 alt="{{ $course->title }}">
-                                        @endif
+                                        <img src="{{ $course->featured_image }}" 
+                                             alt="{{ $course->title }}"
+                                             class="img-fluid rounded">
                                     </div>
                                     <div class="col-md-8">
-                                        <h3>{{ $course->title }}</h3>
-                                        <p class="text-muted">Enrolled: {{ $course->pivot->created_at->format('M d, Y') }}</p>
+                                        <h5>{{ $course->title }}</h5>
+                                        <p class="text-muted mb-2">
+                                            <small>Enrolled: {{ $course->pivot->created_at->format('M d, Y') }}</small>
+                                        </p>
                                         
-                                        <div class="mt-3">
+                                        <div class="progress mb-2" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" 
+                                                 style="width: {{ auth()->user()->getCourseProgress($course) }}%">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                {{ number_format(auth()->user()->getCourseProgress($course), 1) }}% Complete
+                                            </small>
                                             <a href="{{ route('lessons.index', $course) }}" 
-                                               class="btn btn-primary">
+                                               class="btn btn-primary btn-sm">
                                                 Continue Learning
                                             </a>
                                         </div>
@@ -32,33 +42,33 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="text-center py-4">
-                                <p>You haven't enrolled in any courses yet.</p>
+                            <div class="text-center py-5">
+                                <h5>No courses enrolled yet</h5>
+                                <p class="text-muted">Start learning by enrolling in a course</p>
                                 <a href="{{ route('courses.index') }}" class="btn btn-primary">
                                     Browse Courses
                                 </a>
                             </div>
                         @endforelse
-
-                        <div class="mt-4">
-                            {{ $enrolledCourses->links() }}
-                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Sidebar -->
             <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Learning Progress</h3>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Learning Progress</h5>
                     </div>
                     <div class="card-body">
-                        <p>Total Courses: {{ $enrolledCourses->total() }}</p>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Enrolled Courses</span>
+                            <strong>{{ $enrolledCourses->total() }}</strong>
+                        </div>
                         <!-- Add more stats here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</x-layouts.app>
+</x-layouts.lms>

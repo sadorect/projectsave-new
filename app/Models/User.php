@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\Partner;
 use App\Models\Activity;
 use App\Models\Enrollment;
+use App\Models\LessonProgress;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -129,6 +130,33 @@ public function courses()
                 ->withPivot('status', 'completed_at');
 }
 
+public function lessonProgress()
+{
+    return $this->hasMany(LessonProgress::class);
+}
+
+public function markLessonAsCompleted(Lesson $lesson)
+{
+    return $this->lessonProgress()->updateOrCreate(
+        ['lesson_id' => $lesson->id],
+        ['completed' => true, 'last_accessed_at' => now()]
+    );
+}
+
+public function getCourseProgress(Course $course)
+{
+    $totalLessons = $course->lessons()->count();
+    if ($totalLessons === 0) return 0;
+
+    $completedLessons = $this->lessonProgress()
+        ->whereHas('lesson', function ($query) use ($course) {
+            $query->where('course_id', $course->id);
+        })
+        ->where('completed', true)
+        ->count();
+
+    return ($completedLessons / $totalLessons) * 100;
+}
 
 
 
