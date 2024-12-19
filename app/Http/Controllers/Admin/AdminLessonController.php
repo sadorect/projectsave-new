@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -12,10 +12,11 @@ class AdminLessonController extends Controller
 {
     public function index()
     {
-        $lessons = Lesson::with(['course'])
-                        ->latest()
-                        ->paginate(10);
-                        
+        $lessons = Lesson::with('course')
+            ->orderBy('course_id')
+            ->orderBy('order')
+            ->paginate(10);
+            
         return view('admin.lessons.index', compact('lessons'));
     }
 
@@ -30,13 +31,13 @@ class AdminLessonController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required',
-            'course_id' => 'required|exists:courses,id',
             'video_url' => 'nullable|url',
-            'order' => 'required|integer|min:1'
+            'order' => 'required|integer|min:1',
+            'course_id' => 'required|exists:courses,id'
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
-
+        
         Lesson::create($validated);
 
         return redirect()->route('admin.lessons.index')
@@ -54,9 +55,9 @@ class AdminLessonController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required',
-            'course_id' => 'required|exists:courses,id',
             'video_url' => 'nullable|url',
-            'order' => 'required|integer|min:1'
+            'order' => 'required|integer|min:1',
+            'course_id' => 'required|exists:courses,id'
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
@@ -70,7 +71,7 @@ class AdminLessonController extends Controller
     public function destroy(Lesson $lesson)
     {
         $lesson->delete();
-
+        
         return redirect()->route('admin.lessons.index')
                         ->with('success', 'Lesson deleted successfully');
     }

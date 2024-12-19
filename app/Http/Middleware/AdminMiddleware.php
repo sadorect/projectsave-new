@@ -10,7 +10,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next)
     {
         if (!auth()->check() || !auth()->user()->is_admin) {
-            return redirect('/');
+            return redirect()->route('home')->with('error', 'Unauthorized access');
         }
 
         return $next($request);

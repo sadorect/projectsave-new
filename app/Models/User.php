@@ -49,9 +49,14 @@ class User extends Authenticatable
      */
     protected $casts = [
         'birthday' => 'date',
-        'wedding_anniversary' => 'date'
+        'wedding_anniversary' => 'date',
+        'is_admin' => 'boolean',
     ];
 
+    public function isAdmin()
+    {
+        return $this->is_admin === true;
+    }
 
 public function activities()
 {

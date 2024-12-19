@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Lesson Management</h2>
+        <h2>Lessons</h2>
         <a href="{{ route('admin.lessons.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-lg"></i> Add New Lesson
         </a>
@@ -15,26 +15,28 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th>Order</th>
                             <th>Title</th>
                             <th>Course</th>
-                            <th>Order</th>
                             <th>Video</th>
+                            <th>Created At</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($lessons as $lesson)
+                        @foreach($lessons as $lesson)
                             <tr>
+                                <td>{{ $lesson->order }}</td>
                                 <td>{{ $lesson->title }}</td>
                                 <td>{{ $lesson->course->title }}</td>
-                                <td>{{ $lesson->order }}</td>
                                 <td>
                                     @if($lesson->video_url)
                                         <i class="bi bi-camera-video text-success"></i>
                                     @else
-                                        <i class="bi bi-camera-video-off text-muted"></i>
+                                        <i class="bi bi-dash"></i>
                                     @endif
                                 </td>
+                                <td>{{ $lesson->created_at->format('M d, Y') }}</td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{{ route('admin.lessons.edit', $lesson) }}" class="btn btn-sm btn-outline-primary">
@@ -50,11 +52,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="text-center">No lessons found</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
