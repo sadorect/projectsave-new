@@ -25,4 +25,20 @@ class Lesson extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    public function getEmbedVideoUrlAttribute()
+    {
+        if (!$this->video_url) {
+            return null;
+        }
+
+        if (str_contains($this->video_url, 'youtube.com')) {
+            preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $this->video_url, $matches);
+            return isset($matches[1]) ? "https://www.youtube.com/embed/{$matches[1]}" : null;
+        }
+
+        return $this->video_url;
+    }
 }
+
+

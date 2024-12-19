@@ -127,8 +127,9 @@ public function courses()
 {
     return $this->belongsToMany(Course::class, 'course_user')
                 ->withTimestamps()
-                ->withPivot('status', 'completed_at');
+                ->withPivot('status', 'enrolled_at', 'completed_at');
 }
+
 
 public function lessonProgress()
 {

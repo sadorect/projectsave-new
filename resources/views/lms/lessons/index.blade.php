@@ -1,63 +1,39 @@
 <x-layouts.lms>
-    <div class="container py-8">
-        <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h2>{{ $course->title }} - Lessons</h2>
-                <a href="{{ route('lessons.create', $course) }}" class="btn btn-primary">Add New Lesson</a>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>{{ $course->title }}</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <div class="list-group">
+                            @foreach($lessons as $lesson)
+                                <a href="{{ route('lessons.show', [$course->slug, $lesson->slug]) }}" 
+                                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ $lesson->order }}. {{ $lesson->title }}</h5>
+                                        @if($lesson->video_url)
+                                            <small><i class="bi bi-camera-video"></i> Video Lesson</small>
+                                        @endif
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="card-body">
-                @if($lessons->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Order</th>
-                                    <th>Title</th>
-                                    <th>Created</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($lessons as $lesson)
-                                    <tr>
-                                        <td>{{ $lesson->order }}</td>
-                                        <td>
-                                            <a href="{{ route('lessons.show', [$course, $lesson]) }}">
-                                                {{ $lesson->title }}
-                                            </a>
-                                        </td>
-                                        <td>{{ $lesson->created_at->format('M d, Y') }}</td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <a href="{{ route('lessons.edit', [$course, $lesson]) }}" 
-                                                   class="btn btn-sm btn-outline-primary">
-                                                    Edit
-                                                </a>
-                                                
-                                                <form action="{{ route('lessons.destroy', [$course, $lesson]) }}" 
-                                                      method="POST" 
-                                                      class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" 
-                                                            class="btn btn-sm btn-outline-danger" 
-                                                            onclick="return confirm('Are you sure you want to delete this lesson?')">
-                                                        Delete
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Course Progress</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                        </div>
+                        <a href="{{ route('courses.show', $course->slug) }}" class="btn btn-outline-primary w-100">
+                            Course Details
+                        </a>
                     </div>
-                    
-                    {{ $lessons->links() }}
-                @else
-                    <p class="text-center">No lessons available for this course yet.</p>
-                @endif
+                </div>
             </div>
         </div>
     </div>

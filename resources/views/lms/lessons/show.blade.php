@@ -1,43 +1,49 @@
 <x-layouts.lms>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
+            <div class="col-md-8">
+                <div class="card">
                     <div class="card-body">
-                        <h4 class="mb-3">{{ $lesson->title }}</h4>
+                        <h2>{{ $lesson->title }}</h2>
                         
-                        <x-video-player :lesson="$lesson" />
                         
-                        <div class="mt-4">
+                   @if($lesson->video_url)
+                        <div class="video-container mb-4">
+                            <iframe src="{{ $lesson->embed_video_url }}" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                    allowfullscreen>
+                            </iframe>
+                        </div>
+                    @endif
+                                           <div class="lesson-content">
                             {!! $lesson->content !!}
                         </div>
-                        
-                        <div class="mt-4 border-top pt-4">
-                            <button id="mark-complete" 
-                                    class="btn btn-success" 
-                                    data-lesson-id="{{ $lesson->id }}"
-                                    {{ auth()->user()->lessonProgress()->where('lesson_id', $lesson->id)->where('completed', true)->exists() ? 'disabled' : '' }}>
-                                {{ auth()->user()->lessonProgress()->where('lesson_id', $lesson->id)->where('completed', true)->exists() ? 'Completed' : 'Mark as Complete' }}
-                            </button>
+
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{{ route('lessons.index', $course->slug) }}" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left"></i> Back to Lessons
+                            </a>
+                            @if($nextLesson)
+                                <a href="{{ route('lessons.show', [$course->slug, $nextLesson->slug]) }}" class="btn btn-primary">
+                                    Next Lesson <i class="bi bi-arrow-right"></i>
+                                </a>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-lg-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Course Content</h5>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Course Content</h5>
                     </div>
                     <div class="list-group list-group-flush">
-                        @foreach($course->lessons()->orderBy('order')->get() as $courseLesson)
-                            <a href="{{ route('lessons.show', [$course, $courseLesson]) }}" 
-                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center
-                               {{ $lesson->id === $courseLesson->id ? 'active' : '' }}">
-                                {{ $courseLesson->title }}
-                                @if(auth()->user()->lessonProgress()->where('lesson_id', $courseLesson->id)->where('completed', true)->exists())
-                                    <span class="badge bg-success rounded-pill">✓</span>
-                                @endif
+                        @foreach($course->lessons as $courseLesson)
+                            <a href="{{ route('lessons.show', [$course->slug, $courseLesson->slug]) }}" 
+                               class="list-group-item list-group-item-action {{ $courseLesson->id === $lesson->id ? 'active' : '' }}">
+                                {{ $courseLesson->order }}. {{ $courseLesson->title }}
                             </a>
                         @endforeach
                     </div>
@@ -45,8 +51,28 @@
             </div>
         </div>
     </div>
-
-    @push('scripts')
-        <script src="{{ asset('js/lesson-progress.js') }}"></script>
-    @endpush
 </x-layouts.lms>
+<style>
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.lesson-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+</style>

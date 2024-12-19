@@ -10,20 +10,31 @@ use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
-    public function index()
-    {
-        $courses = Course::where('status', 'published')
-                        ->latest()
-                        ->paginate(12);
-                        
-        return view('lms.courses.index', compact('courses'));
-    }
+public function index()
+{
+    $courses = Course::where('status', 'published')
+        ->with('instructor')
+        ->latest()
+        ->paginate(9);
+            
+    return view('lms.courses.index', compact('courses'));
+}
 
-    public function create()
-    {
-        return view('lms.courses.create');
-    }
+public function create()
+{
+    return view('lms.courses.create');
+}
 
+public function show(Course $course)
+{
+    $course->load(['instructor', 'lessons' => function($query) {
+        $query->orderBy('order');
+    }]);
+        
+    $isEnrolled = auth()->user()->courses()->where('course_id', $course->id)->exists();
+        
+    return view('lms.courses.show', compact('course', 'isEnrolled'));
+}
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -47,10 +58,6 @@ class CourseController extends Controller
                         ->with('success', 'Course created successfully');
     }
 
-    public function show(Course $course)
-    {
-        return view('lms.courses.show', compact('course'));
-    }
 
     public function edit(Course $course)
     {

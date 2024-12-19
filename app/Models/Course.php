@@ -40,8 +40,9 @@ public function users()
 {
     return $this->belongsToMany(User::class, 'course_user')
                 ->withTimestamps()
-                ->withPivot('status', 'enrolled_at');
+                ->withPivot('status', 'enrolled_at', 'completed_at');
 }
+
 
 
 }

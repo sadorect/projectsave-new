@@ -16,10 +16,13 @@ Route::middleware(['auth'])->prefix('learn')->group(function () {
     Route::middleware(['course.access'])->group(function () {
         Route::get('/courses/{course:slug}/lessons', [LessonController::class, 'index'])->name('lessons.index');
         Route::get('/courses/{course:slug}/lessons/{lesson:slug}', [LessonController::class, 'show'])->name('lessons.show');
+        
     });
 
     // Dashboard routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('lms.dashboard');
+    Route::post('/courses/{course:slug}/enroll', [DashboardController::class, 'enroll'])->name('courses.enroll');
+    Route::delete('/courses/{course:slug}/unenroll', [DashboardController::class, 'unenroll'])->name('courses.unenroll');
 
     Route::post('/lessons/{lesson}/complete', [ProgressController::class, 'markComplete'])
     ->name('lessons.complete');

@@ -20,13 +20,18 @@ class LessonController extends Controller
 
     public function index(Course $course)
     {
-        $lessons = $course->lessons()->orderBy('order')->paginate(20);
+        $lessons = $course->lessons()->orderBy('order')->get();
         return view('lms.lessons.index', compact('course', 'lessons'));
     }
 
     public function show(Course $course, Lesson $lesson)
     {
-        return view('lms.lessons.show', compact('course', 'lesson'));
+        $nextLesson = $course->lessons()
+            ->where('order', '>', $lesson->order)
+            ->orderBy('order')
+            ->first();
+            
+        return view('lms.lessons.show', compact('course', 'lesson', 'nextLesson'));
     }
 
     public function create(Course $course)
