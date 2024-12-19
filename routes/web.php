@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\NewsUpdateController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\AdminLessonController;
 use App\Http\Controllers\Admin\AdminPartnerController;
+use App\Http\Controllers\Admin\AdminEnrollmentController;
 use App\Http\Controllers\Admin\DeletionRequestController;
 use App\Http\Controllers\Admin\AdminPrayerForceController;
 use App\Http\Controllers\NotificationPreferenceController;
@@ -99,12 +100,7 @@ Route::prefix('admin')->group(function() {
              
         Route::resource('faqs', \App\Http\Controllers\FaqController::class)->names('admin.faqs');
 
-        Route::prefix('lms')->group(function () {
-            Route::resource('courses', AdminCourseController::class);
-            Route::resource('lessons', AdminLessonController::class);
-            Route::get('enrollments', [AdminEnrollmentController::class, 'index'])->name('enrollments.index');
-        });
-        
+          
 
         // User Management
         Route::resource('users', AdminUserController::class)->names('admin.users');
@@ -152,6 +148,15 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
     });
 });
 
+   // Admin LMS Routes
+   Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // LMS Management
+    Route::resource('courses', AdminCourseController::class);
+    Route::resource('lessons', AdminLessonController::class);
+    Route::get('enrollments', [AdminEnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::delete('enrollments/{course}/{user}', [AdminEnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+    Route::patch('enrollments/{course}/{user}/status', [AdminEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
+});
 
 require __DIR__.'/auth.php';
 require __DIR__.'/lms.php';

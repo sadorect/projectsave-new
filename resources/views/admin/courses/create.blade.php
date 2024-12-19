@@ -1,4 +1,6 @@
-<x-admin-layout>
+@extends('admin.layouts.app')
+
+@section('content')
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
@@ -17,4 +19,4 @@
             </div>
         </div>
     </div>
-</x-admin-layout>
+    @endsection

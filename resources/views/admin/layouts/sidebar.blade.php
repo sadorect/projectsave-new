@@ -91,21 +91,26 @@
         </div>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="collapse" href="#lms" role="button" aria-expanded="false" aria-controls="lms">
-            <i class="fas fa-graduation-cap me-2"></i>
-            <span class="menu-title">LMS Management</span>
-            <i class="menu-arrow"></i>
+        <a class="nav-link text-white" data-bs-toggle="collapse" href="#lms" role="button" aria-expanded="false" aria-controls="lms">
+            <i class="bi bi-mortarboard me-2"></i>
+            LMS Management
         </a>
         <div class="collapse" id="lms">
             <ul class="nav flex-column sub-menu">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.courses.index') }}">Courses</a>
+                    <a class="nav-link text-white" href="{{ route('admin.courses.index') }}">
+                        <i class="bi bi-book me-2"></i> Courses
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.lessons.index') }}">Lessons</a>
+                    <a class="nav-link text-white" href="{{ route('admin.lessons.index') }}">
+                        <i class="bi bi-journal-text me-2"></i> Lessons
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.enrollments.index') }}">Enrollments</a>
+                    <a class="nav-link text-white" href="{{ route('admin.enrollments.index') }}">
+                        <i class="bi bi-people me-2"></i> Enrollments
+                    </a>
                 </li>
             </ul>
         </div>
