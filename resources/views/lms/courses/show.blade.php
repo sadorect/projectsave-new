@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.lms>
     <div class="container py-8">
         <div class="row">
             <div class="col-lg-8">
@@ -35,7 +35,7 @@
                                 </form>
                             @endif
                         @endauth
-                        @endauth
+                        
                     </div>
                 </div>
             </div>
@@ -58,4 +58,4 @@
             </div>
         </div>
     </div>
-</x-layouts.app>
+</x-layouts.lms>

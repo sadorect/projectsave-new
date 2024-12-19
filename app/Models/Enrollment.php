@@ -12,11 +12,13 @@ class Enrollment extends Model
         'user_id',
         'course_id',
         'status',
-        'completed_at'
+        'completed_at',
+        'enrolled_at'
     ];
 
     protected $casts = [
-        'completed_at' => 'datetime'
+        'completed_at' => 'datetime',
+        'enrolled_at' => 'datetime'
     ];
 
     public function user()

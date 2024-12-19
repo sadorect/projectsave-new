@@ -125,7 +125,7 @@ public function isEnrolledIn()
 
 public function courses()
 {
-    return $this->belongsToMany(Course::class, 'enrollments')
+    return $this->belongsToMany(Course::class, 'course_user')
                 ->withTimestamps()
                 ->withPivot('status', 'completed_at');
 }

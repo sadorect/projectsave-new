@@ -154,8 +154,16 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
     Route::resource('courses', AdminCourseController::class);
     Route::resource('lessons', AdminLessonController::class);
     Route::get('enrollments', [AdminEnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::get('enrollments/create', [AdminEnrollmentController::class, 'create'])->name('enrollments.create');
     Route::delete('enrollments/{course}/{user}', [AdminEnrollmentController::class, 'destroy'])->name('enrollments.destroy');
     Route::patch('enrollments/{course}/{user}/status', [AdminEnrollmentController::class, 'updateStatus'])->name('enrollments.status');
+ Route::get('enrollments/{course}', [AdminEnrollmentController::class, 'show'])->name('enrollments.show');
+ Route::get('enrollments/{course}/edit', [AdminEnrollmentController::class, 'edit'])->name('enrollments.edit');
+ Route::put('enrollments/{course}/{user}', [AdminEnrollmentController::class, 'update'])->name('enrollments.update');
+ Route::post('enrollments/store', [AdminEnrollmentController::class, 'store'])->name('enrollments.store');
+
+
+
 });
 
 require __DIR__.'/auth.php';

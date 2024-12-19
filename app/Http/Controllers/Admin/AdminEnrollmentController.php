@@ -20,7 +20,7 @@ class AdminEnrollmentController extends Controller
 
     public function create()
     {
-        $courses = Course::pluck('title', 'id');
+        $courses = Course::where('status', 'published')->pluck('title', 'id');
         $users = User::pluck('name', 'id');
         
         return view('admin.enrollments.create', compact('courses', 'users'));
@@ -34,12 +34,14 @@ class AdminEnrollmentController extends Controller
         ]);
 
         $user = User::find($validated['user_id']);
-        $course = Course::find($validated['course_id']);
-
-        $user->courses()->attach($course->id, [
-            'enrolled_at' => now(),
-            'status' => 'active'
-        ]);
+        
+        // Check if user is already enrolled
+        if (!$user->courses()->where('course_id', $validated['course_id'])->exists()) {
+            $user->courses()->attach($validated['course_id'], [
+                'enrolled_at' => now(),
+                'status' => 'active'
+            ]);
+        }
 
         return redirect()->route('admin.enrollments.index')
                         ->with('success', 'Student enrolled successfully');
@@ -49,13 +51,13 @@ class AdminEnrollmentController extends Controller
     {
         $user->courses()->detach($course->id);
         return redirect()->route('admin.enrollments.index')
-                        ->with('success', 'Enrollment removed successfully');
+            ->with('success', 'Student removed from course');
     }
 
     public function updateStatus(Course $course, User $user, Request $request)
     {
         $validated = $request->validate([
-            'status' => 'required|in:active,suspended,completed'
+            'status' => 'required|in:active,completed,suspended'
         ]);
 
         $user->courses()->updateExistingPivot($course->id, [
@@ -63,8 +65,9 @@ class AdminEnrollmentController extends Controller
         ]);
 
         return redirect()->route('admin.enrollments.index')
-                        ->with('success', 'Enrollment status updated');
+            ->with('success', 'Enrollment status updated');
     }
+
 
     public function show(Course $course, User $user)
     {

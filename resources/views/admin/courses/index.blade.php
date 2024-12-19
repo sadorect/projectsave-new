@@ -35,6 +35,9 @@
                                 <td>{{ $course->created_at->format('M d, Y') }}</td>
                                 <td>
                                     <div class="btn-group">
+                                      <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
                                         <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-pencil"></i>
                                         </a>

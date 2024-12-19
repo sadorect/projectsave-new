@@ -18,19 +18,16 @@
 </div>
 
 <div class="form-group mb-3">
-    <label for="featured_image">Featured Image</label>
-    <input type="file" name="featured_image" id="featured_image" 
-           class="form-control @error('featured_image') is-invalid @enderror">
-    @error('featured_image')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-    
-    @if(isset($course) && $course->featured_image)
-        <div class="mt-2">
-            <img src="{{ $course->featured_image }}" alt="Current featured image" class="img-thumbnail" style="max-height: 200px">
-        </div>
-    @endif
+  <label for="featured_image">Featured Image</label>
+  <input type="file" name="featured_image" id="featured_image" 
+         class="form-control @error('featured_image') is-invalid @enderror">
+  <img id="image_preview" src="{{ $course->featured_image ?? '' }}" 
+       class="mt-2" style="max-height: 200px; display: {{ isset($course->featured_image) ? 'block' : 'none' }}">
+  @error('featured_image')
+      <div class="invalid-feedback">{{ $message }}</div>
+  @enderror
 </div>
+
 
 <div class="form-group mb-3">
     <label for="status">Status</label>
@@ -43,3 +40,14 @@
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
 </div>
+
+<script>
+  document.getElementById('featured_image').onchange = function(evt) {
+      const [file] = this.files;
+      if (file) {
+          const preview = document.getElementById('image_preview');
+          preview.src = URL.createObjectURL(file);
+          preview.style.display = 'block';
+      }
+  }
+</script>

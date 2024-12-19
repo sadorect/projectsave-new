@@ -34,9 +34,10 @@ class AdminCourseController extends Controller
         ]);
     
         if ($request->hasFile('featured_image')) {
-            $path = $request->file('featured_image')->store('courses', 'public');
-            $validated['featured_image'] = Storage::url($path);
-        }
+          $path = $request->file('featured_image')->store('courses', 'public');
+          $validated['featured_image'] = $path;
+      }
+      
     
         $validated['slug'] = Str::slug($validated['title']);
         $validated['instructor_id'] = auth()->id();
@@ -63,14 +64,15 @@ class AdminCourseController extends Controller
         ]);
     
         if ($request->hasFile('featured_image')) {
-            // Delete old image if exists
-            if ($course->featured_image) {
-                Storage::delete(str_replace('/storage/', 'public/', $course->featured_image));
-            }
-            
-            $path = $request->file('featured_image')->store('courses', 'public');
-            $validated['featured_image'] = Storage::url($path);
-        }
+          // Delete old image if exists
+          if ($course->featured_image) {
+              Storage::disk('public')->delete($course->featured_image);
+          }
+          
+          $path = $request->file('featured_image')->store('courses', 'public');
+          $validated['featured_image'] = $path;
+      }
+      
     
         $validated['slug'] = Str::slug($validated['title']);
         
@@ -80,6 +82,15 @@ class AdminCourseController extends Controller
                         ->with('success', 'Course updated successfully');
     }
     
+    public function show(Course $course)
+    {
+        $course->load(['instructor', 'lessons' => function($query) {
+            $query->orderBy('order');
+        }]);
+        
+        return view('admin.courses.show', compact('course'));
+    }
+
 
     public function destroy(Course $course)
     {
