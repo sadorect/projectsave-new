@@ -147,6 +147,7 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
 
 
 require __DIR__.'/auth.php';
+require __DIR__.'/lms.php';
 
 
 Route::get('/blog/dates/{year}/{month}', [BlogController::class, 'getDates'])->name('blog.dates');

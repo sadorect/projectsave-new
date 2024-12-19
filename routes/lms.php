@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\LMS\CourseController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LMS\CourseController;
+use App\Http\Controllers\LMS\LessonController;
 
 Route::middleware(['auth'])->prefix('learn')->group(function () {
     // Public course routes

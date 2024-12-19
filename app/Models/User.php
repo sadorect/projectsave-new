@@ -4,8 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Carbon\Carbon;
+use App\Models\Course;
 use App\Models\Partner;
 use App\Models\Activity;
+use App\Models\Enrollment;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -108,5 +110,23 @@ public function hasPermission($permission)
 {
     return $this->roles->flatMap->permissions->contains('slug', $permission);
 }
+
+
+public function enrollments()
+{
+    return $this->hasMany(Enrollment::class);
+}
+
+public function courses()
+{
+    return $this->belongsToMany(Course::class, 'enrollments')
+                ->withTimestamps()
+                ->withPivot('status', 'completed_at');
+}
+
+
+
+
+
 
 }
