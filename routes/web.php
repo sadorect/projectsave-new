@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
@@ -10,7 +11,6 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PartnerController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\FaqController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
@@ -21,6 +21,8 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\VideoReelController;
 use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\NewsUpdateController;
+use App\Http\Controllers\Admin\AdminCourseController;
+use App\Http\Controllers\Admin\AdminLessonController;
 use App\Http\Controllers\Admin\AdminPartnerController;
 use App\Http\Controllers\Admin\DeletionRequestController;
 use App\Http\Controllers\Admin\AdminPrayerForceController;
