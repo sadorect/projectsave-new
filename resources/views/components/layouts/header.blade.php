@@ -62,6 +62,16 @@
                                 <i class="fa fa-envelope"></i>
                                 <p>info@projectsaveng.org</p>
                             </div>
+                            <form class="form-inline my-2 my-lg-0" action="{{ route('search') }}" method="GET">
+                                <div class="input-group">
+                                    <input class="form-control" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ request('q') }}" style="height: 38px;">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-custom py-0" type="submit" style="height: 38px;">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -93,19 +103,19 @@
                         <a href="{{ route('events.index') }}" class="nav-item nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}">Events</a>
                         <a href="{{ route('blog.index') }}" class="nav-item nav-link {{ request()->routeIs('blog.*')|| request()->routeIs('posts.show') ? 'active' : '' }}">Devotional</a>
                         <a href="{{ route('faqs.list') }}" class="nav-item nav-link {{ request()->routeIs('faqs.*') ? 'active' : '' }}">Blog</a>
-                        <a href="{{ route('contact.show') }}" class="nav-item nav-link {{ request()->routeIs('contact.*') ? 'active' : '' }}">Contact</a>
-                        
-                        <form class="form-inline my-2 my-lg-0 ml-4" action="{{ route('search') }}" method="GET">
-                            <div class="input-group">
-                                <input class="form-control" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ request('q') }}" style="height: 38px;">
-                                <div class="input-group-append">
-                                    <button class="btn btn-custom py-0" type="submit" style="height: 38px;">
-                                        <i class="fa fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        @if(!auth()->check())
+
+
+
+
+
+
+
+
+
+
+
+
+                        <a href="{{ route('contact.show') }}" class="nav-item nav-link {{ request()->routeIs('contact.*') ? 'active' : '' }}">Contact</a>                        @if(!auth()->check())
                             <a href="{{ route('login') }}" class="nav-item nav-link">Login</a> |
                             <a href="{{ route('register') }}" class="nav-item nav-link">Register</a>
                         @else
