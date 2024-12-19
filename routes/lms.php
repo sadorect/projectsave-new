@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LMS\CourseController;
 use App\Http\Controllers\LMS\LessonController;
+use App\Http\Controllers\LMS\DashboardController;
 use App\Http\Controllers\LMS\EnrollmentController;
 
 Route::middleware(['auth'])->prefix('learn')->group(function () {
@@ -16,6 +17,10 @@ Route::middleware(['auth'])->prefix('learn')->group(function () {
         Route::get('/courses/{course:slug}/lessons/{lesson:slug}', [LessonController::class, 'show'])->name('lessons.show');
     });
 
+    // Dashboard routes
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('lms.dashboard');
+
+    
      // Enrollment routes
      Route::post('/courses/{course}/enroll', [EnrollmentController::class, 'store'])->name('courses.enroll');
      Route::delete('/courses/{course}/unenroll', [EnrollmentController::class, 'destroy'])->name('courses.unenroll');

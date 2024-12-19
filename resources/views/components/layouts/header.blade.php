@@ -106,17 +106,18 @@
                             </div>
                         </form>
                         @if(!auth()->check())
-                        <a href="{{ route('login') }}" class="nav-item nav-link {{ request()->routeIs('login.*') ? 'active' : '' }}">Login</a> |
-                        <a href="{{ route('register') }}" class="nav-item nav-link {{ request()->routeIs('register.*') ? 'active' : '' }}">Register</a>
+                            <a href="{{ route('login') }}" class="nav-item nav-link">Login</a> |
+                            <a href="{{ route('register') }}" class="nav-item nav-link">Register</a>
                         @else
-                        <div class="d-flex align-items-center">
-                            <a href="{{ route('user.dashboard') }}" class="nav-item nav-link {{ request()->routeIs('user.dashboard') ? 'active' : '' }}">Dashboard</a>
-                            <form class="form-inline m-0" action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="nav-link btn btn-link">Logout</button>
-                            </form>
-                        </div>
-                        @endif  
+                            <div class="d-flex align-items-center">
+                                <a href="{{ route('user.dashboard') }}" class="nav-item nav-link">Dashboard</a>
+                                <a class="nav-link" href="{{ route('lms.dashboard') }}">My Learning</a>
+                                <form class="form-inline m-0" action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="nav-link btn btn-link">Logout</button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

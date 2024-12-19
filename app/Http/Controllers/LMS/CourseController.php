@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\LMS;
 
-use App\Http\Controllers\Controller;
 use App\Models\Course;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
@@ -100,7 +101,7 @@ class CourseController extends Controller
 
     public function enroll(Course $course)
     {
-        auth()->user()->courses()->attach($course->id);
+        auth()->user()->enrolledCourses()->attach($course->id);
         
         return redirect()->route('lessons.index', $course)
                         ->with('success', 'Successfully enrolled in the course');
