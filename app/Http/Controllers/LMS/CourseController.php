@@ -40,7 +40,7 @@ public function show(Course $course)
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'required|in:draft,published,archived'
         ]);
 
@@ -72,7 +72,7 @@ public function show(Course $course)
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'status' => 'required|in:draft,published,archived'
         ]);
 

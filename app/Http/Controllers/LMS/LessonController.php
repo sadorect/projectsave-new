@@ -53,7 +53,7 @@ class LessonController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required',
-            'video' => 'required|file|mimes:mp4,mov,ogg,webm|max:512000',
+            'video' => 'required|file|mimes:mp4,mov,ogg,webm,webp|max:512000',
             'order' => 'required|integer|min:1'
         ]);
 
@@ -91,7 +91,7 @@ class LessonController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required',
-            'video' => 'nullable|file|mimes:mp4,mov,ogg,webm|max:512000',
+            'video' => 'nullable|file|mimes:mp4,mov,ogg,webm,webp|max:512000',
             'order' => 'required|integer|min:1'
         ]);
 
