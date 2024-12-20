@@ -18,10 +18,11 @@
     <div class="container my-5">
         <div class="search-header text-center mb-5">
             <h3>Search Results for "<span class="text-primary">{{ $query }}</span>"</h3>
-            <p class="text-muted">Found {{ $posts->count() + $events->count() }} results</p>
+            <p class="text-muted">Found {{ $posts->count() + $events->count() + $faqs->count() }} results</p>
+
         </div>
         
-        @if($posts->count() > 0 || $events->count() > 0)
+        @if($posts->count() > 0 || $events->count() > 0 || $faqs->count() > 0)
             @if($posts->count() > 0)
                 <div class="section-header mt-5">
                     <p>Blog Posts</p>
@@ -72,7 +73,7 @@
                                 </span>
                                 <h4>{{ $faq->question }}</h4>
                                 <p>{{ Str::limit($faq->answer, 150) }}</p>
-                                <a href="{{ route('faqs.show', $faq->id) }}" class="btn btn-custom btn-sm">Read More</a>
+                                <a href="{{ route('faqs.show', $faq->slug) }}" class="btn btn-custom btn-sm">Read More</a>
                             </div>
                         </div>
                     </div>
