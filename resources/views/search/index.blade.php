@@ -71,8 +71,8 @@
                                 <span class="result-type faq-type">
                                     <i class="far fa-question-circle mr-2"></i>FAQ
                                 </span>
-                                <h4>{{ $faq->question }}</h4>
-                                <p>{{ Str::limit($faq->answer, 150) }}</p>
+                                <h4>{{ $faq->title }}</h4>
+                                <p>{!! Str::limit($faq->details, 150) !!}</p>
                                 <a href="{{ route('faqs.show', $faq->slug) }}" class="btn btn-custom btn-sm">Read More</a>
                             </div>
                         </div>
