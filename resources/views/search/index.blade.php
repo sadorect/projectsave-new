@@ -57,6 +57,30 @@
                 </div>
             @endif
 
+            @if($faqs->count() > 0)
+            <div class="section-header mt-5">
+                <p>FAQs</p>
+                <h2>Frequently Asked Questions</h2>
+            </div>
+            <div class="row">
+                @foreach($faqs as $faq)
+                    <div class="col-lg-6 mb-4">
+                        <div class="search-result-card faq-card">
+                            <div class="result-content">
+                                <span class="result-type faq-type">
+                                    <i class="far fa-question-circle mr-2"></i>FAQ
+                                </span>
+                                <h4>{{ $faq->question }}</h4>
+                                <p>{{ Str::limit($faq->answer, 150) }}</p>
+                                <a href="{{ route('faqs.show', $faq->id) }}" class="btn btn-custom btn-sm">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+        
+
             @if($events->count() > 0)
                 <div class="section-header mt-5">
                     <p>Events</p>
@@ -172,5 +196,21 @@
         .no-results {
             padding: 50px 0;
         }
+
+        .faq-type {
+    background: #17a2b8;
+    color: #fff;
+}
+
+.faq-card .result-content {
+    padding: 25px;
+}
+
+.faq-card h4 {
+    color: #2d3436;
+    font-size: 1.1rem;
+    margin: 15px 0;
+}
+
     </style>
 </x-layouts.app>

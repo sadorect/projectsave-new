@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Event;
+use App\Models\Faq;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
@@ -19,7 +20,11 @@ class SearchController extends Controller
         $events = Event::where('title', 'like', "%{$query}%")
             ->orWhere('description', 'like', "%{$query}%")
             ->get();
+
+            $faqs = Faq::where('title', 'like', "%{$query}%")
+            ->orWhere('details', 'like', "%{$query}%")
+            ->get();
             
-        return view('search.index', compact('posts', 'events', 'query'));
+        return view('search.index', compact('posts', 'events', 'query', 'faqs'));
     }
 }
