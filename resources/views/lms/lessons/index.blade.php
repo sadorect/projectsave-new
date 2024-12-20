@@ -7,7 +7,7 @@
                     <div class="card-body">
                         <div class="list-group">
                             @foreach($lessons as $lesson)
-                                <a href="{{ route('lessons.show', [$course->slug, $lesson->slug]) }}" 
+                                <a href="{{ route('lms.lessons.show', [$course->slug, $lesson->slug]) }}" 
                                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                     <div>
                                         <h5 class="mb-1">{{ $lesson->order }}. {{ $lesson->title }}</h5>
@@ -29,7 +29,7 @@
                         <div class="progress mb-3">
                             <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
                         </div>
-                        <a href="{{ route('courses.show', $course->slug) }}" class="btn btn-outline-primary w-100">
+                        <a href="{{ route('lms.courses.show', $course->slug) }}" class="btn btn-outline-primary w-100">
                             Course Details
                         </a>
                     </div>

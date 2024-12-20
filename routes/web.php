@@ -98,9 +98,7 @@ Route::prefix('admin')->group(function() {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::get('/dashboard/celebrants', [AdminController::class, 'showCelebrants'])->name('admin.dashboard.celebrants');
              
-        Route::resource('faqs', \App\Http\Controllers\FaqController::class)->names('admin.faqs');
-
-          
+               
 
         // User Management
         Route::resource('users', AdminUserController::class)->names('admin.users');
@@ -145,6 +143,8 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
         Route::resource('tags', TagController::class)->names('admin.tags');
         Route::resource('news', NewsUpdateController::class);
         Route::resource('videos', VideoReelController::class);
+
+         Route::resource('faqs', \App\Http\Controllers\FaqController::class)->names('admin.faqs');
     });
 });
 

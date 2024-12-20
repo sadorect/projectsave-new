@@ -21,7 +21,7 @@
             </a>
             
             <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ route('courses.index') }}">Browse Courses</a>
+                <a class="nav-link" href="{{ route('lms.courses.index') }}">Browse Courses</a>
                 <a class="nav-link active" href="{{ route('lms.dashboard') }}">My Learning</a>
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">

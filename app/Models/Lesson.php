@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\LessonProgress;
 use Illuminate\Database\Eloquent\Model;
 
 class Lesson extends Model
@@ -39,6 +40,22 @@ class Lesson extends Model
 
         return $this->video_url;
     }
+
+    public function progress()
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
+
+    public function isCompleted($user)
+    {
+        return $this->progress()
+            ->where('user_id', $user->id)
+            ->where('completed', true)
+            ->exists();
+    }
+
 }
+
+
 
 

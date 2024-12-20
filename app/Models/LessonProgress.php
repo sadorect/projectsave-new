@@ -10,16 +10,11 @@ class LessonProgress extends Model
 {
     protected $table = 'lesson_progress';
     
-    protected $fillable = [
-        'user_id',
-        'lesson_id',
-        'completed',
-        'last_accessed_at'
-    ];
-
+    protected $fillable = ['user_id', 'lesson_id', 'completed', 'completed_at'];
+    
     protected $casts = [
         'completed' => 'boolean',
-        'last_accessed_at' => 'datetime'
+        'completed_at' => 'datetime'
     ];
 
     public function user()

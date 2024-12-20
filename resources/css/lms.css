@@ -1,0 +1,80 @@
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.lesson-content {
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.progress {
+    height: 1.2rem;
+    border-radius: 0.6rem;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+    border-radius: 0.6rem;
+}
+
+.list-group-item {
+    border-left: 3px solid transparent;
+}
+
+.list-group-item.active {
+    border-left: 3px solid var(--bs-primary);
+}
+
+.progress-actions {
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+    margin-top: 2rem;
+}
+
+.card {
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.course-card {
+    height: 100%;
+}
+
+.course-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.stats-card {
+    border-left: 4px solid;
+}
+
+.stats-card.primary {
+    border-color: var(--bs-primary);
+}
+
+.stats-card.success {
+    border-color: var(--bs-success);
+}
+
+.stats-card.info {
+    border-color: var(--bs-info);
+}

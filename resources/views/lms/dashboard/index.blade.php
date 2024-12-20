@@ -4,15 +4,19 @@
             <div class="col-md-4">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
-                        <h5>Total Courses</h5>
-                        <h2>{{ $stats['total'] }}</h2>
+                        <h5>Overall Progress</h5>
+                        <div class="progress bg-light">
+                            <div class="progress-bar bg-success" style="width: {{ $stats['overall_progress'] }}%">
+                                {{ $stats['overall_progress'] }}%
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card bg-success text-white">
                     <div class="card-body">
-                        <h5>Completed</h5>
+                        <h5>Completed Courses</h5>
                         <h2>{{ $stats['completed'] }}</h2>
                     </div>
                 </div>
@@ -28,8 +32,9 @@
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h3>My Courses</h3>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3>My Learning</h3>
+                <a href="{{ route('lms.courses.index') }}" class="btn btn-primary">Browse Courses</a>
             </div>
             <div class="card-body">
                 @if($enrolledCourses->count() > 0)
@@ -42,22 +47,23 @@
                                     @endif
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $course->title }}</h5>
-                                        <p class="card-text">{{ Str::limit($course->description, 100) }}</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <a href="{{ route('lessons.index', $course->slug) }}" class="btn btn-primary">Continue Learning</a>
-                                            <span class="badge bg-{{ $course->pivot->status === 'completed' ? 'success' : 'info' }}">
-                                                {{ ucfirst($course->pivot->status) }}
-                                            </span>
+                                        <div class="progress mb-3">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ $course->progress }}%">
+                                                {{ round($course->progress) }}%
+                                            </div>
                                         </div>
+                                        <a href="{{ route('lms.lessons.index', $course->slug) }}" class="btn btn-primary">
+                                            {{ $course->isCompleted() ? 'Review Course' : 'Continue Learning' }}
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 @else
-                    <div class="text-center py-4">
+                    <div class="text-center py-5">
                         <h4>You haven't enrolled in any courses yet.</h4>
-                        <a href="{{ route('courses.index') }}" class="btn btn-primary mt-3">Browse Courses</a>
+                        <a href="{{ route('lms.courses.index') }}" class="btn btn-primary mt-3">Browse Available Courses</a>
                     </div>
                 @endif
             </div>

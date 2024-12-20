@@ -43,6 +43,31 @@ public function users()
                 ->withPivot('status', 'enrolled_at', 'completed_at');
 }
 
+    public function getProgressAttribute()
+    {
+        if (!auth()->check()) {
+            return 0;
+        }
+        
+        $totalLessons = $this->lessons()->count();
+        if ($totalLessons === 0) {
+            return 0;
+        }
+        
+        $completedLessons = $this->lessons()
+            ->whereHas('progress', function($query) {
+                $query->where('user_id', auth()->id())
+                    ->where('completed', true);
+            })
+            ->count();
+            
+        return ($completedLessons / $totalLessons) * 100;
+    }
+
+    public function isCompleted()
+    {
+        return $this->progress === 100;
+    }
 
 
 }

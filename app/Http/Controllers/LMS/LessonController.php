@@ -25,14 +25,23 @@ class LessonController extends Controller
     }
 
     public function show(Course $course, Lesson $lesson)
-    {
-        $nextLesson = $course->lessons()
-            ->where('order', '>', $lesson->order)
-            ->orderBy('order')
-            ->first();
+{
+    $totalLessons = $course->lessons()->count();
+    $completedLessons = auth()->user()->lessonProgress()
+        ->whereIn('lesson_id', $course->lessons()->pluck('id'))
+        ->where('completed', true)
+        ->count();
+        
+    $courseProgress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
+
+    $nextLesson = $course->lessons()
+        ->where('order', '>', $lesson->order)
+        ->orderBy('order')
+        ->first();
             
-        return view('lms.lessons.show', compact('course', 'lesson', 'nextLesson'));
-    }
+    return view('lms.lessons.show', compact('course', 'lesson', 'nextLesson', 'courseProgress'));
+}
+
 
     public function create(Course $course)
     {

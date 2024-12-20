@@ -13,7 +13,7 @@
                         <h5 class="card-title">{{ $course->title }}</h5>
                         <p class="card-text">{{ Str::limit($course->description, 100) }}</p>
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('courses.show', $course->slug) }}" class="btn btn-primary">View Course</a>
+                            <a href="{{ route('lms.courses.show', $course->slug) }}" class="btn btn-primary">View Course</a>
                             <small class="text-muted">By {{ $course->instructor->name }}</small>
                         </div>
                     </div>
