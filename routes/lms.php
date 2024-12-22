@@ -7,6 +7,13 @@ use App\Http\Controllers\LMS\ProgressController;
 use App\Http\Controllers\LMS\DashboardController;
 use App\Http\Controllers\LMS\EnrollmentController;
 use App\Http\Controllers\LMS\LessonProgressController;
+
+
+// Public access to courses
+Route::get('/asom', [CourseController::class, 'landing'])->name('asom');
+//Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('lms.courses.show');
+
+
 Route::middleware(['auth'])->prefix('learn')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('lms.dashboard');

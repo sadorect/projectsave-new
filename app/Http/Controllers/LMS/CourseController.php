@@ -20,6 +20,16 @@ public function index()
     return view('lms.courses.index', compact('courses'));
 }
 
+public function landing()
+{
+    $courses = Course::where('status', 'published')
+        ->with('instructor')
+        ->latest()
+        ->paginate(9);
+            
+    return view('lms.courses.landing', compact('courses'));
+}
+
 public function create()
 {
     return view('lms.courses.create');
