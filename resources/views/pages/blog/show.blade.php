@@ -176,6 +176,11 @@
                                         </li>
                                     @endforeach
                                     </ul>
+                                    <div class="categories-pagination">
+                                        @for($i = 1; $i <= ceil($categories->count() / 3); $i++)
+                                            <button class="btn btn-sm btn-outline-primary mx-1 category-page" data-page="{{ $i }}">{{ $i }}</button>
+                                        @endfor
+                                    </div>
                                 </div>
                             </div>
 
@@ -356,3 +361,47 @@
 
     </style>
     
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categories = @json($categories);
+            const itemsPerPage = 10;
+            
+            function displayCategories(page) {
+                const start = (page - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const categoriesList = document.getElementById('categories-list');
+                
+                categoriesList.innerHTML = categories.slice(start, end).map(category => `
+                    <li class="category-item">
+                        <a href="">${category.name}</a>
+                        <span>(${category.posts_count})</span>
+                    </li>
+                `).join('');
+            }
+        
+            document.querySelectorAll('.category-page').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const page = e.target.dataset.page;
+                    displayCategories(page);
+                    
+                    // Update active state
+                    document.querySelectorAll('.category-page').forEach(btn => 
+                        btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
+        });
+        </script>
+        
+        <style>
+        .categories-pagination {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .category-page.active {
+            background-color: #FF4C4C;
+            color: white;
+            border-color: #FF4C4C;
+        }
+        </style>
