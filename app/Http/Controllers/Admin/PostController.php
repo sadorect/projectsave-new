@@ -28,38 +28,42 @@ class PostController extends Controller
         $tags = Tag::all();
         return view('admin.posts.create', compact('categories', 'tags'));
     }
+    
     public function store(Request $request)
-    { 
-        $validated = $request->validate([
-            'title' => 'required|max:255',
-            'scripture' => 'nullable',
-            'bible_text' => 'nullable',
-            'subtitle' => 'nullable',
-            'details' => 'required',
-            'action_point' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'author' => 'nullable',
-            'category_ids' => 'array',
-            'tag_ids' => 'array',
-            'published_at' => 'required|date_format:Y-m-d\TH:i',
+{
+    $validated = $request->validate([
+        'title' => 'required|max:255',
+        'scripture' => 'nullable',
+        'bible_text' => 'nullable',
+        'subtitle' => 'nullable',
+        'details' => 'required',
+        'action_point' => 'nullable',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'author' => 'nullable',
+        'category_ids' => 'array',
+        'tag_ids' => 'array',
+        'published_at' => 'required|date_format:Y-m-d\TH:i',
+    ]);
 
+    $validated['slug'] = Str::slug($validated['title']);
+    $validated['user_id'] = auth()->id();
+    $validated['published_at'] = Carbon::parse($request->published_at);
 
-        ]);
+    if ($request->hasFile('image')) {
+        $validated['image'] = $request->file('image')->store('posts', 'public');
+    }
 
-        $validated['slug'] = Str::slug($validated['title']);
-        $validated['user_id'] = auth()->id();
-        $validated['published_at'] = Carbon::parse($request->published_at);
-        
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('posts', 'public');
-        }
-        //DB::enableQueryLog();
-        $post = Post::create($validated);
-        //dd(DB::getQueryLog());
-        $post->categories()->sync($request->category_ids);
-        $post->tags()->sync($request->tag_ids);
+    $post = Post::create($validated);
 
-        // Share to Facebook
+    // Get category IDs, use Uncategorized if none selected
+    $categoryIds = $request->category_ids ?? [Category::firstOrCreate(
+        ['slug' => 'uncategorized'],
+        ['name' => 'Uncategorized']
+    )->id];
+    
+    $post->categories()->sync($categoryIds);
+    $post->tags()->sync($request->tag_ids);
+
     if ($request->has('share_to_facebook')) {
         $facebook = new FacebookService();
         $facebook->sharePost(
@@ -70,9 +74,9 @@ class PostController extends Controller
         );
     }
 
+    return redirect()->route('admin.posts.index')->with('success', 'Post created successfully');
+}
 
-        return redirect()->route('admin.posts.index')->with('success', 'Post created successfully');
-    }
     
 
     public function edit(Post $post)

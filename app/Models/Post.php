@@ -66,6 +66,21 @@ class Post extends Model
         $post->slug = Str::slug($post->title);
     });
 }
+
+// In the Post model:
+protected function setDetailsAttribute($value) {
+    // Match and convert all asterisk-wrapped text while preserving paragraphs
+    $pattern = '/\*((?:[^*]|\\\*)+)\*/';
+    $value = preg_replace($pattern, '<strong>$1</strong>', $value);
+    $this->attributes['details'] = $value;
+}
+
+// In the Post model
+protected function getDetailsAttribute($value) {
+    return preg_replace('/\*((?:[^*]|\\\*)+)\*/', '<strong>$1</strong>', $value);
+}
+
+
 }
 
 
