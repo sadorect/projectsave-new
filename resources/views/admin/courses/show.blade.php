@@ -25,7 +25,7 @@
                     @endif
 
                     <div class="course-description mb-4">
-                        {{ $course->description }}
+                        {!! $course->description !!}
                     </div>
 
                     <div class="d-flex gap-2">

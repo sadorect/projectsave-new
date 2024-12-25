@@ -25,22 +25,42 @@ class AdminCourseController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'status' => 'required|in:draft,published,archived'
-        ]);
-    
-        if ($request->hasFile('featured_image')) {
-          $path = $request->file('featured_image')->store('courses', 'public');
-          $validated['featured_image'] = $path;
-      }
-      
-    
-        $validated['slug'] = Str::slug($validated['title']);
-        $validated['instructor_id'] = auth()->id();
+{
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required',
+        'objectives' => 'required',
+        'outcomes' => 'required',
+        'evaluation' => 'required',
+        'recommended_books' => 'nullable',
+        'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'documents.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
+        'status' => 'required|in:draft,published,archived'
+    ]);
+
+    if ($request->hasFile('featured_image')) {
+        $path = $request->file('featured_image')->store('courses', 'public');
+        $validated['featured_image'] = Storage::url($path);
+    }
+
+    if ($request->hasFile('documents')) {
+        $documents = [];
+        foreach($request->file('documents') as $file) {
+            $path = $file->store('course-documents', 'public');
+            $documents[] = [
+                'name' => $file->getClientOriginalName(),
+                'path' => Storage::url($path),
+                'size' => $file->getSize(),
+                'type' => $file->getClientMimeType()
+            ];
+        }
+        $validated['documents'] = json_encode($documents);
+    }
+
+    $validated['slug'] = Str::slug($validated['title']);
+    $validated['instructor_id'] = auth()->id();
+
+   
     
         Course::create($validated);
     
@@ -55,28 +75,55 @@ class AdminCourseController extends Controller
     }
 
     public function update(Request $request, Course $course)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'status' => 'required|in:draft,published,archived'
-        ]);
+{
+    $this->authorize('update', $course);
     
-        if ($request->hasFile('featured_image')) {
-          // Delete old image if exists
-          if ($course->featured_image) {
-              Storage::disk('public')->delete($course->featured_image);
-          }
-          
-          $path = $request->file('featured_image')->store('courses', 'public');
-          $validated['featured_image'] = $path;
-      }
-      
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required',
+        'objectives' => 'required',
+        'outcomes' => 'required',
+        'evaluation' => 'required',
+        'recommended_books' => 'nullable',
+        'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        'documents.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
+        'status' => 'required|in:draft,published,archived'
+    ]);
+
+    if ($request->hasFile('featured_image')) {
+        if ($course->featured_image) {
+            Storage::delete(str_replace('/storage/', 'public/', $course->featured_image));
+        }
+        $path = $request->file('featured_image')->store('courses', 'public');
+        $validated['featured_image'] = Storage::url($path);
+    }
+
+    if ($request->hasFile('documents')) {
+        if ($course->documents) {
+            $oldDocs = json_decode($course->documents, true);
+            foreach($oldDocs as $doc) {
+                Storage::delete(str_replace('/storage/', 'public/', $doc['path']));
+            }
+        }
+
+        $documents = [];
+        foreach($request->file('documents') as $file) {
+            $path = $file->store('course-documents', 'public');
+            $documents[] = [
+                'name' => $file->getClientOriginalName(),
+                'path' => Storage::url($path),
+                'size' => $file->getSize(),
+                'type' => $file->getClientMimeType()
+            ];
+        }
+        $validated['documents'] = json_encode($documents);
+    }
+
+    $validated['slug'] = Str::slug($validated['title']);
     
-        $validated['slug'] = Str::slug($validated['title']);
+    $course->update($validated);
         
-        $course->update($validated);
+       
     
         return redirect()->route('admin.courses.index')
                         ->with('success', 'Course updated successfully');

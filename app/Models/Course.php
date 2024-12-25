@@ -15,9 +15,18 @@ class Course extends Model
         'slug',
         'instructor_id',
         'featured_image',
-        'status'
+        'status',
+        'objectives',
+        'outcomes',
+        'evaluation',
+        'recommended_books',
+        'documents'
+        
     ];
 
+    protected $casts = [
+        'documents' => 'json'
+    ];
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
