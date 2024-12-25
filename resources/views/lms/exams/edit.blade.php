@@ -2,6 +2,8 @@
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Edit Exam: {{ $exam->title }}</h2>
+            
+          
             <a href="{{ route('lms.questions.create', $exam) }}" class="btn btn-primary">Add Question</a>
         </div>
 

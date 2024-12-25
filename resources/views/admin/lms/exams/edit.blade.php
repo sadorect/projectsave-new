@@ -52,6 +52,9 @@
                         <div class="text-end">
                             <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Update Exam</button>
+                            <a href="{{ route('admin.exams.preview', $exam) }}" class="btn btn-info me-2">
+                              <i class="bi bi-eye"></i> Preview Exam
+                          </a>
                         </div>
                     </form>
                 </div>
@@ -73,11 +76,26 @@
                                 <li class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>{{ $question->question_text }}</div>
-                                        <span class="badge bg-primary">{{ $question->points }} pts</span>
                                     </div>
-                                </li>
+                                
+                                <div>
+                                  <span class="badge bg-primary">{{ $question->points }} pts</span>
+                                  <a href="{{ route('admin.questions.edit', [$exam, $question]) }}" class="btn btn-sm btn-primary ms-2">
+                                      <i class="bi bi-pencil"></i>
+                                  </a>
+                                  <form action="{{ route('admin.questions.destroy', [$exam, $question]) }}" method="POST" class="d-inline">
+                                      @csrf
+                                      @method('DELETE')
+                                      <button type="submit" class="btn btn-sm btn-danger ms-1" onclick="return confirm('Are you sure you want to delete this question?')">
+                                          <i class="bi bi-trash"></i>
+                                      </button>
+                                  </form>
+                              </div>
+                            </li>
                             @endforeach
                         </ul>
+                        
+                      
                     @else
                         <p class="text-muted text-center">No questions added yet</p>
                     @endif

@@ -32,13 +32,24 @@
                             <td>{{ $exam->questions->count() }}</td>
                             <td>{{ $exam->passing_score }}%</td>
                             <td>
-                                <a href="{{ route('admin.exams.edit', $exam) }}" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <a href="{{ route('admin.questions.create', $exam) }}" class="btn btn-sm btn-success">
-                                    <i class="bi bi-plus"></i> Questions
-                                </a>
-                            </td>
+                              <a href="{{ route('admin.exams.preview', $exam) }}" class="btn btn-sm btn-info">
+                                  <i class="bi bi-eye"></i>
+                              </a>
+                              <a href="{{ route('admin.exams.edit', $exam) }}" class="btn btn-sm btn-primary">
+                                  <i class="bi bi-pencil"></i>
+                              </a>
+                              <a href="{{ route('admin.questions.create', $exam) }}" class="btn btn-sm btn-success">
+                                  <i class="bi bi-plus"></i> Questions
+                              </a>
+                              <form action="{{ route('admin.exams.destroy', $exam) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this exam and all its questions?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                          </td>
+                          
                         </tr>
                         @endforeach
                     </tbody>

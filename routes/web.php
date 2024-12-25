@@ -166,11 +166,16 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
  Route::post('enrollments/store', [AdminEnrollmentController::class, 'store'])->name('enrollments.store');
 
  Route::resource('exams', ExamController::class);
+ Route::get('exams/{exam}/preview', [ExamController::class, 'preview'])->name('exams.preview');
     Route::post('exams/{exam}/attempt', [ExamAttemptController::class, 'start'])->name('exams.attempt.start');
     Route::post('exams/{exam}/submit', [ExamAttemptController::class, 'submit'])->name('exams.attempt.submit');
     Route::get('exams/{exam}/results', [ExamAttemptController::class, 'results'])->name('exams.results');
     Route::get('exams/{exam}/questions/create', [QuestionController::class, 'create'])->name('questions.create');
     Route::post('exams/{exam}/questions', [QuestionController::class, 'store'])->name('questions.store');
+    Route::get('exams/{exam}/questions/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
+    Route::put('exams/{exam}/questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
+    Route::delete('exams/{exam}/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+    
 
 
 

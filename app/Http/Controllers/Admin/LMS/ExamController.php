@@ -66,8 +66,21 @@ class ExamController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Exam $exam)
+{
+    $exam->questions()->delete(); // Delete associated questions first
+    $exam->delete();
+    
+    return redirect()->route('admin.exams.index')
+                    ->with('success', 'Exam deleted successfully');
+}
+
+
+
+    public function preview(Exam $exam)
     {
-        //
+        $exam->load('questions');
+        return view('admin.lms.exams.preview', compact('exam'));
     }
+
 }
