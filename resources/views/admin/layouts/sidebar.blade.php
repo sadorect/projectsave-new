@@ -112,6 +112,11 @@
                         <i class="bi bi-people me-2"></i> Enrollments
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ route('admin.exams.index') }}">
+                        <i class="bi bi-pencil-square me-2"></i> Exams
+                    </a>
+                </li>
             </ul>
         </div>
     </li>

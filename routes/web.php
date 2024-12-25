@@ -18,14 +18,17 @@ use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\PrayerForceController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\LMS\ExamController;
 use App\Http\Controllers\Admin\VideoReelController;
 use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Admin\NewsUpdateController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\AdminLessonController;
 use App\Http\Controllers\Admin\AdminPartnerController;
+use App\Http\Controllers\Admin\LMS\QuestionController;
 use App\Http\Controllers\Admin\AdminEnrollmentController;
 use App\Http\Controllers\Admin\DeletionRequestController;
+use App\Http\Controllers\Admin\LMS\ExamAttemptController;
 use App\Http\Controllers\Admin\AdminPrayerForceController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\Admin\NotificationSettingsController;
@@ -161,6 +164,13 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
  Route::get('enrollments/{course}/edit', [AdminEnrollmentController::class, 'edit'])->name('enrollments.edit');
  Route::put('enrollments/{course}/{user}', [AdminEnrollmentController::class, 'update'])->name('enrollments.update');
  Route::post('enrollments/store', [AdminEnrollmentController::class, 'store'])->name('enrollments.store');
+
+ Route::resource('exams', ExamController::class);
+    Route::post('exams/{exam}/attempt', [ExamAttemptController::class, 'start'])->name('exams.attempt.start');
+    Route::post('exams/{exam}/submit', [ExamAttemptController::class, 'submit'])->name('exams.attempt.submit');
+    Route::get('exams/{exam}/results', [ExamAttemptController::class, 'results'])->name('exams.results');
+    Route::get('exams/{exam}/questions/create', [QuestionController::class, 'create'])->name('questions.create');
+    Route::post('exams/{exam}/questions', [QuestionController::class, 'store'])->name('questions.store');
 
 
 
