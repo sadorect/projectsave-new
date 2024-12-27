@@ -78,6 +78,21 @@ public function users()
         return $this->progress === 100;
     }
 
+    public function isCompletedByStudent(User $student)
+    {
+        // Implement your course completion logic here
+        // Example: Check if student has completed all required lessons/modules
+        return $this->getProgressAttribute() === 100;
+    }
+    
+    public function isAvailableForStudent(User $student)
+{
+    return $this->course->users()
+                ->where('user_id', $student->id)
+                ->wherePivot('completed_at', '!=', null)
+                ->exists() &&
+           ($this->is_active || $this->questions()->count() >= 5);
+}
 
 }
 

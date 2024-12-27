@@ -11,6 +11,10 @@ class ExamAttemptController extends Controller
 {
     public function start(Exam $exam)
 {
+    if (!$exam->isAvailableForStudent(auth()->user())) {
+        return redirect()->route('lms.courses.show', $exam->course)
+            ->with('warning', 'Please complete the course before taking this exam.');
+    }
     // Check remaining attempts
     $attemptCount = ExamAttempt::where('user_id', auth()->id())
                                ->where('exam_id', $exam->id)
