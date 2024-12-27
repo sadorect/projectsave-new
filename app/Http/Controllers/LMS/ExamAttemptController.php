@@ -56,4 +56,16 @@ class ExamAttemptController extends Controller
 
         return ($earnedPoints / $totalPoints) * 100;
     }
+
+    public function results(Exam $exam)
+    {
+        $attempt = ExamAttempt::where('user_id', auth()->id())
+                             ->where('exam_id', $exam->id)
+                             ->latest()
+                             ->firstOrFail();
+                              
+        return view('lms.exams.results', compact('exam', 'attempt'));
+    }
+    
+
 }

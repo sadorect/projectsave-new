@@ -38,9 +38,11 @@ class ExamController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
+    public function show(Exam $exam)
+    {   
+        $exam->load(['course', 'questions']);
+        $courses = Course::all();
+        return view('admin.lms.exams.edit', compact('exam', 'courses'));
     }
 
     public function edit(Exam $exam)
@@ -58,7 +60,7 @@ class ExamController extends Controller
             'duration_minutes' => 'required|integer|min:1',
             'passing_score' => 'required|integer|min:0|max:100'
         ]);
-
+       
         $exam->update($validated);
         return redirect()->route('admin.exams.show', $exam);
     }

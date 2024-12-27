@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.lms>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>{{ $exam->title }}</h2>
@@ -45,4 +45,4 @@
             }
         }, 1000);
     </script>
-</x-layouts.app>
+</x-layouts.lms>

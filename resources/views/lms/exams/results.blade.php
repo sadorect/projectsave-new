@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.lms>
     <div class="container py-4">
         <div class="card">
             <div class="card-body text-center">
@@ -38,4 +38,4 @@
         </div>
         @endif
     </div>
-</x-layouts.app>
+</x-layouts.lms>
