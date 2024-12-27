@@ -46,13 +46,31 @@
                                     <label class="form-label">Passing Score (%)</label>
                                     <input type="number" name="passing_score" class="form-control" value="{{ $exam->passing_score }}" required min="0" max="100">
                                 </div>
+                                
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Maximum Attempts Allowed</label>
-                                    <input type="number" name="max_attempts" class="form-control" value="{{ $exam->max_attempts }}" min="1">
+                                    <input type="number" name="max_attempts" class="form-control" value="1" min="1">
                                     <small class="text-muted">Number of times a student can take this exam</small>
                                 </div>
                             </div>
-                        </div>
+        
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="allow_retakes" class="form-check-input" id="allowRetakes" 
+                                               value="1" {{ isset($exam) && $exam->allow_retakes ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="allowRetakes">
+                                            Allow Retakes After Failed Attempts
+                                        </label>
+                                        <small class="text-muted d-block">If checked, students can retry even after using all attempts if they haven't passed</small>
+                                    </div>
+                                </div>
+                            </div> 
+                        </div> 
 
                         <div class="text-end">
                             <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary">Cancel</a>

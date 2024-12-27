@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Exam;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -35,6 +36,12 @@ public function scopeForUserAndExam($query, $userId, $examId)
     return $query->where('user_id', $userId)
                  ->where('exam_id', $examId);
 }
+
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
+
 }
 
 

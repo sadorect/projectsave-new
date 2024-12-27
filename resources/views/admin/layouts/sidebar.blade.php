@@ -117,6 +117,11 @@
                         <i class="bi bi-pencil-square me-2"></i> Exams
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ route('admin.exam-attempts.index') }}">
+                        <i class="bi bi-clock-history me-2"></i> Exam Attempts
+                    </a>
+                </li>
             </ul>
         </div>
     </li>
