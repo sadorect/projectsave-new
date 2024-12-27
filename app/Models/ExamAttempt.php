@@ -29,7 +29,15 @@ class ExamAttempt extends Model
 {
     return $this->belongsTo(Exam::class);
 }
+
+public function scopeForUserAndExam($query, $userId, $examId)
+{
+    return $query->where('user_id', $userId)
+                 ->where('exam_id', $examId);
 }
+}
+
+
 
 
 

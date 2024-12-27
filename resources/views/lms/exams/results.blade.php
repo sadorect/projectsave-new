@@ -3,14 +3,14 @@
         <div class="card">
             <div class="card-body text-center">
                 <h2 class="card-title">Exam Results</h2>
-                <h3 class="mb-4">{{ $exam->title }}</h3>
+                <h3 class="mb-4">{{ Str::upper($exam->title) }}</h3>
 
                 <div class="display-4 mb-4">
-                    Score: {{ number_format($attempt->score, 1) }}%
+                    Score: {{ number_format($score, 1) }}%
                 </div>
 
                 <div class="h4 mb-4">
-                    @if($attempt->passed)
+                    @if($passed)
                         <span class="text-success">Passed!</span>
                     @else
                         <span class="text-danger">Failed</span>
@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        @if($attempt->passed)
+        @if($passed)
         <div class="alert alert-success mt-4">
             <h4>Congratulations!</h4>
             <p>You have successfully passed this exam. Continue with your learning journey!</p>

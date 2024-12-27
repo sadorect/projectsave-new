@@ -3,13 +3,13 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3>{{ $exam->title }}</h3>
             <span class="badge bg-info">
-                Attempt {{ ExamAttempt::forUserAndExam(auth()->id(), $exam->id)->count() }} 
+                Attempt {{ \App\Models\ExamAttempt::forUserAndExam(auth()->id(), $exam->id)->count() }} 
                 of {{ $exam->max_attempts }}
             </span>
             <div id="examTimer" class="h4"></div>
         </div>
 
-        <form id="examForm" action="{{ route('lms.exams.submit', [$exam, $attempt]) }}" method="POST">
+        <form id="examForm" action="{{ route('lms.exams.attempt.submit', [$exam, $attempt]) }}" method="POST">
             @csrf
             <div id="mainContent">
                 <div id="questionContainer">

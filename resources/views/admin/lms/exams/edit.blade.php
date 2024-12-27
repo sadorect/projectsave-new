@@ -46,6 +46,11 @@
                                     <label class="form-label">Passing Score (%)</label>
                                     <input type="number" name="passing_score" class="form-control" value="{{ $exam->passing_score }}" required min="0" max="100">
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Maximum Attempts Allowed</label>
+                                    <input type="number" name="max_attempts" class="form-control" value="{{ $exam->max_attempts }}" min="1">
+                                    <small class="text-muted">Number of times a student can take this exam</small>
+                                </div>
                             </div>
                         </div>
 
@@ -105,3 +110,5 @@
     </div>
 </div>
 @endsection
+
+

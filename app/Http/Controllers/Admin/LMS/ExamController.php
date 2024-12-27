@@ -28,7 +28,8 @@ class ExamController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'duration_minutes' => 'required|integer|min:1',
-            'passing_score' => 'required|integer|min:0|max:100'
+            'passing_score' => 'required|integer|min:0|max:100',
+            'max_attempts' => 'required|integer|min:1'
         ]);
 
         $exam = Exam::create($validated);
@@ -58,7 +59,8 @@ class ExamController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'duration_minutes' => 'required|integer|min:1',
-            'passing_score' => 'required|integer|min:0|max:100'
+            'passing_score' => 'required|integer|min:0|max:100',
+            'max_attempts' => 'required|integer|min:1'
         ]);
        
         $exam->update($validated);

@@ -41,6 +41,12 @@
                             <label class="form-label">Passing Score (%)</label>
                             <input type="number" name="passing_score" class="form-control" required min="0" max="100">
                         </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Maximum Attempts Allowed</label>
+                        <input type="number" name="max_attempts" class="form-control" value="1" min="1">
+                        <small class="text-muted">Number of times a student can take this exam</small>
+                    </div>
                     </div>
                 </div>
 
@@ -67,3 +73,4 @@
 @endpush
 
 @endsection
+

@@ -28,37 +28,39 @@ class ExamAttemptController extends Controller
         'started_at' => now()
     ]);
 
-    return redirect()->route('lms.exams.take', [$exam, $attempt]);
+    return view('lms.exams.take', compact('exam', 'attempt'));
+    //return redirect()->route('lms.exams.take', [$exam, $attempt]);
 }
 
 public function submit(Request $request, Exam $exam, ExamAttempt $attempt)
 {
-    // Calculate score
-    $totalQuestions = $exam->questions->count();
-    $correctAnswers = 0;
-
-    foreach ($request->answers as $questionId => $answer) {
-        $question = $exam->questions->find($questionId);
-        if ($question && $answer === $question->correct_answer) {
-            $correctAnswers++;
-        }
-    }
-
-    $score = ($correctAnswers / $totalQuestions) * 100;
+    $score = $this->calculateScore($exam, $request->answers);
     $passed = $score >= $exam->passing_score;
 
-    // Update attempt record
     $attempt->update([
         'completed_at' => now(),
         'score' => $score,
-        'answers' => $request->answers
+        'answers' => $request->answers,
+        'passed' => $passed
     ]);
 
-    return redirect()->route('lms.exams.results', $exam);
+    $attempt = ExamAttempt::where('user_id', auth()->id())
+                             ->where('exam_id', $exam->id)
+                             ->latest()
+                             ->firstOrFail();
+                             return view('lms.exams.results', [
+                                'exam' => $exam,
+                                'attempt' => $attempt,
+                                'score' => $score,
+                                'passed' => $passed
+                            ]);
+    //return redirect()->route('lms.exams.results', [$exam, 'score' => $score]);
 }
 
+
+
     private function calculateScore(Exam $exam, array $answers)
-    {
+    { 
         $totalPoints = 0;
         $earnedPoints = 0;
 

@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Exam extends Model
 {
     use HasFactory;
-    protected $fillable = ['course_id', 'title', 'description', 'duration_minutes', 'passing_score'];
+    protected $fillable = ['course_id', 'title', 'description', 'duration_minutes', 'passing_score','max_attempts',
+    'allow_retakes'];
 
     public function questions()
     {
