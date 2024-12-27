@@ -10,37 +10,52 @@ use Illuminate\Http\Request;
 class ExamAttemptController extends Controller
 {
     public function start(Exam $exam)
-    {
-        $attempt = ExamAttempt::create([
-            'user_id' => auth()->id(),
-            'exam_id' => $exam->id,
-            'started_at' => now(),
-            'answers' => [],
-            'score' => 0,
-            'passed' => false
-        ]);
+{
+    // Check remaining attempts
+    $attemptCount = ExamAttempt::where('user_id', auth()->id())
+                               ->where('exam_id', $exam->id)
+                               ->count();
 
-        return view('lms.exams.attempt', compact('exam', 'attempt'));
+    if ($attemptCount >= $exam->max_attempts) {
+        return redirect()->back()
+            ->with('error', 'Maximum attempts reached for this exam');
     }
 
-    public function submit(Request $request, Exam $exam)
-    {
-        $attempt = ExamAttempt::where([
-            'user_id' => auth()->id(),
-            'exam_id' => $exam->id,
-        ])->latest()->firstOrFail();
+    // Create new attempt if allowed
+    $attempt = ExamAttempt::create([
+        'user_id' => auth()->id(),
+        'exam_id' => $exam->id,
+        'started_at' => now()
+    ]);
 
-        $score = $this->calculateScore($exam, $request->answers);
-        
-        $attempt->update([
-            'answers' => $request->answers,
-            'score' => $score,
-            'passed' => $score >= $exam->passing_score,
-            'completed_at' => now()
-        ]);
+    return redirect()->route('lms.exams.take', [$exam, $attempt]);
+}
 
-        return redirect()->route('lms.exams.results', $exam);
+public function submit(Request $request, Exam $exam, ExamAttempt $attempt)
+{
+    // Calculate score
+    $totalQuestions = $exam->questions->count();
+    $correctAnswers = 0;
+
+    foreach ($request->answers as $questionId => $answer) {
+        $question = $exam->questions->find($questionId);
+        if ($question && $answer === $question->correct_answer) {
+            $correctAnswers++;
+        }
     }
+
+    $score = ($correctAnswers / $totalQuestions) * 100;
+    $passed = $score >= $exam->passing_score;
+
+    // Update attempt record
+    $attempt->update([
+        'completed_at' => now(),
+        'score' => $score,
+        'answers' => $request->answers
+    ]);
+
+    return redirect()->route('lms.exams.results', $exam);
+}
 
     private function calculateScore(Exam $exam, array $answers)
     {
