@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\AdminLessonController;
 use App\Http\Controllers\Admin\AdminPartnerController;
 use App\Http\Controllers\Admin\LMS\QuestionController;
+use App\Http\Controllers\Admin\MailTemplateController;
 use App\Http\Controllers\Admin\AdminEnrollmentController;
 use App\Http\Controllers\Admin\DeletionRequestController;
 use App\Http\Controllers\Admin\LMS\ExamAttemptController;
@@ -183,6 +185,10 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
     Route::delete('exams/{exam}/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
     
 
+    Route::get('/mail/compose', [MailController::class, 'compose'])->name('mail.compose');
+    Route::post('/mail/send', [MailController::class, 'send'])->name('mail.send');
+    Route::resource('mail-templates', MailTemplateController::class);
+    Route::get('/mail/preview/{template}', [MailController::class, 'preview'])->name('mail.preview');
 
 
 });

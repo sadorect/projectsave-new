@@ -126,6 +126,29 @@
         </div>
     </li>
     
+    <li class="nav-item">
+        <a href="#mailSubmenu" data-bs-toggle="collapse" class="nav-link">
+            <i class="bi bi-envelope"></i>
+            <span>Mail System</span>
+        </a>
+        <div class="collapse {{ request()->routeIs('admin.mail.*') ? 'show' : '' }}" id="mailSubmenu">
+            <ul class="nav flex-column pl-3">
+                <li class="nav-item">
+                    <a href="{{ route('admin.mail.compose') }}" class="nav-link text-white">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Compose Mail
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.mail-templates.index') }}" class="nav-link text-white">
+                        <i class="bi bi-file-text me-2"></i>
+                        Mail Templates
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </li>
+    
     <li>
         <a href="{{route('admin.partners.index')}}" class="nav-link text-white">
             <i class="bi bi-raised-hands me-2"></i>
