@@ -20,6 +20,7 @@
                             <th>Duration</th>
                             <th>Questions</th>
                             <th>Passing Score</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -31,6 +32,12 @@
                             <td>{{ $exam->duration_minutes }} mins</td>
                             <td>{{ $exam->questions->count() }}</td>
                             <td>{{ $exam->passing_score }}%</td>
+                            <td>
+                                <span id="exam-status-{{ $exam->id }}" class="badge bg-{{ $exam->is_active ? 'success' : 'secondary' }}">
+                                    {{ $exam->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                                
+                            </td>
                             <td>
                               <a href="{{ route('admin.exams.preview', $exam) }}" class="btn btn-sm btn-info">
                                   <i class="bi bi-eye"></i>
@@ -59,4 +66,28 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('.toggle-activation').click(function(e) {
+    e.preventDefault();
+    const examId = $(this).data('exam-id');
+    const statusBadge = $(`#exam-status-${examId}`);
+    
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+            const isActive = response.is_active;
+            statusBadge
+                .toggleClass('bg-success bg-secondary')
+                .text(isActive ? 'Active' : 'Inactive');
+        }
+    });
+});
+
+    });
+    </script>
+    @endpush
 @endsection

@@ -168,6 +168,8 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
  Route::resource('exams', ExamController::class);
  Route::get('exams/{exam}/preview', [ExamController::class, 'preview'])->name('exams.preview');
  Route::get('exams/{exam}/edit', [ExamController::class, 'edit'])->name('exams.edit');
+ Route::patch('exams/{exam}/toggle-activation', [ExamController::class, 'toggleActivation'])->name('exams.toggle-activation');
+
     //Route::put('exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
     Route::post('exams/{exam}/attempt', [ExamAttemptController::class, 'start'])->name('exams.attempt.start');
     Route::get('exam-attempts', [ExamAttemptController::class, 'index'])->name('exam-attempts.index');

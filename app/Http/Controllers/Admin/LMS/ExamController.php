@@ -89,4 +89,18 @@ class ExamController extends Controller
         return view('admin.lms.exams.preview', compact('exam'));
     }
 
+    public function toggleActivation(Exam $exam)
+{dd($exam);
+    $exam->is_active = !$exam->is_active;
+    $exam->save();
+    
+    return response()->json([
+        'success' => true,
+        'is_active' => $exam->is_active,
+        'message' => $exam->is_active ? 'Exam activated successfully' : 'Exam deactivated successfully'
+    ]);
+}
+
+    
+
 }

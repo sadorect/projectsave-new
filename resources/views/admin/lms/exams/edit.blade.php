@@ -71,6 +71,23 @@
                                 </div>
                             </div> 
                         </div> 
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>Exam Details</h5>
+                            <form action="{{ route('admin.exams.toggle-activation', $exam) }}" 
+                                method="POST" 
+                                class="d-inline exam-activation-form" 
+                                data-exam-id="{{ $exam->id }}">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn toggle-activation btn-{{ $exam->is_active ? 'success' : 'secondary' }}">
+                                    <i class="bi bi-toggle-{{ $exam->is_active ? 'on' : 'off' }}"></i>
+                                    <span>{{ $exam->is_active ? 'Active' : 'Inactive' }}</span>
+                                </button>
+                                
+                            </form>
+
+                        </div>
+                        
 
                         <div class="text-end">
                             <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary">Cancel</a>
@@ -127,6 +144,33 @@
         </div>
     </div>
 </div>
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        $('.toggle-activation').click(function(e) {
+            e.preventDefault();
+            const button = $(this);
+            const form = button.closest('form');
+            
+            $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: form.serialize() + '&is_active=' + (button.hasClass('btn-success') ? '0' : '1'),
+            success: function(response) {
+                const isActive = !button.hasClass('btn-success');
+                button.toggleClass('btn-success btn-secondary');
+                button.find('i').toggleClass('bi-toggle-on bi-toggle-off');
+                button.find('span').text(isActive ? 'Active' : 'Inactive');
+                
+                toastr.success(response.message);
+            }
+        });
+
+        });
+    });
+    </script>
+    
+    @endpush
 @endsection
 
 
