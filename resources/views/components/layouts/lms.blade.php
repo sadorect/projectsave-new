@@ -25,7 +25,7 @@
                 <a class="nav-link active" href="{{ route('lms.dashboard') }}">My Learning</a>
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        {{ auth()->user()->name }}
+                        {{ auth()->user()?->name }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li><a class="dropdown-item" href="{{ route('user.dashboard') }}">Account Settings</a></li>

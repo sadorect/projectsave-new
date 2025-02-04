@@ -100,6 +100,7 @@
                     <div class="navbar-nav ml-auto">
                         <a href="{{ route('home') }}" class="nav-item nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
                         <a href="{{ route('about') }}" class="nav-item nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
+                        <a href="{{ route('asom') }}" class="nav-item nav-link {{ request()->routeIs('learn.*') ? 'active' : '' }}">ASOM</a>
                         <a href="{{ route('events.index') }}" class="nav-item nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}">Events</a>
                         <a href="{{ route('blog.index') }}" class="nav-item nav-link {{ request()->routeIs('blog.*')|| request()->routeIs('posts.show') ? 'active' : '' }}">Devotional</a>
                         <a href="{{ route('faqs.list') }}" class="nav-item nav-link {{ request()->routeIs('faqs.*') ? 'active' : '' }}">Blog</a>

@@ -188,7 +188,7 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
     Route::get('/mail/compose', [MailController::class, 'compose'])->name('mail.compose');
     Route::post('/mail/send', [MailController::class, 'send'])->name('mail.send');
     Route::resource('mail-templates', MailTemplateController::class);
-    Route::get('/mail/preview/{template}', [MailController::class, 'preview'])->name('mail.preview');
+    Route::post('/mail/preview/{template}', [MailController::class, 'preview'])->name('mail.preview');
 
 
 });

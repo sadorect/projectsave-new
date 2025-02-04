@@ -15,15 +15,16 @@ use App\Http\Controllers\LMS\LessonProgressController;
 // Public access to courses
 Route::get('/asom', [CourseController::class, 'landing'])->name('asom');
 //Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('lms.courses.show');
-
-
+// Course routes
+Route::prefix('learn')->group(function() {
+    Route::get('/', [CourseController::class, 'index'])->name('lms.courses.index');
+    Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('lms.courses.show');
+});
 Route::middleware(['auth'])->prefix('learn')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('lms.dashboard');
     
-    // Course routes
-    Route::get('/', [CourseController::class, 'index'])->name('lms.courses.index');
-    Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('lms.courses.show');
+    
     
     // Enrollment routes
     Route::post('/courses/{course:slug}/enroll', [DashboardController::class, 'enroll'])
@@ -42,6 +43,8 @@ Route::middleware(['auth'])->prefix('learn')->group(function () {
     Route::get('/courses/{course:slug}/progress', [LessonProgressController::class, 'getProgress'])
         ->name('courses.progress');
 });
+
+
 
 Route::prefix('lms')->name('lms.')->middleware(['auth'])->group(function () {
     Route::resource('exams', ExamController::class);

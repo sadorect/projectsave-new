@@ -3,7 +3,7 @@
 @section('content')
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('admin.mail.send') }}" method="POST">
+        <!--form action="{{ route('admin.mail.send') }}" method="POST">
           @csrf
             <div class="mb-3">
                 <label>Recipients</label>
@@ -36,10 +36,48 @@
             </div>
             <button type="button" class="btn btn-info preview-mail" data-_="{{ $template->id }}">
               <i class="bi bi-eye"></i> Preview
-          </button>
+          </button-->
+          <!--a href="{{ route('admin.mail.preview', $template->id) }}" class="btn btn-info" id="previewBtn">
+            <i class="bi bi-eye"></i> Preview Email
+        </a>
+        
           
             <button type="submit" class="btn btn-primary">Send Mail</button>
-        </form>
+        </form-->
+
+        <form action="{{ route('admin.mail.preview',$template->id) }}" method="POST" id="previewForm" class="mb-4">
+          @csrf
+          <div class="card">
+              <div class="card-header">
+                  <h4>Email Preview Options</h4>
+              </div>
+              <div class="card-body">
+                  <select name="template_id" class="form-control mb-3">
+                      @foreach($templates as $template)
+                          <option value="{{ $template->id }}">{{ $template->name }}</option>
+                      @endforeach
+                  </select>
+                  <select id="recipients" name="recipients[]" class="form-control select2" multiple>
+                    <optgroup label="Groups">
+                        @foreach($groups as $group)
+                            <option value="group:{{ $group }}">{{ ucfirst($group) }}</option>
+                        @endforeach
+                    </optgroup>
+                    <optgroup label="Individual Users">
+                        @foreach($users as $user)
+                            <option value="user:{{ $user->id }}">{{ $user->name }}</option>
+                        @endforeach
+                    </optgroup>
+                </select>
+                  <textarea name="custom_message" class="form-control"></textarea>
+              </div>
+              <div class="card-footer">
+                  <button type="submit" class="btn btn-info">
+                      <i class="bi bi-eye"></i> Preview Email
+                  </button>
+              </div>
+          </div>
+      </form>
     </div>
 </div>
 

@@ -69,13 +69,13 @@ protected function getRecipients($selectedRecipients)
 
 
 public function preview(Request $request)
-{
+{ //dd($request->template_id);
     $template = MailTemplate::findOrFail($request->template_id);
     $customMessage = $request->custom_message;
     
     // Get selected recipients data
     $selectedRecipients = $request->recipients;
-    $recipientData = [];
+    $recipientDetails = [];
     
     if ($selectedRecipients) {
         foreach ($selectedRecipients as $recipient) {
@@ -83,7 +83,7 @@ public function preview(Request $request)
                 $userId = str_replace('user:', '', $recipient);
                 $user = User::with(['courses', 'partnerships'])->find($userId);
                 if ($user) {
-                    $recipientData = [
+                    $recipientDetails = [
                         'name' => $user->name,
                         'email' => $user->email,
                         'partnership_type' => $user->partnerships->first()?->type ?? 'Member',
@@ -95,9 +95,9 @@ public function preview(Request $request)
         }
     }
     
-    $content = $this->processTemplate($template, $recipientData);
+    $content = $this->processTemplate($template, $recipientDetails);
     
-    return view('admin.mail.preview', compact('content', 'template', 'customMessage'));
+    return view('admin.mail.preview', compact('content', 'template', 'customMessage', 'recipientDetails'));
 }
 
 protected function processTemplate(MailTemplate $template, array $data)

@@ -41,8 +41,7 @@ public function show(Course $course)
         $query->orderBy('order');
     }]);
         
-    $isEnrolled = auth()->user()->courses()->where('course_id', $course->id)->exists();
-        
+    $isEnrolled = auth()->check() ? auth()->user()->courses()->where('course_id', $course->id)->exists() : false;        
     $courseDetails = [
         'objectives' => $course->objectives,
         'outcomes' => $course->outcomes,
