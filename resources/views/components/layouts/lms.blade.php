@@ -17,11 +17,12 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="/images/logo.png" alt="Logo" height="30">
+                <img src="/images/logo.png" alt="ASOM" height="30">
             </a>
             
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{{ route('lms.courses.index') }}">Browse Courses</a>
+                @auth
                 <a class="nav-link active" href="{{ route('lms.dashboard') }}">My Learning</a>
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -38,6 +39,7 @@
                         </li>
                     </ul>
                 </div>
+                @endauth
             </div>
         </div>
     </nav>

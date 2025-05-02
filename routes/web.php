@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\MailController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedController;
@@ -15,6 +15,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
+use App\Http\Controllers\Admin\MailController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\PrayerForceController;
 use App\Http\Controllers\UserDashboardController;
@@ -56,7 +57,7 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 // Event Routes
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
-Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('events.show');
 
 // Contact Routes
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
@@ -72,7 +73,8 @@ Route::get('/partners/{type}/{partner}', [PartnerController::class, 'show'])->na
 | Authenticated User Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->group(function () {
+//Auth::routes(['verify' => true]);
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::get('/user/profile', [UserDashboardController::class, 'profile'])->name('user.profile');
     Route::get('/user/partnerships', [UserDashboardController::class, 'partnerships'])->name('user.partnerships');

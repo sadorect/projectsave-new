@@ -604,9 +604,9 @@ souls. Let the Holy Spirit lay it in your heart to partner with us:             
                                         <p><i class="fa fa-map-marker-alt"></i>{{ $event->location }}</p>
                                     </div>
                                     <div class="event-text">
-                                        <a class="" href="{{ route('events.show', $event->id) }}"><h3>{{ $event->title }}</h3></a>
+                                        <a class="" href="{{ route('events.show', $event->slug) }}"><h3>{{ $event->title }}</h3></a>
                                         <p>{{ Str::limit($event->description, 120) }}</p>
-                                        <a class="btn btn-custom" href="{{ route('events.show', $event->id) }}">Join Now</a>
+                                        <a class="btn btn-custom" href="{{ route('events.show', $event->slug) }}">Join Now</a>
                                     </div>
                                 </div>
                             </div>
