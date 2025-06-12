@@ -66,6 +66,16 @@
                 <i class="bi bi-bell me-2"></i> Notifications
             </a>
             
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('files.*') ? 'active' : '' }}" href="{{ route('files.index') }}">
+                    <i class="fas fa-folder-open me-2"></i>
+                    <span>My Files</span>
+                    @if(auth()->user()->files()->count() > 0)
+                        <span class="badge bg-primary ms-auto">{{ auth()->user()->files()->count() }}</span>
+                    @endif
+                </a>
+            </li>
+
             <a class="nav-link text-white {{ request()->routeIs('user.settings.*') ? 'active' : '' }}" 
                href="#settings">
                 <i class="bi bi-gear me-2"></i> Settings

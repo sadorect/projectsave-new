@@ -28,6 +28,17 @@ class UserDashboardController extends Controller
         return view('user.dashboard', compact('activities', 'partnerships', 'notifications'));
     }
 
+    public function files(Request $request)
+    {
+        $files = auth()->user()->files()
+            ->when($request->category, fn($q) => $q->where('category', $request->category))
+            ->when($request->search, fn($q) => $q->where('original_name', 'like', "%{$request->search}%"))
+            ->latest()
+            ->paginate(20);
+            $totalSize = auth()->user()->files()->sum('size');
+        return view('user.files', compact('files', 'totalSize'));
+    }
+
     public function profile()
     {
         return view('user.profile');

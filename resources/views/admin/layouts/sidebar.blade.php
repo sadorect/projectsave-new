@@ -91,6 +91,23 @@
         </div>
     </li>
     <li class="nav-item">
+            <a class="nav-link text-white" data-bs-toggle="collapse" href="#fileManagement" role="button" aria-expanded="false" aria-controls="fileManagement">
+                <i class="bi bi-folder me-2"></i>
+                File Management
+            </a>
+            <div class="collapse" id="fileManagement">
+                <ul class="nav flex-column sub-menu">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{{ route('admin.files.index') }}">
+                            <i class="bi bi-file-earmark me-2"></i> All Files
+                        </a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </li>
+    
+    <li class="nav-item">
         <a class="nav-link text-white" data-bs-toggle="collapse" href="#lms" role="button" aria-expanded="false" aria-controls="lms">
             <i class="bi bi-mortarboard me-2"></i>
             LMS Management

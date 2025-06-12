@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Carbon\Carbon;
 use App\Models\Course;
 use App\Models\Partner;
 use App\Models\Activity;
+use App\Models\UserFile;
 use App\Models\Enrollment;
 use App\Models\LessonProgress;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -52,6 +53,32 @@ class User extends Authenticatable implements MustVerifyEmail
         'wedding_anniversary' => 'date',
         'is_admin' => 'boolean',
     ];
+
+    public function files()
+    {
+        return $this->hasMany(UserFile::class);
+    }
+    // In your User model
+public function getTotalFileSizeAttribute()
+{
+    return $this->files()->sum('size');
+}
+
+public function getFormattedTotalFileSizeAttribute()
+{
+    return $this->formatBytes($this->total_file_size);
+}
+
+private function formatBytes($size, $precision = 2)
+{
+    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    
+    for ($i = 0; $size > 1024 && $i < count($units) - 1; $i++) {
+        $size /= 1024;
+    }
+    
+    return round($size, $precision) . ' ' . $units[$i];
+}
 
     public function isAdmin()
     {

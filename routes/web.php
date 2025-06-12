@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminFileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Admin\MailController;
 use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\PrayerForceController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -86,6 +88,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('user.account.deletion');
     Route::post('/account/deletion', [UserDashboardController::class, 'requestDeletion'])
         ->name('user.account.deletion.request');
+
+ // Add the files route
+ Route::get('/user/files', [UserDashboardController::class, 'files'])->name('user.files');
+
+    // File Management Routes
+    Route::prefix('files')->name('files.')->group(function () {
+        Route::get('/', [FileManagerController::class, 'index'])->name('index');
+        Route::post('/upload', [FileManagerController::class, 'upload'])->name('upload');
+        Route::get('/{file}/download', [FileManagerController::class, 'download'])->name('download');
+        Route::delete('/{file}', [FileManagerController::class, 'destroy'])->name('destroy');
+    });
 });
 
 /*
@@ -105,7 +118,17 @@ Route::prefix('admin')->group(function() {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
         Route::get('/dashboard/celebrants', [AdminController::class, 'showCelebrants'])->name('admin.dashboard.celebrants');
              
-               
+        // File Management Routes
+    Route::prefix('files')->name('admin.files.')->group(function () {
+        Route::get('/', [AdminFileController::class, 'index'])->name('index');
+        Route::get('/analysis', [AdminFileController::class, 'storageAnalysis'])->name('analysis');
+        Route::get('/{file}', [AdminFileController::class, 'show'])->name('show');
+        Route::get('/{file}/download', [AdminFileController::class, 'download'])->name('download');
+        Route::delete('/{file}', [AdminFileController::class, 'destroy'])->name('destroy');
+        Route::post('/bulk-delete', [AdminFileController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::patch('/{file}/privacy', [AdminFileController::class, 'updatePrivacy'])->name('update-privacy');
+        Route::post('/cleanup-expired', [AdminFileController::class, 'cleanupExpired'])->name('cleanup-expired');
+    });       
 
         // User Management
         Route::resource('users', AdminUserController::class)->names('admin.users');
