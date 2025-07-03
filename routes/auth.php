@@ -42,6 +42,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('asom/welcome', [RegisteredAsomUserController::class, 'welcome'])
     ->name('asom.welcome');
+
+    // Add this route in your authenticated user routes
+Route::post('/asom/join', [RegisteredAsomUserController::class, 'convertToAsomStudent'])->name('asom.join');
+
     
     Route::get('verify-email', EmailVerificationPromptController::class)
                 ->name('verification.notice');

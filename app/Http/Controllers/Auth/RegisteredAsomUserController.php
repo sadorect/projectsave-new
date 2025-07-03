@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Log;
 use App\Models\User;
 use App\Rules\Recaptcha;
 use Illuminate\View\View;
@@ -115,4 +116,44 @@ class RegisteredAsomUserController extends Controller
 
         return view('asom-welcome', compact('whatsappGroups'));
     }
+
+    // Add this method to your existing RegisteredAsomUserController
+
+/**
+ * Convert existing user to ASOM student
+ */
+  public function convertToAsomStudent(Request $request): RedirectResponse
+  {
+      //$user = Auth::user();
+      $user = User::find($request->user_id);
+
+    // Debug: Check if user is authenticated
+    if (!$user) {
+      return redirect()->back()->with('error', 'You must be logged in to join ASOM.');
+  }
+  
+  /* Debug: Log the user info
+  Log::info('ASOM Join attempt', [
+      'user_id' => $user->id,
+      'current_user_type' => $user->user_type,
+      'email' => $user->email
+  ]);*/
+
+
+
+      // Check if user is already an ASOM student
+      if ($user->user_type === 'asom_student') {
+          return redirect()->route('asom.welcome')->with('info', 'You are already enrolled in ASOM!');
+      }
+      
+      // Update user type to ASOM student
+    $user->user_type = 'asom_student';
+    $user->save();
+      
+      // Optional: Send welcome email or notification
+      // $user->notify(new AsomWelcomeNotification());
+      
+      return redirect()->route('asom.welcome')->with('success', 'Welcome to ASOM! You have been successfully enrolled.');
+  }
+
 }

@@ -189,10 +189,10 @@
                         </div>
                         
                         <div class="groups-container">
-                            @if(session('verified'))
+                            @if(session('verified') || session('success') )
                                 <div class="alert alert-success">
                                     <i class="fas fa-check-circle me-2"></i>
-                                    <strong>Email Verified!</strong> Your account has been successfully verified. You can now join all WhatsApp groups below.
+                                    <strong>Email Verified!</strong> Your account has been successfully verified and have been enrolled in the ASOM program. You can now join all WhatsApp groups below.
                                 </div>
                             @endif
 

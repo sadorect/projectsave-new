@@ -109,40 +109,78 @@
             </div>
 
             <!-- ASOM Information Card -->
-            @if(auth()->user()->user_type !== 'asom_student')
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-graduation-cap me-2"></i>Archippus School of Ministry (ASOM)
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-8">
-                            <h6 class="mb-2">Transform Your Ministry Journey</h6>
-                            <p class="text-muted mb-3">
-                                Join our comprehensive ministry training program designed to equip you with biblical knowledge, 
-                                practical skills, and spiritual formation for effective ministry.
-                            </p>
-                            <ul class="list-unstyled mb-0">
-                                <li><i class="fas fa-check text-success me-2"></i>Biblical Studies & Hermeneutics</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Ministry Skills & Leadership</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Spiritual Formation & Counseling</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Interactive WhatsApp Learning Groups</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-4 text-center">
-                            <i class="fas fa-graduation-cap fa-4x text-primary mb-3"></i>
-                            <div>
-                                <a href="{{ route('asom.welcome') }}" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-rocket me-2"></i>Join ASOM
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Update the ASOM Information Card section -->
+@if(auth()->user()->user_type !== 'asom_student')
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-gradient-primary text-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-graduation-cap me-2"></i>Archippus School of Ministry (ASOM)
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h6 class="mb-2">Transform Your Ministry Journey</h6>
+                <p class="text-muted mb-3">
+                    Join our comprehensive ministry training program designed to equip you with biblical knowledge, 
+                    practical skills, and spiritual formation for effective ministry.
+                </p>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-check text-success me-2"></i>Biblical Studies & Hermeneutics</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Ministry Skills & Leadership</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Spiritual Formation & Counseling</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Interactive WhatsApp Learning Groups</li>
+                </ul>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-graduation-cap fa-4x text-primary mb-3"></i>
+                <div>
+                    <form action="{{ route('asom.join') }}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+                        <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('Are you ready to join ASOM and begin your ministry training journey?')">
+                            <i class="fas fa-rocket me-2"></i>Join ASOM
+                        </button>
+                    </form>
                 </div>
             </div>
-            @endif
+        </div>
+    </div>
+</div>
+@else
+<!-- Show this for ASOM students -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-gradient-success text-white">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-graduation-cap me-2"></i>ASOM Student Dashboard
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h6 class="mb-2">Welcome to ASOM!</h6>
+                <p class="text-muted mb-3">
+                    You are now enrolled in the Archippus School of Ministry. Access your course materials 
+                    and join your WhatsApp groups to begin your learning journey.
+                </p>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-success"><i class="fas fa-check me-1"></i>Enrolled</span>
+                    <span class="badge bg-info"><i class="fas fa-users me-1"></i>Access to Groups</span>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-graduation-cap fa-4x text-success mb-3"></i>
+                <div>
+                    <a href="{{ route('asom.welcome') }}" class="btn btn-success btn-lg">
+                        <i class="fas fa-users me-2"></i>View Groups
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
         </div>
 
         <!-- Quick Actions Sidebar -->
@@ -167,9 +205,13 @@
                                 <i class="fas fa-graduation-cap me-2"></i>ASOM Groups
                             </a>
                         @else
-                            <a href="{{ route('asom.welcome') }}" class="btn btn-outline-warning">
+                        <form action="{{ route('asom.join') }}" method="POST" class="d-inline" onsubmit="return confirm('Join ASOM now?')">
+                            @csrf
+                            <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+                            <button type="submit" class="btn btn-outline-warning w-100" >
                                 <i class="fas fa-graduation-cap me-2"></i>Join ASOM
-                            </a>
+                            </button>
+                        </form>
                         @endif
                         <a href="{{ route('user.files') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-folder me-2"></i>My Files
