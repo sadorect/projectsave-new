@@ -39,7 +39,7 @@
                         <i class="fas fa-praying-hands fa-2x text-info"></i>
                     </div>
                     <h5 class="card-title">Prayer Points</h5>
-                    <p class="card-text h4 text-info mb-0">12</p>
+                    <p class="card-text h4 text-info mb-0">0</p>
                 </div>
             </div>
         </div>
@@ -113,7 +113,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-gradient-primary text-white">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-graduation-cap me-2"></i>African School of Ministry (ASOM)
+                        <i class="fas fa-graduation-cap me-2"></i>Archippus School of Ministry (ASOM)
                     </h5>
                 </div>
                 <div class="card-body">
