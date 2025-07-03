@@ -119,7 +119,8 @@ Route::prefix('admin')->group(function() {
         Route::get('/dashboard/celebrants', [AdminController::class, 'showCelebrants'])->name('admin.dashboard.celebrants');
              
         // File Management Routes
-    Route::prefix('files')->name('admin.files.')->group(function () {
+    Route::prefix('files')->name('admin.files.')->group(function ()
+     {
         Route::get('/', [AdminFileController::class, 'index'])->name('index');
         Route::get('/analysis', [AdminFileController::class, 'storageAnalysis'])->name('analysis');
         Route::get('/{file}', [AdminFileController::class, 'show'])->name('show');

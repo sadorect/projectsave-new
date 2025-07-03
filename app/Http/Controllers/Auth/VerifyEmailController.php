@@ -16,6 +16,11 @@ class VerifyEmailController extends Controller
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
+            // Check if user is ASOM student and should be redirected to welcome page
+            if ($this->shouldRedirectToAsomWelcome($request->user())) {
+                return redirect()->route('asom.welcome')->with('verified', true);
+            }
+            
             return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
         }
 
@@ -23,6 +28,22 @@ class VerifyEmailController extends Controller
             event(new Verified($request->user()));
         }
 
+        // After successful verification, check if user should go to ASOM welcome
+        if ($this->shouldRedirectToAsomWelcome($request->user())) {
+            // Clear the session flag
+            session()->forget('asom_redirect_after_verification');
+            return redirect()->route('asom.welcome')->with('verified', true);
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
+    }
+
+    /**
+     * Determine if user should be redirected to ASOM welcome page
+     */
+    private function shouldRedirectToAsomWelcome($user): bool
+    {
+        return $user->user_type === 'asom_student' && 
+               (session('asom_redirect_after_verification') || request()->has('asom'));
     }
 }

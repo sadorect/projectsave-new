@@ -15,8 +15,17 @@ class EmailVerificationPromptController extends Controller
      */
     public function __invoke(Request $request): RedirectResponse|View
     {
-        return $request->user()->hasVerifiedEmail()
-                    ? redirect()->intended(RouteServiceProvider::HOME)
-                    : view('auth.verify-email');
+        if ($request->user()->hasVerifiedEmail()) {
+            // If user is already verified and is ASOM student, redirect to welcome
+            if ($request->user()->user_type === 'asom_student' && session('asom_redirect_after_verification')) {
+                session()->forget('asom_redirect_after_verification');
+                return redirect()->route('asom.welcome');
+            }
+            
+            return redirect()->intended(RouteServiceProvider::HOME);
+        }
+
+        return view('auth.verify-email');
     }
+    
 }

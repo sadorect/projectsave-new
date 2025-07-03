@@ -19,7 +19,7 @@
         <div class="row justify-content-center">
             <div class="col-lg-6">
                 <div class="register-form">
-                    <form method="POST" action="{{ route('register') }}">
+                    <form method="POST" action="{{ route('asom.register') }}">
                         @csrf
                         
                         <div class="form-group">
