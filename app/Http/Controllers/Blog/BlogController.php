@@ -28,11 +28,20 @@ class BlogController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::with(['categories', 'tags'])
-            ->orderBy('published_at', 'desc')
+        $query = Post::with(['categories', 'tags'])
+            ->whereNotNull('published_at');
+            
+        // Filter by date if provided
+        if ($request->has('date')) {
+            $date = $request->get('date');
+            $query->whereDate('published_at', $date);
+        }
+        
+        $posts = $query->orderBy('published_at', 'desc')
             ->paginate(6);
+            
         return view('pages.blog.index', compact('posts'));
     }
 
@@ -113,10 +122,11 @@ class BlogController extends Controller
           $calendar = $this->generateCalendar();
           $currentMonth = Carbon::now()->format('F Y');
 
-          $postDates = Post::whereRaw('MONTH(created_at) = ?', [11])
-          ->whereRaw('YEAR(created_at) = ?', [now()->year])
-          ->get(['created_at'])
-          ->map(fn($post) => $post->created_at->format('Y-m-d'))
+          $postDates = Post::whereNotNull('published_at')
+          ->whereRaw('MONTH(published_at) = ?', [now()->month])
+          ->whereRaw('YEAR(published_at) = ?', [now()->year])
+          ->get(['published_at'])
+          ->map(fn($post) => $post->published_at->format('Y-m-d'))
           ->toArray();
       
           $previous = Post::where('status', 'published')
@@ -165,7 +175,8 @@ class BlogController extends Controller
           $calendar = $this->generateCalendar();
           $currentMonth = Carbon::now()->format('F Y');
 
-          $postDates = Post::whereRaw('MONTH(created_at) = ?', [11])
+          $postDates = Post::where('status', 'published')
+          ->whereRaw('MONTH(created_at) = ?', [now()->month])
           ->whereRaw('YEAR(created_at) = ?', [now()->year])
           ->get(['created_at'])
           ->map(fn($post) => $post->created_at->format('Y-m-d'))
@@ -186,18 +197,14 @@ class BlogController extends Controller
 
     private function generateCalendar($month = null, $year = null)
 {
-    $month = 11;//$month ?? Carbon::now()->month;
-    $year = 2024;//$year ?? Carbon::now()->year;
+    $month = $month ?? Carbon::now()->month;
+    $year = $year ?? Carbon::now()->year;
     
     $date = Carbon::createFromDate($year, $month, 1);
-    Log::info("Initial date:", ['date' => $date->format('Y-m-d')]);
     $calendar = collect();
     
     // Add empty days for the start of the month
     for ($i = 0; $i < $date->dayOfWeek; $i++) {
-        
-         $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
-    
         $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
     }
     
@@ -205,7 +212,6 @@ class BlogController extends Controller
     while ($date->month === (int) $month) {
         $calendar->push(clone $date);
         $date->addDay();
-        Log::info("Adding current month date:", ['date' => $calendar->last()->format('Y-m-d')]);
     }
     
     // Add remaining days to complete the grid
@@ -264,7 +270,23 @@ class BlogController extends Controller
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully');
     }
 
-
-
+    public function getCalendarData($year, $month)
+    {
+        $calendar = $this->generateCalendar($month, $year);
+        $currentMonth = Carbon::createFromDate($year, $month)->format('F Y');
+        
+        $postDates = Post::whereNotNull('published_at')
+            ->whereRaw('MONTH(published_at) = ?', [$month])
+            ->whereRaw('YEAR(published_at) = ?', [$year])
+            ->get(['published_at'])
+            ->map(fn($post) => $post->published_at->format('Y-m-d'))
+            ->toArray();
+            
+        return response()->json([
+            'calendar' => $calendar->map(fn($date) => $date->format('Y-m-d'))->toArray(),
+            'currentMonth' => $currentMonth,
+            'postDates' => $postDates
+        ]);
+    }
 
 }

@@ -55,6 +55,7 @@ class AdminController extends Controller
             'active_users' => User::where('email_verified_at', '!=', null)->count(),
             'new_users_today' => User::whereDate('created_at', today())->count(),
             'pending_partners' => Partner::where('status', 'pending')->count(),
+            'asom_students' => User::where('user_type', 'asom_student')->count(),
         ];
 
         $recent_activity = Post::with('author')

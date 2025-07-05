@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Event;
 use App\Models\Partner;
+use App\Http\Controllers\Controller;
 
 class DashboardController extends Controller
 {
@@ -17,8 +18,12 @@ class DashboardController extends Controller
             'active_users' => User::where('email_verified_at', '!=', null)->count(),
             'new_users_today' => User::whereDate('created_at', today())->count(),
             'pending_partners' => Partner::where('status', 'pending')->count(),
+            'asom_students' => User::where('user_type', 'asom_student')->count(),
         ];
+// Debug: Check if the key exists
 
+
+Log::info('Dashboard stats', $stats);
         $recent_activity = Post::with('author')
             ->latest()
             ->take(5)

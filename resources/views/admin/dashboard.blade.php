@@ -46,6 +46,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-3 mb-4">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">ASOM Students</h5>
+                    <p class="card-text display-6">{{ $stats['asom_students'] ?? 0 }}</p>
+                    
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Add after existing stats cards -->
