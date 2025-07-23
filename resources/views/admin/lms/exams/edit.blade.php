@@ -53,7 +53,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Maximum Attempts Allowed</label>
-                                    <input type="number" name="max_attempts" class="form-control" value="1" min="1">
+                                    <input type="number" name="max_attempts" class="form-control" value="{{ $exam->max_attempts }}"  min="1">
                                     <small class="text-muted">Number of times a student can take this exam</small>
                                 </div>
                             </div>
@@ -71,8 +71,21 @@
                                 </div>
                             </div> 
                         </div> 
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5>Exam Details</h5>
+                       
+                        
+
+                        <div class="text-end">
+                            <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Exam</button>
+                            <a href="{{ route('admin.exams.preview', $exam) }}" class="btn btn-info me-2">
+                              <i class="bi bi-eye"></i> Preview Exam
+                          </a>
+                        </div>
+                    </form>
+                </div>
+
+                 <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5>Exam Status</h5>
                             <form action="{{ route('admin.exams.toggle-activation', $exam) }}" 
                                 method="POST" 
                                 class="d-inline exam-activation-form" 
@@ -87,18 +100,7 @@
                             </form>
 
                         </div>
-                        
-
-                        <div class="text-end">
-                            <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Update Exam</button>
-                            <a href="{{ route('admin.exams.preview', $exam) }}" class="btn btn-info me-2">
-                              <i class="bi bi-eye"></i> Preview Exam
-                          </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </div>           
         </div>
 
         <div class="col-md-4">
