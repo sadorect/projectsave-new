@@ -112,30 +112,33 @@
                     </a>
                 </div>
                 <div class="card-body">
+                    {{-- Search box --}}
+                        <div class="mb-3">
+                            <input type="text" id="question-search" class="form-control" placeholder="Search questions...">
+                        </div>
                     @if($exam->questions->count() > 0)
-                        <ul class="list-group">
-                            @foreach($exam->questions as $question)
-                                <li class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>{{ $question->question_text }}</div>
-                                    </div>
-                                
-                                <div>
-                                  <span class="badge bg-primary">{{ $question->points }} pts</span>
-                                  <a href="{{ route('admin.questions.edit', [$exam, $question]) }}" class="btn btn-sm btn-primary ms-2">
-                                      <i class="bi bi-pencil"></i>
-                                  </a>
-                                  <form action="{{ route('admin.questions.destroy', [$exam, $question]) }}" method="POST" class="d-inline">
-                                      @csrf
-                                      @method('DELETE')
-                                      <button type="submit" class="btn btn-sm btn-danger ms-1" onclick="return confirm('Are you sure you want to delete this question?')">
-                                          <i class="bi bi-trash"></i>
-                                      </button>
-                                  </form>
-                              </div>
-                            </li>
-                            @endforeach
-                        </ul>
+                           <ul class="list-group" id="question-list">
+            @foreach($exam->questions as $question)
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="question-text">{{ $question->question_text }}</div>
+                    </div>
+                    <div>
+                        <span class="badge bg-primary">{{ $question->points }} pts</span>
+                        <a href="{{ route('admin.questions.edit', [$exam, $question]) }}" class="btn btn-sm btn-primary ms-2">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form action="{{ route('admin.questions.destroy', [$exam, $question]) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger ms-1" onclick="return confirm('Are you sure you want to delete this question?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            @endforeach
+        </ul>
                         
                       
                     @else
@@ -168,6 +171,15 @@
             }
         });
 
+        });
+        // Question search functionality
+        $('#question-search').on('keyup', function() {
+            var value = $(this).val().toLowerCase();
+            $('#question-list .list-group-item').filter(function() {
+                $(this).toggle(
+                    $(this).find('.question-text').text().toLowerCase().indexOf(value) > -1
+                );
+            });
         });
     });
     </script>
