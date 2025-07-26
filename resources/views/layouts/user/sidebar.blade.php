@@ -21,6 +21,10 @@
                         <i class="bi bi-person me-2"></i> My Profile
                     </a>
 
+            <a class="nav-link text-white {{ request()->routeIs('lms.dashboard') ? 'active' : '' }}" 
+               href="{{route('lms.dashboard')}}">
+                <i class="bi bi-people me-2"></i> ASOM
+            </a>
                     <!-- Add to sidebar menu -->
                     <!-- Add this where you want in the nav section -->
 @if(isset($showContentManagement) && $showContentManagement)

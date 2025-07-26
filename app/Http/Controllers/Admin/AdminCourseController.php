@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use Log;
+use Exception;
 use App\Models\Course;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
 class AdminCourseController extends Controller
@@ -39,17 +41,23 @@ class AdminCourseController extends Controller
     ]);
 
     if ($request->hasFile('featured_image')) {
-        $path = $request->file('featured_image')->store('courses', 'public');
-        $validated['featured_image'] = Storage::url($path);
+         $path = $request->file('featured_image')->store('projectsave/lms/courses/images', [
+            'disk' => 's3',
+            'visibility' => 'private'
+        ]);
+        $validated['featured_image'] = $path;
     }
 
     if ($request->hasFile('documents')) {
         $documents = [];
         foreach($request->file('documents') as $file) {
-            $path = $file->store('course-documents', 'public');
+            $docPath = $file->store('projectsave/lms/courses/documents', [
+                'disk' => 's3',
+                'visibility' => 'private'
+            ]);
             $documents[] = [
                 'name' => $file->getClientOriginalName(),
-                'path' => Storage::url($path),
+                'path' => $docPath,
                 'size' => $file->getSize(),
                 'type' => $file->getClientMimeType()
             ];
@@ -74,10 +82,11 @@ class AdminCourseController extends Controller
         return view('admin.courses.edit', compact('course'));
     }
 
+
     public function update(Request $request, Course $course)
 {
     $this->authorize('update', $course);
-    
+
     $validated = $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'required',
@@ -90,46 +99,58 @@ class AdminCourseController extends Controller
         'status' => 'required|in:draft,published,archived'
     ]);
 
-    if ($request->hasFile('featured_image')) {
-        if ($course->featured_image) {
-            Storage::delete(str_replace('/storage/', 'public/', $course->featured_image));
-        }
-        $path = $request->file('featured_image')->store('courses', 'public');
-        $validated['featured_image'] = Storage::url($path);
-    }
-
-    if ($request->hasFile('documents')) {
-        if ($course->documents) {
-            $oldDocs = json_decode($course->documents, true);
-            foreach($oldDocs as $doc) {
-                Storage::delete(str_replace('/storage/', 'public/', $doc['path']));
+     try {
+        // Handle featured image upload
+        if ($request->hasFile('featured_image')) {
+            if ($course->featured_image) {
+                Storage::disk('s3')->delete($course->featured_image);
             }
+            $path = $request->file('featured_image')->store('projectsave/lms/courses/images', [
+                'disk' => 's3',
+                'visibility' => 'private'
+            ]);
+            $validated['featured_image'] = $path;
         }
 
-        $documents = [];
-        foreach($request->file('documents') as $file) {
-            $path = $file->store('course-documents', 'public');
-            $documents[] = [
-                'name' => $file->getClientOriginalName(),
-                'path' => Storage::url($path),
-                'size' => $file->getSize(),
-                'type' => $file->getClientMimeType()
-            ];
-        }
-        $validated['documents'] = json_encode($documents);
-    }
+        // Handle documents upload
+        if ($request->hasFile('documents')) {
+            if ($course->documents) {
+                $oldDocs = json_decode($course->documents, true);
+                foreach ($oldDocs as $doc) {
+                    Storage::disk('s3')->delete($doc['path']);
+                }
+            }
 
-    $validated['slug'] = Str::slug($validated['title']);
-    
-    $course->update($validated);
-        
-       
-    
+            $documents = [];
+            foreach ($request->file('documents') as $file) {
+                $docPath = $file->store('projectsave/lms/courses/documents', [
+                    'disk' => 's3',
+                    'visibility' => 'private'
+                ]);
+                $documents[] = [
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $docPath,
+                    'size' => $file->getSize(),
+                    'type' => $file->getClientMimeType()
+                ];
+            }
+            $validated['documents'] = json_encode($documents);
+        }
+
+        $validated['slug'] = Str::slug($validated['title']);
+        $course->update($validated);
+
         return redirect()->route('admin.courses.index')
-                        ->with('success', 'Course updated successfully');
+            ->with('success', 'Course updated successfully');
+    } catch (\Exception $e) {
+        return back()->withErrors(['error' => 'Course update failed: ' . $e->getMessage()]);
     }
+}
+
     
-    public function show(Course $course)
+
+    
+        public function show(Course $course)
     {
         $course->load(['instructor', 'lessons' => function($query) {
             $query->orderBy('order');

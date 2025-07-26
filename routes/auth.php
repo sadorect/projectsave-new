@@ -39,7 +39,7 @@ Route::middleware('guest')->group(function () {
                 ->name('password.store');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'verified')->group(function () {
     Route::get('asom/welcome', [RegisteredAsomUserController::class, 'welcome'])
     ->name('asom.welcome');
 

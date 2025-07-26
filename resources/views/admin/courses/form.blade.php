@@ -11,7 +11,7 @@
     <label for="description">Description</label>
     <textarea name="description" id="description" rows="5" 
               class="form-control @error('description') is-invalid @enderror" 
-              required>{{ old('description', $course->description ?? '') }}</textarea>
+              >{{ old('description', $course->description ?? '') }}</textarea>
     @error('description')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
@@ -53,60 +53,109 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Document upload functionality
     const container = document.getElementById('document-container');
-
-    // Add new document input
-    container.addEventListener('click', function(e) {
-        if (e.target.closest('.add-document')) {
-            const newGroup = document.createElement('div');
-            newGroup.className = 'document-input-group mb-2';
-            newGroup.innerHTML = `
-                <div class="input-group">
-                    <input type="file" name="documents[]" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-                    <button type="button" class="btn btn-success add-document"><i class="fas fa-plus"></i></button>
-                    <button type="button" class="btn btn-danger remove-document"><i class="fas fa-trash"></i></button>
-                </div>
-                <div class="document-preview mt-1"></div>
-            `;
-            container.appendChild(newGroup);
-        }
-        
-        if (e.target.closest('.remove-document')) {
-            const group = e.target.closest('.document-input-group');
-            if (container.children.length > 1) {
-                group.remove();
-            }
-        }
-    });
-
-    // Preview files
-    container.addEventListener('change', function(e) {
-        if (e.target.type === 'file') {
-            const preview = e.target.closest('.document-input-group').querySelector('.document-preview');
-            const file = e.target.files[0];
-            if (file) {
-                preview.innerHTML = `
-                    <div class="document-item">
-                        <i class="fas fa-file"></i>
-                        <span>${file.name}</span>
-                        <small class="text-muted">(${(file.size/1024/1024).toFixed(2)} MB)</small>
+    if (container) {
+        // Add new document input
+        container.addEventListener('click', function(e) {
+            if (e.target.closest('.add-document')) {
+                const newGroup = document.createElement('div');
+                newGroup.className = 'document-input-group mb-2';
+                newGroup.innerHTML = `
+                    <div class="input-group">
+                        <input type="file" name="documents[]" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                        <button type="button" class="btn btn-success add-document"><i class="fas fa-plus"></i></button>
+                        <button type="button" class="btn btn-danger remove-document"><i class="fas fa-trash"></i></button>
                     </div>
+                    <div class="document-preview mt-1"></div>
                 `;
+                container.appendChild(newGroup);
             }
-        }
-    });
+            
+            if (e.target.closest('.remove-document')) {
+                const group = e.target.closest('.document-input-group');
+                if (container.children.length > 1) {
+                    group.remove();
+                }
+            }
+        });
+
+        // Preview files
+        container.addEventListener('change', function(e) {
+            if (e.target.type === 'file') {
+                const preview = e.target.closest('.document-input-group').querySelector('.document-preview');
+                const file = e.target.files[0];
+                if (file) {
+                    preview.innerHTML = `
+                        <div class="document-item">
+                            <i class="fas fa-file"></i>
+                            <span>${file.name}</span>
+                            <small class="text-muted">(${(file.size/1024/1024).toFixed(2)} MB)</small>
+                        </div>
+                    `;
+                }
+            }
+        });
+    }
+
+    // CKEditor initialization
+    if (typeof ClassicEditor !== 'undefined') {
+        const editors = ['description', 'objectives', 'outcomes', 'evaluation', 'recommended_books'];
+        
+        editors.forEach(field => {
+            const element = document.querySelector(`#${field}`);
+           // const editorElement = document.querySelector('#details');
+console.log(element);
+            if (element) {
+                ClassicEditor
+                    .create(element, {
+                        toolbar: [
+                            'heading', '|',
+                            'bold', 'italic', 'link', '|',
+                            'bulletedList', 'numberedList', '|',
+                            'outdent', 'indent', '|',
+                            'blockQuote', 'insertTable', '|',
+                            'undo', 'redo'
+                        ]
+                    })
+                    .then(editor => {
+                        console.log(`CKEditor initialized for ${field}`);
+                    })
+                    .catch(error => {
+                        console.error(`Error initializing CKEditor for ${field}:`, error);
+                        // Fallback to plain textarea if CKEditor fails
+                        element.style.display = 'block';
+                    });
+            } else {
+                console.warn(`Element #${field} not found for CKEditor initialization`);
+            }
+        });
+    } else {
+        console.error('CKEditor not loaded. Please check the CDN link.');
+    }
+
+    // Image preview functionality
+    const featuredImageInput = document.getElementById('featured_image');
+    const imagePreview = document.getElementById('image_preview');
+    
+    if (featuredImageInput && imagePreview) {
+        featuredImageInput.onchange = function(evt) {
+            const [file] = this.files;
+            if (file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
+                if (validTypes.includes(file.type)) {
+                    imagePreview.src = URL.createObjectURL(file);
+                    imagePreview.style.display = 'block';
+                } else {
+                    alert('Please select a valid image file (JPEG, PNG, JPG, GIF, or WebP)');
+                    this.value = '';
+                }
+            }
+        };
+    }
 });
 </script>
-<script>
-    const editors = ['description','objectives', 'outcomes', 'evaluation', 'recommended_books'];
-    editors.forEach(field => {
-        ClassicEditor
-            .create(document.querySelector(`#${field}`))
-            .catch(error => {
-                console.error(error);
-            });
-    });
-    </script>
 <style>
 .document-item {
     padding: 8px;
@@ -124,8 +173,14 @@ document.addEventListener('DOMContentLoaded', function() {
   <label for="featured_image">Featured Image</label>
   <input type="file" name="featured_image" id="featured_image" 
          class="form-control @error('featured_image') is-invalid @enderror">
-  <img id="image_preview" src="{{ $course->featured_image ?? '' }}" 
-       class="mt-2" style="max-height: 200px; display: {{ isset($course->featured_image) ? 'block' : 'none' }}">
+  @if(isset($course->featured_image) && $course->featured_image)
+    <img id="image_preview" src="{{ Storage::disk('s3')->url($course->featured_image )}}" 
+         class="mt-2" style="max-height: 200px; display: block"
+         onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
+  @else
+    <img id="image_preview" src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
+         class="mt-2" style="max-height: 200px; display: none">
+  @endif
   @error('featured_image')
       <div class="invalid-feedback">{{ $message }}</div>
   @enderror
@@ -144,13 +199,4 @@ document.addEventListener('DOMContentLoaded', function() {
     @enderror
 </div>
 
-<script>
-  document.getElementById('featured_image').onchange = function(evt) {
-      const [file] = this.files;
-      if (file) {
-          const preview = document.getElementById('image_preview');
-          preview.src = URL.createObjectURL(file);
-          preview.style.display = 'block';
-      }
-  }
-</script>
+

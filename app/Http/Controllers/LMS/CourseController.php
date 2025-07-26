@@ -67,14 +67,14 @@ public function store(Request $request)
     ]);
 
     if ($request->hasFile('featured_image')) {
-        $path = $request->file('featured_image')->store('courses', 'public');
+        $path = $request->file('featured_image')->store('lms/courses/images');
         $validated['featured_image'] = Storage::url($path);
     }
 
     if ($request->hasFile('documents')) {
         $documents = [];
         foreach($request->file('documents') as $file) {
-            $path = $file->store('course-documents', 'public');
+            $path = $file->store('lms/courses/documents');
             $documents[] = [
                 'name' => $file->getClientOriginalName(),
                 'path' => Storage::url($path),
@@ -120,9 +120,11 @@ public function store(Request $request)
 
     if ($request->hasFile('featured_image')) {
         if ($course->featured_image) {
-            Storage::delete(str_replace('/storage/', 'public/', $course->featured_image));
+            // Extract path from full URL for S3 deletion
+            $oldPath = str_replace(Storage::url(''), '', $course->featured_image);
+            Storage::delete($oldPath);
         }
-        $path = $request->file('featured_image')->store('courses', 'public');
+        $path = $request->file('featured_image')->store('lms/courses/images');
         $validated['featured_image'] = Storage::url($path);
     }
 
@@ -130,13 +132,15 @@ public function store(Request $request)
         if ($course->documents) {
             $oldDocs = json_decode($course->documents, true);
             foreach($oldDocs as $doc) {
-                Storage::delete(str_replace('/storage/', 'public/', $doc['path']));
+                // Extract path from full URL for S3 deletion
+                $oldPath = str_replace(Storage::url(''), '', $doc['path']);
+                Storage::delete($oldPath);
             }
         }
 
         $documents = [];
         foreach($request->file('documents') as $file) {
-            $path = $file->store('course-documents', 'public');
+            $path = $file->store('lms/courses/documents');
             $documents[] = [
                 'name' => $file->getClientOriginalName(),
                 'path' => Storage::url($path),

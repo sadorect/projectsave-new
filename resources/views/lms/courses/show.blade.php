@@ -26,7 +26,14 @@
                 <h1 class="mb-4">{{ $course->title }}</h1>
                 
                 @if($course->featured_image)
-                    <img src="{{ $course->featured_image }}" alt="{{ $course->title }}" class="img-fluid rounded mb-4">
+                    <img src="{{ Storage::disk('s3')->url($course->featured_image) }}" 
+                         alt="{{ $course->title }}" 
+                         class="img-fluid rounded mb-4"
+                         onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
+                @else
+                    <img src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
+                         alt="{{ $course->title }}" 
+                         class="img-fluid rounded mb-4">
                 @endif
 
                 <!-- Course Overview Tabs -->

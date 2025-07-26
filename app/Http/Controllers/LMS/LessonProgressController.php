@@ -11,8 +11,19 @@ class LessonProgressController extends Controller
 {
     public function markComplete(Course $course, Lesson $lesson)
     {
-        $progress = auth()->user()->lessonProgress()->updateOrCreate(
-            ['lesson_id' => $lesson->id],
+        // Ensure the lesson belongs to the course
+        if ($lesson->course_id !== $course->id) {
+            return response()->json(['success' => false, 'message' => 'Lesson does not belong to this course.'], 400);
+        }
+
+        $user = auth()->user();
+
+        // Mark lesson as complete for the user
+         $user->lessonProgress()->updateOrCreate(
+            [
+                'lesson_id' => $lesson->id,
+                'user_id' => $user->id
+            ],
             [
                 'completed' => true,
                 'completed_at' => now()
@@ -20,23 +31,29 @@ class LessonProgressController extends Controller
         );
 
         $totalLessons = $course->lessons()->count();
-        $completedLessons = auth()->user()->lessonProgress()
+        $completedLessons = $user->lessonProgress()
             ->whereIn('lesson_id', $course->lessons()->pluck('id'))
+            ->where('user_id', $user->id)
             ->where('completed', true)
             ->count();
 
-        $progressPercentage = ($completedLessons / $totalLessons) * 100;
+        $progressPercentage = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
 
         if ($progressPercentage === 100) {
-            auth()->user()->courses()->updateExistingPivot($course->id, [
+            $user->courses()->updateExistingPivot($course->id, [
                 'status' => 'completed',
                 'completed_at' => now()
             ]);
         }
 
-        return response()->json([
+        return view('lms.lessons.index', ['message' => 'Lesson marked as complete!'])
+            ->with('success', 'Lesson marked as complete!')
+            ->with('progressPercentage', $progressPercentage);
+        // Alternatively, you can return a JSON response
+       /* return response()->json([
             'success' => true,
             'progress' => $progressPercentage
         ]);
+        */
     }
 }

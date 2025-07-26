@@ -21,8 +21,15 @@
                     </div>
 
                     @if($course->featured_image)
-                        <img src="{{ $course->featured_image }}" alt="{{ $course->title }}" class="img-fluid mb-4 rounded">
-                    @endif
+                    <img src="{{ Storage::disk('s3')->temporaryUrl($course->featured_image, now()->addMinutes(10)) }}" 
+                             alt="{{ $course->title }}" 
+                         class="img-fluid mb-4 rounded"
+                         onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
+                @else
+                    <img src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
+                         alt="{{ $course->title }}" 
+                         class="img-fluid mb-4 rounded">
+                @endif
 
                     <div class="course-description mb-4">
                         {!! $course->description !!}

@@ -87,8 +87,15 @@
                     <div class="course-card h-100">
                         <div class="course-image">
                             @if($course->featured_image)
-                                <img src="{{ $course->featured_image }}" alt="{{ $course->title }}" class="img-fluid">
-                            @endif
+                            <img src="{{ Storage::disk('s3')->url($course->featured_image) }}" 
+                                     alt="{{ $course->title }}" 
+                         class="img-fluid"
+                         onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
+                @else
+                    <img src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
+                         alt="{{ $course->title }}" 
+                         class="img-fluid">
+                @endif
                             <div class="course-overlay">
                                 <span class="badge bg-{{ $course->status === 'published' ? 'success' : 'warning' }}">
                                     {{ ucfirst($course->status) }}
@@ -100,7 +107,7 @@
                             <p>{!! Str::limit($course->description, 100) !!}</p>
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <a href="{{ route('lms.courses.show', $course->slug) }}" class="btn btn-outline-primary">View Details</a>
-                                <small class="text-muted">By {{ $course->instructor->name }}</small>
+                                <!--small class="text-muted">By {{ $course->instructor->name }}</small-->
                             </div>
                         </div>
                     </div>

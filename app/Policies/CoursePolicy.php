@@ -19,7 +19,8 @@ class CoursePolicy
  */
 public function update(User $user, Course $course)
 {
-    return $user->id === $course->instructor_id;
+    // Allow admins to update any course, or course instructors to update their own
+    return $user->isAdmin() || $user->id === $course->instructor_id;
 }
 
 /**
@@ -31,7 +32,8 @@ public function update(User $user, Course $course)
  */
 public function delete(User $user, Course $course)
 {
-    return $user->id === $course->instructor_id;
+    // Allow admins to delete any course, or course instructors to delete their own
+    return $user->isAdmin() || $user->id === $course->instructor_id;
 }
 
 }

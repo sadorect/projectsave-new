@@ -40,7 +40,7 @@ class Course extends Model
     public function getFeaturedImageAttribute($value)
 {
     if ($value) {
-        return Storage::url($value);
+        return $value;
     }
     return null;
 }
@@ -93,6 +93,26 @@ public function users()
                 ->exists() &&
            ($this->is_active || $this->questions()->count() >= 5);
 }
+
+    /**
+     * Get the course featured image URL with fallback
+     */
+    public function getFeaturedImageUrlAttribute(): string
+    {
+        if ($this->featured_image) {
+            return $this->featured_image;
+        }
+        
+        return asset('frontend/img/course-placeholder.jpg');
+    }
+
+    /**
+     * Check if course has a valid featured image
+     */
+    public function hasFeaturedImage(): bool
+    {
+        return !empty($this->featured_image);
+    }
 
 }
 

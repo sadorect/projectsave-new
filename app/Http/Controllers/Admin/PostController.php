@@ -9,6 +9,7 @@ use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\FacebookService;
+use App\Services\FileUploadService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 

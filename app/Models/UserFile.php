@@ -28,7 +28,19 @@ class UserFile extends Model
 
     public function getUrlAttribute(): string
     {
+        // If using S3, return direct S3 URL for public files
+        if (config('filesystems.default') === 's3' && !$this->is_private) {
+            return Storage::url($this->path);
+        }
+        
+        // For local storage or private files, use download route
         return route('files.download', $this->id);
+    }
+
+    public function getDirectUrlAttribute(): string
+    {
+        // Always return the direct storage URL
+        return Storage::url($this->path);
     }
 
     public function isExpired(): bool

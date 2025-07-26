@@ -21,11 +21,12 @@
 
                         <div class="progress-actions">
                             @if(!$lesson->isCompleted(auth()->user()))
-                                <button class="btn btn-success mark-complete" 
-                                        data-lesson="{{ $lesson->id }}" 
-                                        data-course="{{ $course->id }}">
-                                    Mark as Complete
-                                </button>
+                                <form method="POST" action="{{ route('lessons.complete', [$course->id, $lesson->id]) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-success">
+                                        Mark as Complete
+                                    </button>
+                                </form>
                             @else
                                 <button class="btn btn-success disabled">Completed</button>
                             @endif
@@ -80,22 +81,9 @@
         </div>
         @include('lms.lessons._completion_modal')
     </div>
-
-    {{-- @push('scripts')
-    <script>
-        $('.mark-complete').click(function() {
-            let lessonId = $(this).data('lesson');
-            let courseId = $(this).data('course');
-            
-            $.post(`/learn/courses/${courseId}/lessons/${lessonId}/complete`, {
-                _token: '{{ csrf_token() }}'
-            })
-            .done(function(response) {
-                location.reload();
-            });
-        });
-    </script>
-    @endpush --}}   
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+      
    
 
 

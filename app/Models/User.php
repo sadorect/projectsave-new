@@ -166,10 +166,13 @@ public function courses()
 }
 
 
-public function lessonProgress()
-{
-    return $this->hasMany(LessonProgress::class);
-}
+ /**
+     * Get the lesson progress for the user.
+     */
+    public function lessonProgress()
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
 
 public function markLessonAsCompleted(Lesson $lesson)
 {

@@ -43,7 +43,14 @@
                             <div class="col-md-4 mb-4">
                                 <div class="card h-100">
                                     @if($course->featured_image)
-                                        <img src="{{ $course->featured_image }}" class="card-img-top" alt="{{ $course->title }}">
+                                        <img src="{{ Storage::disk('s3')->url($course->featured_image) }}" 
+                                             class="card-img-top" 
+                                             alt="{{ $course->title }}"
+                                             onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
+                                    @else
+                                        <img src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
+                                             class="card-img-top" 
+                                             alt="{{ $course->title }}">
                                     @endif
                                     <div class="card-body">
                                         <h5 class="card-title">{{ $course->title }}</h5>
