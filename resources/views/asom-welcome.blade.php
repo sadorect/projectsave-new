@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Welcome to ASOM - {{ config('app.name', 'Laravel') }}</title>
+    <title>ASOM Dashboard - {{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -19,60 +19,112 @@
 
     <style>
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             min-height: 100vh;
             font-family: 'Figtree', sans-serif;
         }
         
-        .welcome-container {
-            padding: 2rem 0;
+        .dashboard-container {
+            padding: 1rem 0;
         }
         
-        .welcome-card {
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        .welcome-stats {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
         
-        .welcome-header {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-        
-        .welcome-header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            font-weight: 600;
-        }
-        
-        .welcome-header p {
-            margin: 0.5rem 0 0 0;
-            font-size: 1.1rem;
-            opacity: 0.9;
+        .progress-overview {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            padding: 1.5rem;
         }
         
         .groups-container {
             padding: 2rem;
         }
         
-        .group-card {
-            background: #f8f9fa;
+        .nav-tabs-custom {
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-tabs-custom .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+        }
+        
+        .nav-tabs-custom .nav-link.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: none;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .stat-card p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .course-card {
+            background: white;
             border: 1px solid #e9ecef;
-            border-radius: 10px;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .course-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .group-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
             padding: 1.5rem;
             margin-bottom: 1rem;
             transition: all 0.3s ease;
             text-decoration: none;
             color: inherit;
             display: block;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
         .group-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             text-decoration: none;
             color: inherit;
         }
@@ -139,6 +191,35 @@
             border-top: 1px solid #e9ecef;
         }
         
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        
+        .progress-circle {
+            fill: none;
+            stroke: #e9ecef;
+            stroke-width: 8;
+        }
+        
+        .progress-circle.filled {
+            stroke: #28a745;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.6s ease;
+        }
+        
+        .achievement-badge {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+            color: white;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+        
         .btn-dashboard {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -175,20 +256,351 @@
             text-decoration: none;
             transform: translateY(-1px);
         }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 1.5rem 0;
+                text-align: center;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs-custom .nav-link {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .course-card {
+                margin-bottom: 1rem;
+            }
+            
+            .progress-ring {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .group-card {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-container {
+                padding: 0.5rem 0;
+            }
+            
+            .welcome-stats,
+            .progress-overview {
+                padding: 1rem;
+            }
+            
+            .nav-tabs-custom .nav-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 1.8rem;
+            }
+            
+            .course-card,
+            .group-card {
+                padding: 1rem;
+            }
+        }
+        
+        /* Interactive Enhancements */
+        .stat-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .course-card:hover .course-icon {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-tabs-custom .nav-link {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tabs-custom .nav-link:hover {
+            color: #667eea;
+            border-bottom-color: rgba(102, 126, 234, 0.3);
+        }
     </style>
 </head>
 <body>
-    <div class="welcome-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="welcome-card">
-                        <div class="welcome-header">
-                            <h1><i class="fas fa-graduation-cap me-3"></i>Welcome to ASOM!</h1>
-                            <p>Archippus School of Ministry - Your Journey in Ministry Begins Here</p>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2"><i class="fas fa-graduation-cap me-3"></i>ASOM Dashboard</h1>
+                    <p class="mb-0 opacity-75">Welcome back, {{ Auth::user()->name }}! Continue your ministry training journey.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{{ route('user.dashboard') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-home me-2"></i>Main Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <!-- Quick Stats Overview -->
+            <div class="welcome-stats">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card bg-primary">
+                            <h3>{{ $stats['total_courses'] }}</h3>
+                            <p>Total Courses</p>
+                            <small><i class="fas fa-book-open me-1"></i>Available Modules</small>
                         </div>
-                        
-                        <div class="groups-container">
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card bg-success">
+                            <h3>{{ $stats['completed_courses'] }}</h3>
+                            <p>Completed</p>
+                            <small><i class="fas fa-check-circle me-1"></i>Finished Courses</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card bg-warning">
+                            <h3>{{ $stats['in_progress_courses'] }}</h3>
+                            <p>In Progress</p>
+                            <small><i class="fas fa-clock me-1"></i>Active Learning</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card bg-info">
+                            <h3>{{ $stats['overall_progress'] }}%</h3>
+                            <p>Overall Progress</p>
+                            <small><i class="fas fa-chart-line me-1"></i>Completion Rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs nav-tabs-custom" id="asomTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                        <i class="fas fa-tachometer-alt me-2"></i>Overview
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button" role="tab">
+                        <i class="fas fa-book me-2"></i>Courses
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="groups-tab" data-bs-toggle="tab" data-bs-target="#groups" type="button" role="tab">
+                        <i class="fab fa-whatsapp me-2"></i>WhatsApp Groups
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="achievements-tab" data-bs-toggle="tab" data-bs-target="#achievements" type="button" role="tab">
+                        <i class="fas fa-trophy me-2"></i>Achievements
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="asomTabContent">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="progress-overview">
+                                <h4 class="mb-4"><i class="fas fa-chart-line me-2 text-primary"></i>Learning Progress</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="progress-ring mb-3">
+                                            <svg width="120" height="120">
+                                                <circle class="progress-circle" cx="60" cy="60" r="52"></circle>
+                                                <circle class="progress-circle filled" cx="60" cy="60" r="52" 
+                                                        style="stroke-dasharray: 0 327; stroke-dashoffset: 0"></circle>
+                                                <text x="60" y="65" text-anchor="middle" style="font-size: 24px; font-weight: bold; fill: #333;">{{ $stats['overall_progress'] }}%</text>
+                                            </svg>
+                                        </div>
+                                        <h6 class="text-center">Overall Completion</h6>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3">Recent Activity</h6>
+                                        <div class="activity-item mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="activity-icon bg-primary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-user-plus fa-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="mb-0 fw-semibold">Welcome to ASOM!</p>
+                                                    <small class="text-muted">You've successfully enrolled in the program</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <h6 class="mb-3">Next Steps</h6>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                                    <i class="fas fa-envelope-circle-check fa-2x text-warning me-3"></i>
+                                                    <div>
+                                                        <h6 class="mb-1">
+                                                            @if(!Auth::user()->hasVerifiedEmail())
+                                                                Verify Your Email
+                                                            @else
+                                                                ✓ Email Verified
+                                                            @endif
+                                                        </h6>
+                                                        <small class="text-muted">
+                                                            @if(!Auth::user()->hasVerifiedEmail())
+                                                                Required to access course groups
+                                                            @else
+                                                                You can now access all features
+                                                            @endif
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                                    <i class="fab fa-whatsapp fa-2x text-success me-3"></i>
+                                                    <div>
+                                                        <h6 class="mb-1">Join Course Groups</h6>
+                                                        <small class="text-muted">Connect with instructors and students</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="progress-overview">
+                                <h5 class="mb-4"><i class="fas fa-calendar me-2 text-info"></i>Upcoming</h5>
+                                <div class="upcoming-item mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-center">
+                                        <div class="date-badge bg-primary text-white rounded p-2 me-3 text-center" style="min-width: 50px;">
+                                            <div class="fw-bold">15</div>
+                                            <small>MAR</small>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Bible Introduction</h6>
+                                            <small class="text-muted">Start your first course</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="upcoming-item mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-center">
+                                        <div class="date-badge bg-success text-white rounded p-2 me-3 text-center" style="min-width: 50px;">
+                                            <div class="fw-bold">22</div>
+                                            <small>MAR</small>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">Study Group Session</h6>
+                                            <small class="text-muted">Group discussion & Q&A</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Courses Tab -->
+                <div class="tab-pane fade" id="courses" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="mb-4"><i class="fas fa-book me-2 text-primary"></i>Your ASOM Courses</h4>
+                            <div class="row">
+                                @foreach($coursesWithProgress as $course)
+                                <div class="col-lg-6 mb-4">
+                                    <div class="course-card">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="course-icon bg-primary text-white rounded-circle me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="{{ $course['icon'] }}"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h5 class="mb-1">{{ $course['name'] }}</h5>
+                                                <small class="text-muted">{{ $course['lessons'] }} lesson{{ $course['lessons'] != 1 ? 's' : '' }}</small>
+                                            </div>
+                                            @if($course['progress'] > 0)
+                                                <span class="badge bg-success">{{ $course['progress'] }}% Complete</span>
+                                            @elseif($course['is_enrolled'])
+                                                <span class="badge bg-info">Enrolled</span>
+                                            @else
+                                                <span class="badge bg-secondary">Not Enrolled</span>
+                                            @endif
+                                        </div>
+                                        <div class="progress mb-3" style="height: 8px;">
+                                            <div class="progress-bar" style="width: {{ $course['progress'] }}%"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            @if($course['is_enrolled'])
+                                                @if($course['lessons'] > 0)
+                                                    <a href="{{ route('lms.lessons.index', $course['slug']) }}" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-play me-1"></i>{{ $course['progress'] > 0 ? 'Continue' : 'Start Course' }}
+                                                    </a>
+                                                @else
+                                                    <button class="btn btn-secondary btn-sm" disabled>
+                                                        <i class="fas fa-clock me-1"></i>Content Coming Soon
+                                                    </button>
+                                                @endif
+                                            @else
+                                                <form action="{{ route('lms.courses.enroll', $course['slug']) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-plus me-1"></i>Enroll Now
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            <small class="text-muted">{{ $course['instructor'] }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Groups Tab -->
+                <div class="tab-pane fade" id="groups" role="tabpanel">
+                    <div class="groups-container p-0">
                             @if(session('verified') || session('success') )
                                 <div class="alert alert-success">
                                     <i class="fas fa-check-circle me-2"></i>
@@ -261,12 +673,133 @@
                                     @endif
                                 </ul>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Achievements Tab -->
+                <div class="tab-pane fade" id="achievements" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="mb-4"><i class="fas fa-trophy me-2 text-primary"></i>Your Achievements</h4>
                             
-                            <div class="dashboard-link">
-                                <p class="text-muted mb-3">Ready to explore more features?</p>
-                                <a href="{{ route('user.dashboard') }}" class="btn-dashboard">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
-                                </a>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="progress-overview">
+                                        <h5 class="mb-4">Available Badges</h5>
+                                        <div class="row">
+                                            <div class="col-md-4 mb-4">
+                                                <div class="text-center p-4 {{ $achievements['first_course'] ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-medal fa-3x {{ $achievements['first_course'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                    <h6>First Course</h6>
+                                                    <p class="{{ $achievements['first_course'] ? 'text-white' : 'text-muted' }} small mb-2">Complete your first ASOM course</p>
+                                                    <span class="badge {{ $achievements['first_course'] ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ $achievements['first_course'] ? 'Unlocked' : 'Locked' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <div class="text-center p-4 {{ $achievements['bible_scholar'] ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-book-reader fa-3x {{ $achievements['bible_scholar'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                    <h6>Bible Scholar</h6>
+                                                    <p class="{{ $achievements['bible_scholar'] ? 'text-white' : 'text-muted' }} small mb-2">Complete Bible Introduction & Hermeneutics</p>
+                                                    <span class="badge {{ $achievements['bible_scholar'] ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ $achievements['bible_scholar'] ? 'Unlocked' : 'Locked' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <div class="text-center p-4 {{ $achievements['community_builder'] ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-users fa-3x {{ $achievements['community_builder'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                    <h6>Community Builder</h6>
+                                                    <p class="{{ $achievements['community_builder'] ? 'text-white' : 'text-muted' }} small mb-2">Verify email and join community</p>
+                                                    <span class="badge {{ $achievements['community_builder'] ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ $achievements['community_builder'] ? 'Unlocked' : 'Locked' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <div class="text-center p-4 {{ $achievements['preacher'] ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-microphone fa-3x {{ $achievements['preacher'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                    <h6>Preacher</h6>
+                                                    <p class="{{ $achievements['preacher'] ? 'text-white' : 'text-muted' }} small mb-2">Complete Homiletics course</p>
+                                                    <span class="badge {{ $achievements['preacher'] ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ $achievements['preacher'] ? 'Unlocked' : 'Locked' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <div class="text-center p-4 {{ $achievements['counselor'] ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-hands-helping fa-3x {{ $achievements['counselor'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                    <h6>Counselor</h6>
+                                                    <p class="{{ $achievements['counselor'] ? 'text-white' : 'text-muted' }} small mb-2">Complete Biblical Counseling</p>
+                                                    <span class="badge {{ $achievements['counselor'] ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ $achievements['counselor'] ? 'Unlocked' : 'Locked' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-4">
+                                                <div class="text-center p-4 {{ $achievements['graduate'] ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-graduation-cap fa-3x {{ $achievements['graduate'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                    <h6>ASOM Graduate</h6>
+                                                    <p class="{{ $achievements['graduate'] ? 'text-white' : 'text-muted' }} small mb-2">Complete all ASOM courses</p>
+                                                    <span class="badge {{ $achievements['graduate'] ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ $achievements['graduate'] ? 'Unlocked' : 'Locked' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="progress-overview">
+                                        <h5 class="mb-4">Progress Milestones</h5>
+                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
+                                            <div class="d-flex align-items-center">
+                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-lock fa-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1">25% Complete</h6>
+                                                    <small class="text-muted">First milestone reward</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
+                                            <div class="d-flex align-items-center">
+                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-lock fa-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1">50% Complete</h6>
+                                                    <small class="text-muted">Halfway there!</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
+                                            <div class="d-flex align-items-center">
+                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-lock fa-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1">75% Complete</h6>
+                                                    <small class="text-muted">Almost there!</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
+                                            <div class="d-flex align-items-center">
+                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-lock fa-sm"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1">100% Complete</h6>
+                                                    <small class="text-muted">ASOM Graduate!</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -277,5 +810,81 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle direct tab navigation from URL hash
+            const hash = window.location.hash;
+            if (hash && hash.includes('-tab')) {
+                const tabId = hash.replace('#', '').replace('-tab', '');
+                const tabTrigger = document.querySelector(`#${tabId}-tab`);
+                if (tabTrigger) {
+                    const tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            }
+            
+            // Animate progress ring with real data
+            const progressRing = document.querySelector('.progress-circle.filled');
+            if (progressRing) {
+                const progress = {{ $stats['overall_progress'] }};
+                const circumference = 2 * Math.PI * 52; // radius = 52
+                progressRing.style.strokeDasharray = circumference;
+                progressRing.style.strokeDashoffset = circumference;
+                
+                // Animate to actual progress
+                setTimeout(() => {
+                    const offset = circumference - (progress / 100) * circumference;
+                    progressRing.style.strokeDashoffset = offset;
+                }, 500);
+            }
+            
+            // Add click analytics for course cards (placeholder)
+            document.querySelectorAll('.course-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // This can be enhanced to track course interactions
+                    console.log('Course card clicked:', this.querySelector('h5').textContent);
+                });
+            });
+            
+            // Tab change event handling
+            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', function(e) {
+                    // Update URL hash when tab changes
+                    const targetId = e.target.getAttribute('data-bs-target').replace('#', '');
+                    window.location.hash = targetId.replace(targetId.split('-')[0], targetId.split('-')[0] + '-tab');
+                });
+            });
+            
+            // Mobile-friendly card interactions
+            if (window.innerWidth <= 768) {
+                document.querySelectorAll('.course-card, .group-card').forEach(card => {
+                    card.addEventListener('touchstart', function() {
+                        this.style.transform = 'translateY(-2px)';
+                    });
+                    
+                    card.addEventListener('touchend', function() {
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 150);
+                    });
+                });
+            }
+        });
+        
+        // Function to update progress (can be called when real data is available)
+        function updateProgress(percentage) {
+            const progressRing = document.querySelector('.progress-circle.filled');
+            const progressText = document.querySelector('.progress-ring text');
+            
+            if (progressRing && progressText) {
+                const circumference = 2 * Math.PI * 52;
+                const offset = circumference - (percentage / 100) * circumference;
+                
+                progressRing.style.strokeDashoffset = offset;
+                progressText.textContent = percentage + '%';
+            }
+        }
+    </script>
 </body>
 </html>

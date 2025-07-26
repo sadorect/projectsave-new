@@ -170,9 +170,12 @@
             </div>
             <div class="col-md-4 text-center">
                 <i class="fas fa-graduation-cap fa-4x text-success mb-3"></i>
-                <div>
-                    <a href="{{ route('asom.welcome') }}" class="btn btn-success btn-lg">
-                        <i class="fas fa-users me-2"></i>View Groups
+                <div class="d-flex gap-2 flex-wrap justify-content-center">
+                    <a href="{{ route('asom.welcome') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i>ASOM Dashboard
+                    </a>
+                    <a href="{{ route('asom.welcome') }}#groups-tab" class="btn btn-success btn-lg">
+                        <i class="fab fa-whatsapp me-2"></i>Course Groups
                     </a>
                 </div>
             </div>
@@ -201,8 +204,11 @@
                             <i class="fas fa-calendar me-2"></i>View Events
                         </a>
                         @if(auth()->user()->user_type === 'asom_student')
-                            <a href="{{ route('asom.welcome') }}" class="btn btn-outline-warning">
-                                <i class="fas fa-graduation-cap me-2"></i>ASOM Groups
+                            <a href="{{ route('asom.welcome') }}" class="btn btn-outline-primary mb-2 w-100">
+                                <i class="fas fa-graduation-cap me-2"></i>ASOM Dashboard
+                            </a>
+                            <a href="{{ route('asom.welcome') }}#groups-tab" class="btn btn-outline-success">
+                                <i class="fab fa-whatsapp me-2"></i>Course Groups
                             </a>
                         @else
                         <form action="{{ route('asom.join') }}" method="POST" class="d-inline" onsubmit="return confirm('Join ASOM now?')">

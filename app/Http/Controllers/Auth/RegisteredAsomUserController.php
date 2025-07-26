@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use Log;
 use App\Models\User;
+use App\Models\Course;
 use App\Rules\Recaptcha;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
@@ -63,6 +64,56 @@ class RegisteredAsomUserController extends Controller
      */
     public function welcome(): View
     {
+        $user = Auth::user();
+        
+        // Get all ASOM-related courses
+        $asomCourses = Course::with(['lessons', 'instructor'])
+            ->whereIn('title', [
+                'Bible Introduction',
+                'Hermeneutics', 
+                'Ministry Vitals',
+                'Spiritual Gifts & Ministry',
+                'Biblical Counseling',
+                'Homiletics'
+            ])
+            ->get();
+
+        // Get user's enrolled courses
+        $enrolledCourses = $user->courses()
+            ->withPivot('status', 'enrolled_at', 'completed_at')
+            ->get();
+
+        // Calculate course statistics
+        $stats = [
+            'total_courses' => $asomCourses->count(),
+            'enrolled_courses' => $enrolledCourses->count(),
+            'completed_courses' => $enrolledCourses->where('pivot.status', 'completed')->count(),
+            'in_progress_courses' => $enrolledCourses->where('pivot.status', 'active')->count(),
+            'overall_progress' => $this->calculateOverallProgress($enrolledCourses)
+        ];
+
+        // Map courses with progress and lesson counts
+        $coursesWithProgress = $asomCourses->map(function ($course) use ($user) {
+            $isEnrolled = $user->courses()->where('course_id', $course->id)->exists();
+            $progress = $isEnrolled ? $user->getCourseProgress($course) : 0;
+            
+            return [
+                'id' => $course->id,
+                'slug' => $course->slug,
+                'name' => $course->title,
+                'description' => $course->description,
+                'icon' => $this->getCourseIcon($course->title),
+                'progress' => round($progress),
+                'lessons' => $course->lessons()->count(),
+                'is_enrolled' => $isEnrolled,
+                'instructor' => $course->instructor ? $course->instructor->name : 'TBA',
+                'featured_image' => $course->featured_image
+            ];
+        });
+
+        // Calculate achievements
+        $achievements = $this->calculateAchievements($user, $enrolledCourses);
+
         $whatsappGroups = [
             [
                 'name' => 'Bible Introduction',
@@ -114,7 +165,49 @@ class RegisteredAsomUserController extends Controller
             ]
         ];
 
-        return view('asom-welcome', compact('whatsappGroups'));
+        return view('asom-welcome', compact('whatsappGroups', 'stats', 'coursesWithProgress', 'achievements'));
+    }
+
+    private function calculateOverallProgress($enrolledCourses)
+    {
+        if ($enrolledCourses->isEmpty()) {
+            return 0;
+        }
+
+        $totalProgress = $enrolledCourses->sum(function ($course) {
+            return Auth::user()->getCourseProgress($course);
+        });
+
+        return round($totalProgress / $enrolledCourses->count(), 1);
+    }
+
+    private function getCourseIcon($courseTitle)
+    {
+        $icons = [
+            'Bible Introduction' => 'fas fa-book-open',
+            'Hermeneutics' => 'fas fa-search',
+            'Ministry Vitals' => 'fas fa-heart',
+            'Spiritual Gifts & Ministry' => 'fas fa-gifts',
+            'Biblical Counseling' => 'fas fa-hands-helping',
+            'Homiletics' => 'fas fa-microphone'
+        ];
+
+        return $icons[$courseTitle] ?? 'fas fa-book';
+    }
+
+    private function calculateAchievements($user, $enrolledCourses)
+    {
+        $completedCourses = $enrolledCourses->where('pivot.status', 'completed');
+        $totalCompleted = $completedCourses->count();
+        
+        return [
+            'first_course' => $totalCompleted >= 1,
+            'bible_scholar' => $completedCourses->whereIn('title', ['Bible Introduction', 'Hermeneutics'])->count() >= 2,
+            'community_builder' => $user->hasVerifiedEmail(), // Simplified for now
+            'preacher' => $completedCourses->where('title', 'Homiletics')->count() >= 1,
+            'counselor' => $completedCourses->where('title', 'Biblical Counseling')->count() >= 1,
+            'graduate' => $totalCompleted >= 6
+        ];
     }
 
     // Add this method to your existing RegisteredAsomUserController
