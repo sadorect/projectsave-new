@@ -46,7 +46,7 @@ class LessonProgressController extends Controller
             ]);
         }
 
-        return view('lms.lessons.index', ['message' => 'Lesson marked as complete!'])
+        return redirect()->back()
             ->with('success', 'Lesson marked as complete!')
             ->with('progressPercentage', $progressPercentage);
         // Alternatively, you can return a JSON response

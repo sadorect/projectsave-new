@@ -60,10 +60,25 @@
                     <div class="mb-3">
                         <i class="fas fa-graduation-cap fa-2x text-success"></i>
                     </div>
-                    <h5 class="card-title">ASOM Status</h5>
-                    <p class="card-text h4 text-success mb-0">
-                        {{ auth()->user()->user_type === 'asom_student' ? 'Enrolled' : 'Available' }}
-                    </p>
+                    <h5 class="card-title">ASOM Progress</h5>
+                    @if(auth()->user()->user_type === 'asom_student')
+                        @php
+                        $user = auth()->user();
+                        $asomCourses = \App\Models\Course::whereIn('title', [
+                            'Bible Introduction', 'Hermeneutics', 'Ministry Vitals',
+                            'Spiritual Gifts & Ministry', 'Biblical Counseling', 'Homiletics'
+                        ])->get();
+                        $enrolledCourses = $user->courses()->get();
+                        $overallProgress = $enrolledCourses->isEmpty() ? 0 : round($enrolledCourses->sum(function($course) use($user) {
+                            return $user->getCourseProgress($course);
+                        }) / $enrolledCourses->count(), 1);
+                        @endphp
+                        <p class="card-text h4 text-primary mb-0">{{ $overallProgress }}%</p>
+                        <small class="text-muted">{{ $enrolledCourses->count() }}/{{ $asomCourses->count() }} courses</small>
+                    @else
+                        <p class="card-text h4 text-success mb-0">Available</p>
+                        <small class="text-muted">Ready to enroll</small>
+                    @endif
                 </div>
             </div>
         </div>

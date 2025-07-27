@@ -47,7 +47,7 @@ class DashboardController extends Controller
         ]);
     }
     
-    return redirect()->route('lms.dashboard')
+    return redirect()->back()
                     ->with('success', 'Successfully enrolled in course');
 }
 

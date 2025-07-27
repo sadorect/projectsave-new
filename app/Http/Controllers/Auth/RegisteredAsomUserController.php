@@ -68,17 +68,10 @@ class RegisteredAsomUserController extends Controller
         
         // Get all ASOM-related courses
         $asomCourses = Course::with(['lessons', 'instructor'])
-            ->whereIn('title', [
-                'Bible Introduction',
-                'Hermeneutics', 
-                'Ministry Vitals',
-                'Spiritual Gifts & Ministry',
-                'Biblical Counseling',
-                'Homiletics'
-            ])
+            ->where('status', 'published')
             ->get();
 
-        // Get user's enrolled courses
+        // Get user's enrolled courses (filtered to ASOM courses only)
         $enrolledCourses = $user->courses()
             ->withPivot('status', 'enrolled_at', 'completed_at')
             ->get();
@@ -92,9 +85,10 @@ class RegisteredAsomUserController extends Controller
             'overall_progress' => $this->calculateOverallProgress($enrolledCourses)
         ];
 
-        // Map courses with progress and lesson counts
-        $coursesWithProgress = $asomCourses->map(function ($course) use ($user) {
-            $isEnrolled = $user->courses()->where('course_id', $course->id)->exists();
+        // Map all courses with enrollment and progress data
+        $allCourses = $asomCourses->map(function ($course) use ($user, $enrolledCourses) {
+            $enrolledCourse = $enrolledCourses->where('id', $course->id)->first();
+            $isEnrolled = $enrolledCourse !== null;
             $progress = $isEnrolled ? $user->getCourseProgress($course) : 0;
             
             return [
@@ -106,10 +100,16 @@ class RegisteredAsomUserController extends Controller
                 'progress' => round($progress),
                 'lessons' => $course->lessons()->count(),
                 'is_enrolled' => $isEnrolled,
+                'enrollment_status' => $isEnrolled ? $enrolledCourse->pivot->status : null,
+                'enrolled_at' => $isEnrolled ? $enrolledCourse->pivot->enrolled_at : null,
                 'instructor' => $course->instructor ? $course->instructor->name : 'TBA',
                 'featured_image' => $course->featured_image
             ];
         });
+
+        // Separate enrolled and available courses
+        $enrolledCoursesWithProgress = $allCourses->where('is_enrolled', true)->values();
+        $availableCoursesWithProgress = $allCourses->where('is_enrolled', false)->values();
 
         // Calculate achievements
         $achievements = $this->calculateAchievements($user, $enrolledCourses);
@@ -165,7 +165,7 @@ class RegisteredAsomUserController extends Controller
             ]
         ];
 
-        return view('asom-welcome', compact('whatsappGroups', 'stats', 'coursesWithProgress', 'achievements'));
+        return view('asom-welcome', compact('whatsappGroups', 'stats', 'allCourses', 'enrolledCoursesWithProgress', 'availableCoursesWithProgress', 'achievements'));
     }
 
     private function calculateOverallProgress($enrolledCourses)

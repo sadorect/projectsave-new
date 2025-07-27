@@ -354,6 +354,21 @@
             color: #667eea;
             border-bottom-color: rgba(102, 126, 234, 0.3);
         }
+        
+        .course-card.enrolled {
+            border-left: 4px solid #28a745;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff8 100%);
+        }
+        
+        .course-card.available:hover {
+            border-left: 4px solid #667eea;
+        }
+        
+        .btn-group .btn-check:checked + .btn {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -373,6 +388,7 @@
             </div>
         </div>
     </div>
+@include('components.alerts')
 
     <div class="dashboard-container">
         <div class="container">
@@ -545,54 +561,126 @@
                 <div class="tab-pane fade" id="courses" role="tabpanel">
                     <div class="row">
                         <div class="col-12">
-                            <h4 class="mb-4"><i class="fas fa-book me-2 text-primary"></i>Your ASOM Courses</h4>
-                            <div class="row">
-                                @foreach($coursesWithProgress as $course)
-                                <div class="col-lg-6 mb-4">
-                                    <div class="course-card">
-                                        <div class="d-flex align-items-center mb-3">
-                                            <div class="course-icon bg-primary text-white rounded-circle me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
-                                                <i class="{{ $course['icon'] }}"></i>
+                            <!-- Sub Navigation for Courses -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="mb-0"><i class="fas fa-book me-2 text-primary"></i>ASOM Courses</h4>
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="courseFilter" id="myCoursesBtn" autocomplete="off" checked>
+                                    <label class="btn btn-outline-primary" for="myCoursesBtn">My Courses ({{ $enrolledCoursesWithProgress->count() }})</label>
+                                    
+                                    <input type="radio" class="btn-check" name="courseFilter" id="allCoursesBtn" autocomplete="off">
+                                    <label class="btn btn-outline-primary" for="allCoursesBtn">All Courses ({{ $allCourses->count() }})</label>
+                                </div>
+                            </div>
+                            
+                            <!-- My Enrolled Courses -->
+                            <div id="myCourses" class="course-section">
+                                @if($enrolledCoursesWithProgress->count() > 0)
+                                    <div class="row">
+                                        @foreach($enrolledCoursesWithProgress as $course)
+                                        <div class="col-lg-6 mb-4">
+                                            <div class="course-card enrolled">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <div class="course-icon bg-success text-white rounded-circle me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="{{ $course['icon'] }}"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <h5 class="mb-1">{{ $course['name'] }}</h5>
+                                                        <small class="text-muted">{{ $course['lessons'] }} lesson{{ $course['lessons'] != 1 ? 's' : '' }} • Enrolled {{ $course['enrolled_at'] ? \Carbon\Carbon::parse($course['enrolled_at'])->diffForHumans() : '' }}</small>
+                                                    </div>
+                                                    @if($course['progress'] > 0)
+                                                        <span class="badge bg-success">{{ $course['progress'] }}% Complete</span>
+                                                    @else
+                                                        <span class="badge bg-info">Just Started</span>
+                                                    @endif
+                                                </div>
+                                                <div class="progress mb-3" style="height: 8px;">
+                                                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: {{ $course['progress'] }}%"></div>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    @if($course['lessons'] > 0)
+                                                        <a href="{{ route('lms.lessons.index', $course['slug']) }}" class="btn btn-primary btn-sm">
+                                                            <i class="fas fa-play me-1"></i>{{ $course['progress'] > 0 ? 'Continue Learning' : 'Start Course' }}
+                                                        </a>
+                                                    @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>
+                                                            <i class="fas fa-clock me-1"></i>Content Coming Soon
+                                                        </button>
+                                                    @endif
+                                                    <small class="text-muted">{{ $course['instructor'] }}</small>
+                                                </div>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <h5 class="mb-1">{{ $course['name'] }}</h5>
-                                                <small class="text-muted">{{ $course['lessons'] }} lesson{{ $course['lessons'] != 1 ? 's' : '' }}</small>
-                                            </div>
-                                            @if($course['progress'] > 0)
-                                                <span class="badge bg-success">{{ $course['progress'] }}% Complete</span>
-                                            @elseif($course['is_enrolled'])
-                                                <span class="badge bg-info">Enrolled</span>
-                                            @else
-                                                <span class="badge bg-secondary">Not Enrolled</span>
-                                            @endif
                                         </div>
-                                        <div class="progress mb-3" style="height: 8px;">
-                                            <div class="progress-bar" style="width: {{ $course['progress'] }}%"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            @if($course['is_enrolled'])
-                                                @if($course['lessons'] > 0)
-                                                    <a href="{{ route('lms.lessons.index', $course['slug']) }}" class="btn btn-primary btn-sm">
-                                                        <i class="fas fa-play me-1"></i>{{ $course['progress'] > 0 ? 'Continue' : 'Start Course' }}
-                                                    </a>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No Enrolled Courses Yet</h5>
+                                        <p class="text-muted">Enroll in ASOM courses to start your ministry training journey.</p>
+                                        <button class="btn btn-outline-primary" onclick="document.getElementById('allCoursesBtn').click()">
+                                            <i class="fas fa-search me-2"></i>Browse All Courses
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <!-- All Available Courses -->
+                            <div id="allCourses" class="course-section d-none">
+                                <div class="row">
+                                    @foreach($allCourses as $course)
+                                    <div class="col-lg-6 mb-4">
+                                        <div class="course-card {{ $course['is_enrolled'] ? 'enrolled' : 'available' }}">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="course-icon {{ $course['is_enrolled'] ? 'bg-success' : 'bg-primary' }} text-white rounded-circle me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="{{ $course['icon'] }}"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h5 class="mb-1">{{ $course['name'] }}</h5>
+                                                    <small class="text-muted">{{ $course['lessons'] }} lesson{{ $course['lessons'] != 1 ? 's' : '' }}</small>
+                                                </div>
+                                                @if($course['is_enrolled'])
+                                                    @if($course['progress'] > 0)
+                                                        <span class="badge bg-success">{{ $course['progress'] }}% Complete</span>
+                                                    @else
+                                                        <span class="badge bg-info">Enrolled</span>
+                                                    @endif
                                                 @else
-                                                    <button class="btn btn-secondary btn-sm" disabled>
-                                                        <i class="fas fa-clock me-1"></i>Content Coming Soon
-                                                    </button>
+                                                    <span class="badge bg-secondary">Available</span>
                                                 @endif
-                                            @else
-                                                <form action="{{ route('lms.courses.enroll', $course['slug']) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                                        <i class="fas fa-plus me-1"></i>Enroll Now
-                                                    </button>
-                                                </form>
+                                            </div>
+                                            
+                                            @if($course['is_enrolled'])
+                                                <div class="progress mb-3" style="height: 8px;">
+                                                    <div class="progress-bar progress-bar-striped" style="width: {{ $course['progress'] }}%"></div>
+                                                </div>
                                             @endif
-                                            <small class="text-muted">{{ $course['instructor'] }}</small>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                @if($course['is_enrolled'])
+                                                    @if($course['lessons'] > 0)
+                                                        <a href="{{ route('lms.lessons.index', $course['slug']) }}" class="btn btn-primary btn-sm">
+                                                            <i class="fas fa-play me-1"></i>{{ $course['progress'] > 0 ? 'Continue' : 'Start Course' }}
+                                                        </a>
+                                                    @else
+                                                        <button class="btn btn-secondary btn-sm" disabled>
+                                                            <i class="fas fa-clock me-1"></i>Content Coming Soon
+                                                        </button>
+                                                    @endif
+                                                @else
+                                                    <form action="{{ route('lms.courses.enroll', $course['slug']) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-plus me-1"></i>Enroll Now
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                                <small class="text-muted">{{ $course['instructor'] }}</small>
+                                            </div>
                                         </div>
                                     </div>
+                                    @endforeach
                                 </div>
-                                @endforeach
                             </div>
                         </div>
                     </div>
@@ -751,55 +839,59 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="progress-overview">
-                                        <h5 class="mb-4">Progress Milestones</h5>
-                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
-                                            <div class="d-flex align-items-center">
-                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-lock fa-sm"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-1">25% Complete</h6>
-                                                    <small class="text-muted">First milestone reward</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
-                                            <div class="d-flex align-items-center">
-                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-lock fa-sm"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-1">50% Complete</h6>
-                                                    <small class="text-muted">Halfway there!</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
-                                            <div class="d-flex align-items-center">
-                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-lock fa-sm"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-1">75% Complete</h6>
-                                                    <small class="text-muted">Almost there!</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="milestone-item mb-3 p-3 bg-light rounded opacity-50">
-                                            <div class="d-flex align-items-center">
-                                                <div class="milestone-icon bg-secondary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-lock fa-sm"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-1">100% Complete</h6>
-                                                    <small class="text-muted">ASOM Graduate!</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {{-- filepath: resources/views/asom-welcome.blade.php --}}
+<div class="col-lg-4">
+    <div class="progress-overview">
+        <h5 class="mb-4">Progress Milestones</h5>
+        @php
+            $progress = $stats['overall_progress'];
+        @endphp
+        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 25 ? '' : 'opacity-50' }}">
+            <div class="d-flex align-items-center">
+                <div class="milestone-icon {{ $progress >= 25 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas {{ $progress >= 25 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1">25% Complete</h6>
+                    <small class="text-muted">First milestone reward</small>
+                </div>
+            </div>
+        </div>
+        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 50 ? '' : 'opacity-50' }}">
+            <div class="d-flex align-items-center">
+                <div class="milestone-icon {{ $progress >= 50 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas {{ $progress >= 50 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1">50% Complete</h6>
+                    <small class="text-muted">Halfway there!</small>
+                </div>
+            </div>
+        </div>
+        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 75 ? '' : 'opacity-50' }}">
+            <div class="d-flex align-items-center">
+                <div class="milestone-icon {{ $progress >= 75 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas {{ $progress >= 75 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1">75% Complete</h6>
+                    <small class="text-muted">Almost there!</small>
+                </div>
+            </div>
+        </div>
+        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 100 ? '' : 'opacity-50' }}">
+            <div class="d-flex align-items-center">
+                <div class="milestone-icon {{ $progress >= 100 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas {{ $progress >= 100 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1">100% Complete</h6>
+                    <small class="text-muted">ASOM Graduate!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                             </div>
                         </div>
                     </div>
@@ -884,6 +976,28 @@
                 progressRing.style.strokeDashoffset = offset;
                 progressText.textContent = percentage + '%';
             }
+        }
+        
+        // Handle course filter toggle
+        const myCoursesBtn = document.getElementById('myCoursesBtn');
+        const allCoursesBtn = document.getElementById('allCoursesBtn');
+        const myCoursesSection = document.getElementById('myCourses');
+        const allCoursesSection = document.getElementById('allCourses');
+        
+        if (myCoursesBtn && allCoursesBtn) {
+            myCoursesBtn.addEventListener('change', function() {
+                if (this.checked) {
+                    myCoursesSection.classList.remove('d-none');
+                    allCoursesSection.classList.add('d-none');
+                }
+            });
+            
+            allCoursesBtn.addEventListener('change', function() {
+                if (this.checked) {
+                    allCoursesSection.classList.remove('d-none');
+                    myCoursesSection.classList.add('d-none');
+                }
+            });
         }
     </script>
 </body>
