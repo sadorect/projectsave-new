@@ -553,7 +553,7 @@
                                     </div>
                                 </div>
 
-                                @if($examData['pending_exams']->count() > 0)
+                                @if(count($examData['pending_exams']) > 0)
                                     <h6 class="mb-3">Pending Exams</h6>
                                     @foreach($examData['pending_exams'] as $exam)
                                         <div class="upcoming-item mb-3 p-3 bg-light rounded">
@@ -847,7 +847,7 @@
                                     <div class="col-lg-8">
                                         <div class="progress-overview">
                                             <h5 class="mb-4">Available Exams</h5>
-                                            @if($examData['pending_exams']->count() > 0)
+                                            @if(count($examData['pending_exams']) > 0)
                                                 @foreach($examData['pending_exams'] as $exam)
                                                     <div class="course-card mb-3">
                                                         <div class="d-flex align-items-center mb-3">
