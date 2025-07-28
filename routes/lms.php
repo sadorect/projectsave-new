@@ -10,6 +10,8 @@ use App\Http\Controllers\LMS\DashboardController;
 use App\Http\Controllers\LMS\EnrollmentController;
 use App\Http\Controllers\LMS\ExamAttemptController;
 use App\Http\Controllers\LMS\LessonProgressController;
+use App\Http\Controllers\LMS\StudentExamController;
+use App\Http\Controllers\LMS\CertificateController;
 
 
 // Public access to courses
@@ -46,12 +48,27 @@ Route::middleware(['auth'])->prefix('learn')->group(function () {
 
 
 
-Route::prefix('lms')->name('lms.')->middleware(['auth'])->group(function () {
-    Route::resource('exams', ExamController::class);
-    Route::post('exams/{exam}/attempt', [ExamAttemptController::class, 'start'])->name('exams.attempt.start');
-    Route::post('exams/{exam}/submit', [ExamAttemptController::class, 'submit'])->name('exams.attempt.submit');
-    Route::get('exams/{exam}/results', [ExamAttemptController::class, 'results'])->name('exams.results');
-    Route::get('exams/{exam}/questions/create', [QuestionController::class, 'create'])->name('questions.create');
-    Route::post('exams/{exam}/questions', [QuestionController::class, 'store'])->name('questions.store');
+// Student Exam Routes (using StudentExamController)
+Route::prefix('exams')->name('lms.exams.')->middleware(['auth'])->group(function () {
+    Route::get('/', [StudentExamController::class, 'index'])->name('index');
+    Route::get('/{exam}', [StudentExamController::class, 'show'])->name('show');
+    Route::post('/{exam}/start', [StudentExamController::class, 'start'])->name('start');
+    Route::get('/{exam}/attempts/{attempt}/take', [StudentExamController::class, 'take'])->name('take');
+    Route::post('/{exam}/attempts/{attempt}/save-answer', [StudentExamController::class, 'saveAnswer'])->name('save-answer');
+    Route::post('/{exam}/attempts/{attempt}/submit', [StudentExamController::class, 'submit'])->name('submit');
+    Route::get('/{exam}/attempts/{attempt}/results', [StudentExamController::class, 'results'])->name('results');
 });
+
+// Certificate routes
+Route::middleware(['auth'])->prefix('learn')->group(function () {
+    Route::prefix('certificates')->name('lms.certificates.')->group(function () {
+        Route::get('/', [CertificateController::class, 'index'])->name('index');
+        Route::get('/{certificate}', [CertificateController::class, 'show'])->name('show');
+        Route::post('/courses/{course}/generate', [CertificateController::class, 'generate'])->name('generate');
+        Route::get('/{certificate}/download', [CertificateController::class, 'download'])->name('download');
+    });
+});
+
+// Public certificate verification (no auth required)
+Route::get('/verify/{certificateId}', [CertificateController::class, 'verify'])->name('certificates.verify');
 

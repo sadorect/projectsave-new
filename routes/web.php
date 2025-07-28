@@ -67,6 +67,9 @@ Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('even
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
+// Public Certificate Verification Route
+Route::get('/certificates/verify/{certificateId}', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'verify'])->name('certificates.verify');
+
 // Partnership Routes
 Route::get('/partners/{type}', [PartnerController::class, 'create'])->name('partners.create');
 Route::post('/partners/{type}', [PartnerController::class, 'store'])->name('partners.store');
@@ -213,6 +216,19 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
     Route::put('exams/{exam}/questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
     Route::delete('exams/{exam}/questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
     
+    // Certificate Management Routes
+    Route::prefix('certificates')->name('certificates.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'index'])->name('index');
+        Route::get('/pending', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'pending'])->name('pending');
+        Route::post('/generate-sample', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'generateSample'])->name('generate-sample');
+        Route::post('/generate-sample-course', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'generateSampleCourse'])->name('generate-sample-course');
+        Route::delete('/cleanup-samples', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'cleanupSamples'])->name('cleanup-samples');
+        Route::get('/{certificate}', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'show'])->name('show');
+        Route::patch('/{certificate}/approve', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'approve'])->name('approve');
+        Route::patch('/{certificate}/reject', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'reject'])->name('reject');
+        Route::post('/bulk-approve', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'bulkApprove'])->name('bulk-approve');
+        Route::get('/export', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'export'])->name('export');
+    });
 
     Route::get('/mail/compose', [MailController::class, 'compose'])->name('mail.compose');
     Route::post('/mail/send', [MailController::class, 'send'])->name('mail.send');

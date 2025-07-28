@@ -444,9 +444,17 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="achievements-tab" data-bs-toggle="tab" data-bs-target="#achievements" type="button" role="tab">
-                        <i class="fas fa-trophy me-2"></i>Achievements
+                    <button class="nav-link" id="exams-tab" data-bs-toggle="tab" data-bs-target="#exams" type="button" role="tab">
+                        <i class="fas fa-clipboard-check me-2"></i>Exams
                     </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="achievements-tab" data-bs-toggle="tab" data-bs-target="#achievements" type="button" role="tab">
+                    <i class="fas fa-trophy me-2"></i>Achievements
+                    </button>
+                <button class="nav-link" id="certificates-tab" data-bs-toggle="tab" data-bs-target="#certificates" type="button" role="tab">
+                    <i class="fas fa-certificate me-2"></i>Certificates
+                </button>
                 </li>
             </ul>
 
@@ -527,31 +535,62 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="progress-overview">
-                                <h5 class="mb-4"><i class="fas fa-calendar me-2 text-info"></i>Upcoming</h5>
-                                <div class="upcoming-item mb-3 p-3 bg-light rounded">
-                                    <div class="d-flex align-items-center">
-                                        <div class="date-badge bg-primary text-white rounded p-2 me-3 text-center" style="min-width: 50px;">
-                                            <div class="fw-bold">15</div>
-                                            <small>MAR</small>
+                                <h5 class="mb-4"><i class="fas fa-clipboard-check me-2 text-warning"></i>Exam Status</h5>
+                                
+                                <!-- Exam Stats -->
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <div class="text-center p-2 bg-primary text-white rounded">
+                                            <h6 class="mb-0">{{ $examData['available_exams'] }}</h6>
+                                            <small>Available</small>
                                         </div>
-                                        <div>
-                                            <h6 class="mb-1">Bible Introduction</h6>
-                                            <small class="text-muted">Start your first course</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="text-center p-2 bg-success text-white rounded">
+                                            <h6 class="mb-0">{{ $examData['passed_exams'] }}</h6>
+                                            <small>Passed</small>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="upcoming-item mb-3 p-3 bg-light rounded">
-                                    <div class="d-flex align-items-center">
-                                        <div class="date-badge bg-success text-white rounded p-2 me-3 text-center" style="min-width: 50px;">
-                                            <div class="fw-bold">22</div>
-                                            <small>MAR</small>
+
+                                @if($examData['pending_exams']->count() > 0)
+                                    <h6 class="mb-3">Pending Exams</h6>
+                                    @foreach($examData['pending_exams'] as $exam)
+                                        <div class="upcoming-item mb-3 p-3 bg-light rounded">
+                                            <div class="d-flex align-items-center">
+                                                <div class="date-badge bg-warning text-white rounded p-2 me-3 text-center" style="min-width: 50px;">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-1">{{ $exam['title'] }}</h6>
+                                                    <small class="text-muted">{{ $exam['course'] }} • {{ $exam['duration'] }}min</small>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h6 class="mb-1">Study Group Session</h6>
-                                            <small class="text-muted">Group discussion & Q&A</small>
-                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <i class="fas fa-graduation-cap fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0 small">Complete courses to unlock exams</p>
                                     </div>
-                                </div>
+                                @endif
+
+                                @if($examData['recent_results']->count() > 0)
+                                    <h6 class="mb-3 mt-4">Recent Results</h6>
+                                    @foreach($examData['recent_results']->take(2) as $result)
+                                        <div class="upcoming-item mb-2 p-2 bg-light rounded">
+                                            <div class="d-flex align-items-center">
+                                                <div class="date-badge {{ $result['passed'] ? 'bg-success' : 'bg-danger' }} text-white rounded p-2 me-3 text-center" style="min-width: 40px;">
+                                                    <i class="fas {{ $result['passed'] ? 'fa-check' : 'fa-times' }}"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="fw-bold">{{ $result['exam_title'] }}</small><br>
+                                                    <small class="text-muted">{{ $result['score'] }}% • {{ $result['completed_at'] }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -765,6 +804,137 @@
                     </div>
                 </div>
 
+                <!-- Exams Tab -->
+                <div class="tab-pane fade" id="exams" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="mb-4"><i class="fas fa-clipboard-check me-2 text-primary"></i>ASOM Examinations</h4>
+                            
+                            <!-- Exam Stats Overview -->
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-primary">
+                                        <h3>{{ $examData['available_exams'] }}</h3>
+                                        <p>Available Exams</p>
+                                        <small><i class="fas fa-clipboard-list me-1"></i>Ready to Take</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-success">
+                                        <h3>{{ $examData['passed_exams'] }}</h3>
+                                        <p>Passed Exams</p>
+                                        <small><i class="fas fa-check-circle me-1"></i>Successfully Completed</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-warning">
+                                        <h3>{{ $examData['pending_exams']->count() }}</h3>
+                                        <p>Pending Exams</p>
+                                        <small><i class="fas fa-clock me-1"></i>Awaiting Completion</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="stat-card bg-info">
+                                        <h3>{{ $examData['completed_exams'] }}</h3>
+                                        <p>Total Attempts</p>
+                                        <small><i class="fas fa-chart-line me-1"></i>Overall Progress</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if($examData['available_exams'] > 0)
+                                <div class="row">
+                                    <div class="col-lg-8">
+                                        <div class="progress-overview">
+                                            <h5 class="mb-4">Available Exams</h5>
+                                            @if($examData['pending_exams']->count() > 0)
+                                                @foreach($examData['pending_exams'] as $exam)
+                                                    <div class="course-card mb-3">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="course-icon bg-warning text-white rounded-circle me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="fas fa-file-alt"></i>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <h5 class="mb-1">{{ $exam['title'] }}</h5>
+                                                                <small class="text-muted">{{ $exam['course'] }} • {{ $exam['questions'] }} questions • {{ $exam['duration'] }} minutes</small>
+                                                            </div>
+                                                            <span class="badge bg-warning">Available</span>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <a href="{{ route('lms.exams.show', $exam['id']) }}" class="btn btn-primary btn-sm">
+                                                                <i class="fas fa-play me-1"></i>Take Exam
+                                                            </a>
+                                                            <small class="text-muted">Course: {{ $exam['course'] }}</small>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="text-center py-4">
+                                                    <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                                                    <h5 class="text-muted">No Exams Available Yet</h5>
+                                                    <p class="text-muted">Complete your courses to unlock exams!</p>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-4">
+                                        <div class="progress-overview">
+                                            <h5 class="mb-4">Recent Results</h5>
+                                            @if($examData['recent_results']->count() > 0)
+                                                @foreach($examData['recent_results'] as $result)
+                                                    <div class="course-card mb-3 {{ $result['passed'] ? 'border-success' : 'border-danger' }}">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <div class="course-icon {{ $result['passed'] ? 'bg-success' : 'bg-danger' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                                <i class="fas {{ $result['passed'] ? 'fa-check' : 'fa-times' }}"></i>
+                                                            </div>
+                                                            <div class="flex-grow-1">
+                                                                <h6 class="mb-0">{{ $result['exam_title'] }}</h6>
+                                                                <small class="text-muted">{{ $result['course_title'] }}</small>
+                                                            </div>
+                                                            <span class="badge {{ $result['passed'] ? 'bg-success' : 'bg-danger' }}">{{ $result['score'] }}%</span>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <small class="text-muted">{{ $result['completed_at'] }}</small>
+                                                            <a href="{{ route('lms.exams.results', [$result['exam_id'], $result['attempt_id']]) }}" class="btn btn-outline-primary btn-sm">
+                                                                <i class="fas fa-eye me-1"></i>View Results
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="text-center py-4">
+                                                    <i class="fas fa-chart-line fa-2x text-muted mb-3"></i>
+                                                    <p class="text-muted mb-0">No exam results yet. Take your first exam to see results here!</p>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-center py-5">
+                                    <i class="fas fa-graduation-cap fa-4x text-muted mb-4"></i>
+                                    <h4 class="text-muted mb-3">Complete Courses to Unlock Exams</h4>
+                                    <p class="text-muted mb-4">Exams become available after you complete 100% of a course. Start learning to unlock your first exam!</p>
+                                    <a href="#courses" onclick="document.getElementById('courses-tab').click()" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-book me-2"></i>Browse Courses
+                                    </a>
+                                </div>
+                            @endif
+
+                            <div class="alert alert-info mt-4">
+                                <h6><i class="fas fa-info-circle me-2"></i>Exam Information:</h6>
+                                <ul class="mb-0">
+                                    <li>Exams are unlocked after completing 100% of a course</li>
+                                    <li>Each exam has a time limit and passing score requirement</li>
+                                    <li>You can view detailed results and feedback after completion</li>
+                                    <li>Multiple attempts may be allowed depending on the exam settings</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Achievements Tab -->
                 <div class="tab-pane fade" id="achievements" role="tabpanel">
                     <div class="row">
@@ -887,6 +1057,96 @@
                 <div>
                     <h6 class="mb-1">100% Complete</h6>
                     <small class="text-muted">ASOM Graduate!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificates Tab -->
+    <div class="tab-pane fade" id="certificates" role="tabpanel">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="mb-4"><i class="fas fa-certificate me-2 text-primary"></i>Your Certificates</h4>
+                    
+                    @php
+                        $userCertificates = Auth::user()->certificates()->with('course')->orderBy('issued_at', 'desc')->get();
+                    @endphp
+                    
+                    @if($userCertificates->isEmpty())
+                        <div class="text-center py-5">
+                            <i class="fas fa-certificate text-muted mb-3" style="font-size: 4rem;"></i>
+                            <h5 class="text-muted mb-3">No Certificates Yet</h5>
+                            <p class="text-muted mb-4">Complete courses and pass exams to earn certificates</p>
+                            <a href="#courses-tab" class="btn btn-primary" onclick="switchTab('courses')">
+                                <i class="fas fa-book me-2"></i>View Courses
+                            </a>
+                        </div>
+                    @else
+                        <div class="row">
+                            @foreach($userCertificates as $certificate)
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <i class="fas fa-certificate text-primary me-3" style="font-size: 2rem;"></i>
+                                                <div>
+                                                    <h6 class="card-title mb-1">{{ $certificate->course->title }}</h6>
+                                                    <small class="text-muted">{{ $certificate->certificate_id }}</small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                @if($certificate->is_approved)
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Approved
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-clock me-1"></i>Pending Approval
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            
+                                            <div class="small text-muted mb-3">
+                                                <div><strong>Issued:</strong> {{ $certificate->issued_at->format('M j, Y') }}</div>
+                                                @if($certificate->final_grade)
+                                                    <div><strong>Grade:</strong> {{ number_format($certificate->final_grade, 1) }}%</div>
+                                                @endif
+                                            </div>
+                                            
+                                            <div class="d-grid gap-2">
+                                                <a href="{{ route('lms.certificates.show', $certificate) }}" 
+                                                   class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-eye me-2"></i>View Certificate
+                                                </a>
+                                                @if($certificate->is_approved)
+                                                    <a href="{{ route('lms.certificates.download', $certificate) }}" 
+                                                       class="btn btn-success btn-sm">
+                                                        <i class="fas fa-download me-2"></i>Download PDF
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <a href="{{ route('lms.certificates.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-list me-2"></i>View All Certificates
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

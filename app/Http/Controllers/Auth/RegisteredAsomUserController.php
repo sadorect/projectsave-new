@@ -114,6 +114,9 @@ class RegisteredAsomUserController extends Controller
         // Calculate achievements
         $achievements = $this->calculateAchievements($user, $enrolledCourses);
 
+        // Get exam data for completed courses
+        $examData = $this->getExamData($user, $enrolledCoursesWithProgress);
+
         $whatsappGroups = [
             [
                 'name' => 'Bible Introduction',
@@ -165,7 +168,7 @@ class RegisteredAsomUserController extends Controller
             ]
         ];
 
-        return view('asom-welcome', compact('whatsappGroups', 'stats', 'allCourses', 'enrolledCoursesWithProgress', 'availableCoursesWithProgress', 'achievements'));
+        return view('asom-welcome', compact('whatsappGroups', 'stats', 'allCourses', 'enrolledCoursesWithProgress', 'availableCoursesWithProgress', 'achievements', 'examData'));
     }
 
     private function calculateOverallProgress($enrolledCourses)
@@ -193,6 +196,77 @@ class RegisteredAsomUserController extends Controller
         ];
 
         return $icons[$courseTitle] ?? 'fas fa-book';
+    }
+
+    private function getExamData($user, $enrolledCoursesWithProgress)
+    {
+        // Get courses that are 100% complete
+        $completedCourses = $enrolledCoursesWithProgress->where('progress', 100);
+        
+        if ($completedCourses->isEmpty()) {
+            return [
+                'available_exams' => 0,
+                'completed_exams' => 0,
+                'passed_exams' => 0,
+                'pending_exams' => [],
+                'recent_results' => []
+            ];
+        }
+        
+        // Get available exams for completed courses
+        $availableExams = \App\Models\Exam::whereIn('course_id', $completedCourses->pluck('id'))
+    ->where('is_active', true)
+    ->with('course', 'questions')
+    ->get()
+    ->filter(function($exam) {
+        return $exam->questions->count() >= 5;
+    });
+        
+        // Get user's exam attempts
+        $examAttempts = \App\Models\ExamAttempt::where('user_id', $user->id)
+            ->whereIn('exam_id', $availableExams->pluck('id'))
+            ->with('exam.course')
+            ->orderBy('completed_at', 'desc')
+            ->get();
+        
+        $completedAttempts = $examAttempts->whereNotNull('completed_at');
+        $passedAttempts = $completedAttempts->filter(function($attempt) {
+            return $attempt->score >= $attempt->exam->passing_score;
+        });
+        
+        // Get pending exams (available but not taken or failed)
+        $pendingExams = $availableExams->filter(function($exam) use ($passedAttempts) {
+            return !$passedAttempts->contains('exam_id', $exam->id);
+        })->take(3)->map(function($exam) {
+            return [
+                'id' => $exam->id,
+                'title' => $exam->title,
+                'course' => $exam->course->title,
+                'duration' => $exam->duration_minutes,
+                'questions' => $exam->questions()->count()
+            ];
+        });
+        
+        // Get recent exam results
+        $recentResults = $completedAttempts->take(3)->map(function($attempt) {
+            return [
+                'exam_title' => $attempt->exam->title,
+                'course_title' => $attempt->exam->course->title,
+                'score' => $attempt->score,
+                'passed' => $attempt->score >= $attempt->exam->passing_score,
+                'completed_at' => $attempt->completed_at->format('M j, Y'),
+                'exam_id' => $attempt->exam_id,
+                'attempt_id' => $attempt->id
+            ];
+        });
+        
+        return [
+            'available_exams' => $availableExams->count(),
+            'completed_exams' => $completedAttempts->unique('exam_id')->count(),
+            'passed_exams' => $passedAttempts->unique('exam_id')->count(),
+            'pending_exams' => $pendingExams,
+            'recent_results' => $recentResults
+        ];
     }
 
     private function calculateAchievements($user, $enrolledCourses)

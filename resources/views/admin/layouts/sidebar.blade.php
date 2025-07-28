@@ -139,6 +139,16 @@
                         <i class="bi bi-clock-history me-2"></i> Exam Attempts
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{{ route('admin.certificates.index') }}">
+                        <i class="bi bi-award me-2"></i> Certificates
+                        @if(\App\Models\Certificate::where('is_approved', false)->whereNull('approved_at')->count() > 0)
+                            <span class="badge bg-warning ms-1">
+                                {{ \App\Models\Certificate::where('is_approved', false)->whereNull('approved_at')->count() }}
+                            </span>
+                        @endif
+                    </a>
+                </li>
             </ul>
         </div>
     </li>

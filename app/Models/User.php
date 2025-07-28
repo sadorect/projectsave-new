@@ -197,6 +197,22 @@ public function getCourseProgress(Course $course)
     return ($completedLessons / $totalLessons) * 100;
 }
 
+/**
+ * Get the exam attempts for the user.
+ */
+public function examAttempts()
+{
+    return $this->hasMany(\App\Models\ExamAttempt::class);
+}
+
+/**
+ * Get the certificates for the user.
+ */
+public function certificates()
+{
+    return $this->hasMany(\App\Models\Certificate::class);
+}
+
 
 
 

@@ -56,6 +56,8 @@ class AdminController extends Controller
             'new_users_today' => User::whereDate('created_at', today())->count(),
             'pending_partners' => Partner::where('status', 'pending')->count(),
             'asom_students' => User::where('user_type', 'asom_student')->count(),
+            'pending_certificates' => \App\Models\Certificate::where('is_approved', false)->whereNull('approved_at')->count(),
+            'total_certificates' => \App\Models\Certificate::count(),
         ];
 
         $recent_activity = Post::with('author')

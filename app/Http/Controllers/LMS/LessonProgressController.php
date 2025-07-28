@@ -5,6 +5,8 @@ namespace App\Http\Controllers\LMS;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Models\Certificate;
+use App\Models\ExamAttempt;
 use Illuminate\Http\Request;
 
 class LessonProgressController extends Controller
@@ -39,11 +41,40 @@ class LessonProgressController extends Controller
 
         $progressPercentage = $totalLessons > 0 ? ($completedLessons / $totalLessons) * 100 : 0;
 
-        if ($progressPercentage === 100) {
+        if ($progressPercentage === 100.0) {
             $user->courses()->updateExistingPivot($course->id, [
                 'status' => 'completed',
                 'completed_at' => now()
             ]);
+            
+            // Auto-generate certificate if course is completed and no certificate exists
+            $existingCertificate = Certificate::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->first();
+                
+            if (!$existingCertificate) {
+                // Get final grade from exams if available
+                $finalGrade = null;
+                $examAttempts = ExamAttempt::where('user_id', $user->id)
+                    ->whereHas('exam', function($query) use ($course) {
+                        $query->where('course_id', $course->id);
+                    })
+                    ->where('status', 'completed')
+                    ->get();
+
+                if ($examAttempts->isNotEmpty()) {
+                    $finalGrade = $examAttempts->avg('score');
+                }
+
+                Certificate::create([
+                    'user_id' => $user->id,
+                    'course_id' => $course->id,
+                    'final_grade' => $finalGrade,
+                    'issued_at' => now(),
+                    'completed_at' => now(),
+                    'is_approved' => false, // Requires admin approval
+                ]);
+            }
         }
 
         return redirect()->back()

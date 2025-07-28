@@ -73,6 +73,11 @@ public function users()
         return ($completedLessons / $totalLessons) * 100;
     }
 
+    public function exams()
+    {
+        return $this->hasMany(Exam::class);
+    }
+
     public function isCompleted()
     {
         return $this->progress === 100;
