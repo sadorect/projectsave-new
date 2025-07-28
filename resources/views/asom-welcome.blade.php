@@ -378,7 +378,7 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="mb-2"><i class="fas fa-graduation-cap me-3"></i>ASOM Dashboard</h1>
-                    <p class="mb-0 opacity-75">Welcome back, {{ Auth::user()->name }}! Continue your ministry training journey.</p>
+                    <p class="mb-0 opacity-75">Welcome back, {{ Auth::user()?->name ?? 'Student' }}! Continue your ministry training journey.</p>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <a href="{{ route('user.dashboard') }}" class="btn btn-light btn-lg">
@@ -397,28 +397,28 @@
                 <div class="row">
                     <div class="col-md-3">
                         <div class="stat-card bg-primary">
-                            <h3>{{ $stats['total_courses'] }}</h3>
+                            <h3>{{ $stats['total_courses'] ?? 0 }}</h3>
                             <p>Total Courses</p>
                             <small><i class="fas fa-book-open me-1"></i>Available Modules</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-success">
-                            <h3>{{ $stats['completed_courses'] }}</h3>
+                            <h3>{{ $stats['completed_courses'] ?? 0 }}</h3>
                             <p>Completed</p>
                             <small><i class="fas fa-check-circle me-1"></i>Finished Courses</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-warning">
-                            <h3>{{ $stats['in_progress_courses'] }}</h3>
+                            <h3>{{ $stats['in_progress_courses'] ?? 0 }}</h3>
                             <p>In Progress</p>
                             <small><i class="fas fa-clock me-1"></i>Active Learning</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="stat-card bg-info">
-                            <h3>{{ $stats['overall_progress'] }}%</h3>
+                            <h3>{{ $stats['overall_progress'] ?? 0 }}%</h3>
                             <p>Overall Progress</p>
                             <small><i class="fas fa-chart-line me-1"></i>Completion Rate</small>
                         </div>
@@ -473,7 +473,7 @@
                                                 <circle class="progress-circle" cx="60" cy="60" r="52"></circle>
                                                 <circle class="progress-circle filled" cx="60" cy="60" r="52" 
                                                         style="stroke-dasharray: 0 327; stroke-dashoffset: 0"></circle>
-                                                <text x="60" y="65" text-anchor="middle" style="font-size: 24px; font-weight: bold; fill: #333;">{{ $stats['overall_progress'] }}%</text>
+                                                <text x="60" y="65" text-anchor="middle" style="font-size: 24px; font-weight: bold; fill: #333;">{{ $stats['overall_progress'] ?? 0 }}%</text>
                                             </svg>
                                         </div>
                                         <h6 class="text-center">Overall Completion</h6>
@@ -503,14 +503,14 @@
                                                     <i class="fas fa-envelope-circle-check fa-2x text-warning me-3"></i>
                                                     <div>
                                                         <h6 class="mb-1">
-                                                            @if(!Auth::user()->hasVerifiedEmail())
-                                                                Verify Your Email
-                                                            @else
-                                                                ✓ Email Verified
-                                                            @endif
+                                                        @if(!Auth::user()?->hasVerifiedEmail())
+                                                        Verify Your Email
+                                                        @else
+                                                        ✓ Email Verified
+                                                        @endif
                                                         </h6>
                                                         <small class="text-muted">
-                                                            @if(!Auth::user()->hasVerifiedEmail())
+                                                        @if(!Auth::user()?->hasVerifiedEmail())
                                                                 Required to access course groups
                                                             @else
                                                                 You can now access all features
@@ -541,19 +541,19 @@
                                 <div class="row mb-3">
                                     <div class="col-6">
                                         <div class="text-center p-2 bg-primary text-white rounded">
-                                            <h6 class="mb-0">{{ $examData['available_exams'] }}</h6>
+                                            <h6 class="mb-0">{{ $examData['available_exams'] ?? 0 }}</h6>
                                             <small>Available</small>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="text-center p-2 bg-success text-white rounded">
-                                            <h6 class="mb-0">{{ $examData['passed_exams'] }}</h6>
+                                            <h6 class="mb-0">{{ $examData['passed_exams'] ?? 0 }}</h6>
                                             <small>Passed</small>
                                         </div>
                                     </div>
                                 </div>
 
-                                @if(count($examData['pending_exams']) > 0)
+                                @if(isset($examData['pending_exams']) && count($examData['pending_exams']) > 0)
                                     <h6 class="mb-3">Pending Exams</h6>
                                     @foreach($examData['pending_exams'] as $exam)
                                         <div class="upcoming-item mb-3 p-3 bg-light rounded">
@@ -575,9 +575,9 @@
                                     </div>
                                 @endif
 
-                                @if($examData['recent_results']->count() > 0)
+                                @if(isset($examData['recent_results']) && count($examData['recent_results']) > 0)
                                     <h6 class="mb-3 mt-4">Recent Results</h6>
-                                    @foreach($examData['recent_results']->take(2) as $result)
+                                    @foreach(array_slice($examData['recent_results'], 0, 2) as $result)
                                         <div class="upcoming-item mb-2 p-2 bg-light rounded">
                                             <div class="d-flex align-items-center">
                                                 <div class="date-badge {{ $result['passed'] ? 'bg-success' : 'bg-danger' }} text-white rounded p-2 me-3 text-center" style="min-width: 40px;">
@@ -605,16 +605,16 @@
                                 <h4 class="mb-0"><i class="fas fa-book me-2 text-primary"></i>ASOM Courses</h4>
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="courseFilter" id="myCoursesBtn" autocomplete="off" checked>
-                                    <label class="btn btn-outline-primary" for="myCoursesBtn">My Courses ({{ $enrolledCoursesWithProgress->count() }})</label>
+                                    <label class="btn btn-outline-primary" for="myCoursesBtn">My Courses ({{ isset($enrolledCoursesWithProgress) ? $enrolledCoursesWithProgress->count() : 0 }})</label>
                                     
                                     <input type="radio" class="btn-check" name="courseFilter" id="allCoursesBtn" autocomplete="off">
-                                    <label class="btn btn-outline-primary" for="allCoursesBtn">All Courses ({{ $allCourses->count() }})</label>
+                                    <label class="btn btn-outline-primary" for="allCoursesBtn">All Courses ({{ isset($allCourses) ? $allCourses->count() : 0 }})</label>
                                 </div>
                             </div>
                             
                             <!-- My Enrolled Courses -->
                             <div id="myCourses" class="course-section">
-                                @if($enrolledCoursesWithProgress->count() > 0)
+                                @if(isset($enrolledCoursesWithProgress) && $enrolledCoursesWithProgress->count() > 0)
                                     <div class="row">
                                         @foreach($enrolledCoursesWithProgress as $course)
                                         <div class="col-lg-6 mb-4">
@@ -739,7 +739,7 @@
                                 <div class="verification-notice">
                                     <h5><i class="fas fa-exclamation-triangle me-2"></i>Email Verification Required</h5>
                                     <p class="mb-2">
-                                        Welcome, <strong>{{ Auth::user()->name }}</strong>! You can see your course groups below, but to join them and access all ASOM features, 
+                                        Welcome, <strong>{{ Auth::user()?->name ?? 'Student' }}</strong>! You can see your course groups below, but to join them and access all ASOM features, 
                                         please verify your email address first.
                                     </p>
                                     <a href="{{ route('verification.notice') }}" class="btn-verify">
@@ -750,7 +750,7 @@
                                 <div class="instructions">
                                     <h5><i class="fas fa-info-circle me-2"></i>Getting Started</h5>
                                     <p class="mb-0">
-                                        Welcome, <strong>{{ Auth::user()->name }}</strong>! To begin your ASOM journey, please join the WhatsApp groups for your courses below. 
+                                        Welcome, <strong>{{ Auth::user()?->name ?? 'Student' }}</strong>! To begin your ASOM journey, please join the WhatsApp groups for your courses below. 
                                         These groups are where you'll receive course materials, interact with faculty, and connect with fellow students.
                                     </p>
                                 </div>
@@ -761,7 +761,7 @@
                             <div class="row">
                                 @foreach($whatsappGroups as $group)
                                 <div class="col-md-6 col-lg-4">
-                                    @if(Auth::user()->hasVerifiedEmail())
+                                    @if(Auth::user()?->hasVerifiedEmail())
                                         <a href="{{ $group['url'] }}" target="_blank" class="group-card">
                                     @else
                                         <div class="group-card" style="opacity: 0.7; cursor: not-allowed;">
@@ -773,13 +773,13 @@
                                         <div class="group-description">{{ $group['description'] }}</div>
                                         <span class="whatsapp-btn">
                                             <i class="fab fa-whatsapp"></i>
-                                            @if(Auth::user()->hasVerifiedEmail())
+                                            @if(Auth::user()?->hasVerifiedEmail())
                                                 Join Group
                                             @else
                                                 Verify Email First
                                             @endif
                                         </span>
-                                    @if(Auth::user()->hasVerifiedEmail())
+                                    @if(Auth::user()?->hasVerifiedEmail())
                                         </a>
                                     @else
                                         </div>
@@ -795,7 +795,7 @@
                                     <li>Make sure to introduce yourself when you join</li>
                                     <li>Keep group discussions respectful and on-topic</li>
                                     <li>Check the Info Desk group for general announcements</li>
-                                    @if(!Auth::user()->hasVerifiedEmail())
+                                    @if(!Auth::user()?->hasVerifiedEmail())
                                         <li><strong>Remember to verify your email to access all features!</strong></li>
                                     @endif
                                 </ul>
@@ -814,41 +814,41 @@
                             <div class="row mb-4">
                                 <div class="col-md-3">
                                     <div class="stat-card bg-primary">
-                                        <h3>{{ $examData['available_exams'] }}</h3>
+                                        <h3>{{ $examData['available_exams'] ?? 0 }}</h3>
                                         <p>Available Exams</p>
                                         <small><i class="fas fa-clipboard-list me-1"></i>Ready to Take</small>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="stat-card bg-success">
-                                        <h3>{{ $examData['passed_exams'] }}</h3>
+                                        <h3>{{ $examData['passed_exams'] ?? 0 }}</h3>
                                         <p>Passed Exams</p>
                                         <small><i class="fas fa-check-circle me-1"></i>Successfully Completed</small>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="stat-card bg-warning">
-                                        <h3>{{ $examData['pending_exams']->count() }}</h3>
+                                        <h3>{{ isset($examData['pending_exams']) ? count($examData['pending_exams']) : 0 }}</h3>
                                         <p>Pending Exams</p>
                                         <small><i class="fas fa-clock me-1"></i>Awaiting Completion</small>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="stat-card bg-info">
-                                        <h3>{{ $examData['completed_exams'] }}</h3>
+                                        <h3>{{ $examData['completed_exams'] ?? 0 }}</h3>
                                         <p>Total Attempts</p>
                                         <small><i class="fas fa-chart-line me-1"></i>Overall Progress</small>
                                     </div>
                                 </div>
                             </div>
 
-                            @if($examData['available_exams'] > 0)
+                            @if(isset($examData['available_exams']) && $examData['available_exams'] > 0)
                                 <div class="row">
                                     <div class="col-lg-8">
                                         <div class="progress-overview">
                                             <h5 class="mb-4">Available Exams</h5>
-                                            @if(count($examData['pending_exams']) > 0)
-                                                @foreach($examData['pending_exams'] as $exam)
+                                            @if(isset($examData['pending_exams']) && count($examData['pending_exams']) > 0)
+                                            @foreach($examData['pending_exams'] as $exam)
                                                     <div class="course-card mb-3">
                                                         <div class="d-flex align-items-center mb-3">
                                                             <div class="course-icon bg-warning text-white rounded-circle me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
@@ -881,7 +881,7 @@
                                     <div class="col-lg-4">
                                         <div class="progress-overview">
                                             <h5 class="mb-4">Recent Results</h5>
-                                            @if($examData['recent_results']->count() > 0)
+                                            @if(isset($examData['recent_results']) && count($examData['recent_results']) > 0)
                                                 @foreach($examData['recent_results'] as $result)
                                                     <div class="course-card mb-3 {{ $result['passed'] ? 'border-success' : 'border-danger' }}">
                                                         <div class="d-flex align-items-center mb-2">
@@ -947,62 +947,62 @@
                                         <h5 class="mb-4">Available Badges</h5>
                                         <div class="row">
                                             <div class="col-md-4 mb-4">
-                                                <div class="text-center p-4 {{ $achievements['first_course'] ? 'bg-success text-white' : 'bg-light' }} rounded">
-                                                    <i class="fas fa-medal fa-3x {{ $achievements['first_course'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                <div class="text-center p-4 {{ ($achievements['first_course'] ?? false) ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-medal fa-3x {{ ($achievements['first_course'] ?? false) ? 'text-white' : 'text-muted' }} mb-3"></i>
                                                     <h6>First Course</h6>
-                                                    <p class="{{ $achievements['first_course'] ? 'text-white' : 'text-muted' }} small mb-2">Complete your first ASOM course</p>
-                                                    <span class="badge {{ $achievements['first_course'] ? 'bg-light text-success' : 'bg-secondary' }}">
-                                                        {{ $achievements['first_course'] ? 'Unlocked' : 'Locked' }}
+                                                    <p class="{{ ($achievements['first_course'] ?? false) ? 'text-white' : 'text-muted' }} small mb-2">Complete your first ASOM course</p>
+                                                    <span class="badge {{ ($achievements['first_course'] ?? false) ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ ($achievements['first_course'] ?? false) ? 'Unlocked' : 'Locked' }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 mb-4">
-                                                <div class="text-center p-4 {{ $achievements['bible_scholar'] ? 'bg-success text-white' : 'bg-light' }} rounded">
-                                                    <i class="fas fa-book-reader fa-3x {{ $achievements['bible_scholar'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                <div class="text-center p-4 {{ ($achievements['bible_scholar'] ?? false) ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-book-reader fa-3x {{ ($achievements['bible_scholar'] ?? false) ? 'text-white' : 'text-muted' }} mb-3"></i>
                                                     <h6>Bible Scholar</h6>
-                                                    <p class="{{ $achievements['bible_scholar'] ? 'text-white' : 'text-muted' }} small mb-2">Complete Bible Introduction & Hermeneutics</p>
-                                                    <span class="badge {{ $achievements['bible_scholar'] ? 'bg-light text-success' : 'bg-secondary' }}">
-                                                        {{ $achievements['bible_scholar'] ? 'Unlocked' : 'Locked' }}
+                                                    <p class="{{ ($achievements['bible_scholar'] ?? false) ? 'text-white' : 'text-muted' }} small mb-2">Complete Bible Introduction & Hermeneutics</p>
+                                                    <span class="badge {{ ($achievements['bible_scholar'] ?? false) ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ ($achievements['bible_scholar'] ?? false) ? 'Unlocked' : 'Locked' }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 mb-4">
-                                                <div class="text-center p-4 {{ $achievements['community_builder'] ? 'bg-success text-white' : 'bg-light' }} rounded">
-                                                    <i class="fas fa-users fa-3x {{ $achievements['community_builder'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                <div class="text-center p-4 {{ ($achievements['community_builder'] ?? false) ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-users fa-3x {{ ($achievements['community_builder'] ?? false) ? 'text-white' : 'text-muted' }} mb-3"></i>
                                                     <h6>Community Builder</h6>
-                                                    <p class="{{ $achievements['community_builder'] ? 'text-white' : 'text-muted' }} small mb-2">Verify email and join community</p>
-                                                    <span class="badge {{ $achievements['community_builder'] ? 'bg-light text-success' : 'bg-secondary' }}">
-                                                        {{ $achievements['community_builder'] ? 'Unlocked' : 'Locked' }}
+                                                    <p class="{{ ($achievements['community_builder'] ?? false) ? 'text-white' : 'text-muted' }} small mb-2">Verify email and join community</p>
+                                                    <span class="badge {{ ($achievements['community_builder'] ?? false) ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ ($achievements['community_builder'] ?? false) ? 'Unlocked' : 'Locked' }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 mb-4">
-                                                <div class="text-center p-4 {{ $achievements['preacher'] ? 'bg-success text-white' : 'bg-light' }} rounded">
-                                                    <i class="fas fa-microphone fa-3x {{ $achievements['preacher'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                <div class="text-center p-4 {{ ($achievements['preacher'] ?? false) ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-microphone fa-3x {{ ($achievements['preacher'] ?? false) ? 'text-white' : 'text-muted' }} mb-3"></i>
                                                     <h6>Preacher</h6>
-                                                    <p class="{{ $achievements['preacher'] ? 'text-white' : 'text-muted' }} small mb-2">Complete Homiletics course</p>
-                                                    <span class="badge {{ $achievements['preacher'] ? 'bg-light text-success' : 'bg-secondary' }}">
-                                                        {{ $achievements['preacher'] ? 'Unlocked' : 'Locked' }}
+                                                    <p class="{{ ($achievements['preacher'] ?? false) ? 'text-white' : 'text-muted' }} small mb-2">Complete Homiletics course</p>
+                                                    <span class="badge {{ ($achievements['preacher'] ?? false) ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ ($achievements['preacher'] ?? false) ? 'Unlocked' : 'Locked' }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 mb-4">
-                                                <div class="text-center p-4 {{ $achievements['counselor'] ? 'bg-success text-white' : 'bg-light' }} rounded">
-                                                    <i class="fas fa-hands-helping fa-3x {{ $achievements['counselor'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                <div class="text-center p-4 {{ ($achievements['counselor'] ?? false) ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-hands-helping fa-3x {{ ($achievements['counselor'] ?? false) ? 'text-white' : 'text-muted' }} mb-3"></i>
                                                     <h6>Counselor</h6>
-                                                    <p class="{{ $achievements['counselor'] ? 'text-white' : 'text-muted' }} small mb-2">Complete Biblical Counseling</p>
-                                                    <span class="badge {{ $achievements['counselor'] ? 'bg-light text-success' : 'bg-secondary' }}">
-                                                        {{ $achievements['counselor'] ? 'Unlocked' : 'Locked' }}
+                                                    <p class="{{ ($achievements['counselor'] ?? false) ? 'text-white' : 'text-muted' }} small mb-2">Complete Biblical Counseling</p>
+                                                    <span class="badge {{ ($achievements['counselor'] ?? false) ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ ($achievements['counselor'] ?? false) ? 'Unlocked' : 'Locked' }}
                                                     </span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 mb-4">
-                                                <div class="text-center p-4 {{ $achievements['graduate'] ? 'bg-success text-white' : 'bg-light' }} rounded">
-                                                    <i class="fas fa-graduation-cap fa-3x {{ $achievements['graduate'] ? 'text-white' : 'text-muted' }} mb-3"></i>
+                                                <div class="text-center p-4 {{ ($achievements['graduate'] ?? false) ? 'bg-success text-white' : 'bg-light' }} rounded">
+                                                    <i class="fas fa-graduation-cap fa-3x {{ ($achievements['graduate'] ?? false) ? 'text-white' : 'text-muted' }} mb-3"></i>
                                                     <h6>ASOM Graduate</h6>
-                                                    <p class="{{ $achievements['graduate'] ? 'text-white' : 'text-muted' }} small mb-2">Complete all ASOM courses</p>
-                                                    <span class="badge {{ $achievements['graduate'] ? 'bg-light text-success' : 'bg-secondary' }}">
-                                                        {{ $achievements['graduate'] ? 'Unlocked' : 'Locked' }}
+                                                    <p class="{{ ($achievements['graduate'] ?? false) ? 'text-white' : 'text-muted' }} small mb-2">Complete all ASOM courses</p>
+                                                    <span class="badge {{ ($achievements['graduate'] ?? false) ? 'bg-light text-success' : 'bg-secondary' }}">
+                                                        {{ ($achievements['graduate'] ?? false) ? 'Unlocked' : 'Locked' }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -1014,7 +1014,7 @@
     <div class="progress-overview">
         <h5 class="mb-4">Progress Milestones</h5>
         @php
-            $progress = $stats['overall_progress'];
+            $progress = $stats['overall_progress'] ?? 0;
         @endphp
         <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 25 ? '' : 'opacity-50' }}">
             <div class="d-flex align-items-center">
@@ -1078,7 +1078,7 @@
                     <h4 class="mb-4"><i class="fas fa-certificate me-2 text-primary"></i>Your Certificates</h4>
                     
                     @php
-                        $userCertificates = Auth::user()->certificates()->with('course')->orderBy('issued_at', 'desc')->get();
+                        $userCertificates = Auth::user()?->certificates()?->with('course')?->orderBy('issued_at', 'desc')?->get() ?? collect();
                     @endphp
                     
                     @if($userCertificates->isEmpty())
@@ -1179,7 +1179,7 @@
             // Animate progress ring with real data
             const progressRing = document.querySelector('.progress-circle.filled');
             if (progressRing) {
-                const progress = {{ $stats['overall_progress'] }};
+                const progress = {{ $stats['overall_progress'] ?? 0 }};
                 const circumference = 2 * Math.PI * 52; // radius = 52
                 progressRing.style.strokeDasharray = circumference;
                 progressRing.style.strokeDashoffset = circumference;
