@@ -452,14 +452,16 @@
                     <button class="nav-link" id="achievements-tab" data-bs-toggle="tab" data-bs-target="#achievements" type="button" role="tab">
                     <i class="fas fa-trophy me-2"></i>Achievements
                     </button>
-                <button class="nav-link" id="certificates-tab" data-bs-toggle="tab" data-bs-target="#certificates" type="button" role="tab">
-                    <i class="fas fa-certificate me-2"></i>Certificates
-                </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="certificates-tab" data-bs-toggle="tab" data-bs-target="#certificates" type="button" role="tab">
+                        <i class="fas fa-certificate me-2"></i>Certificates
+                    </button>
                 </li>
             </ul>
 
             <!-- Tab Content -->
-            <div class="tab-content" id="asomTabContent">
+            <div class="tab-content mt-4" id="asomTabsContent">
                 <!-- Overview Tab -->
                 <div class="tab-pane fade show active" id="overview" role="tabpanel">
                     <div class="row">
@@ -577,7 +579,7 @@
 
                                 @if(isset($examData['recent_results']) && count($examData['recent_results']) > 0)
                                     <h6 class="mb-3 mt-4">Recent Results</h6>
-                                    @foreach(array_slice($examData['recent_results'], 0, 2) as $result)
+                                    @foreach(($examData['recent_results'] ?? collect())->take(2) as $result)
                                         <div class="upcoming-item mb-2 p-2 bg-light rounded">
                                             <div class="d-flex align-items-center">
                                                 <div class="date-badge {{ $result['passed'] ? 'bg-success' : 'bg-danger' }} text-white rounded p-2 me-3 text-center" style="min-width: 40px;">
@@ -802,7 +804,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                
 
                 <!-- Exams Tab -->
                 <div class="tab-pane fade" id="exams" role="tabpanel">
@@ -1010,148 +1012,140 @@
                                     </div>
                                 </div>
                                 {{-- filepath: resources/views/asom-welcome.blade.php --}}
-<div class="col-lg-4">
-    <div class="progress-overview">
-        <h5 class="mb-4">Progress Milestones</h5>
-        @php
-            $progress = $stats['overall_progress'] ?? 0;
-        @endphp
-        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 25 ? '' : 'opacity-50' }}">
-            <div class="d-flex align-items-center">
-                <div class="milestone-icon {{ $progress >= 25 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas {{ $progress >= 25 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">25% Complete</h6>
-                    <small class="text-muted">First milestone reward</small>
-                </div>
-            </div>
-        </div>
-        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 50 ? '' : 'opacity-50' }}">
-            <div class="d-flex align-items-center">
-                <div class="milestone-icon {{ $progress >= 50 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas {{ $progress >= 50 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">50% Complete</h6>
-                    <small class="text-muted">Halfway there!</small>
-                </div>
-            </div>
-        </div>
-        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 75 ? '' : 'opacity-50' }}">
-            <div class="d-flex align-items-center">
-                <div class="milestone-icon {{ $progress >= 75 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas {{ $progress >= 75 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">75% Complete</h6>
-                    <small class="text-muted">Almost there!</small>
-                </div>
-            </div>
-        </div>
-        <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 100 ? '' : 'opacity-50' }}">
-            <div class="d-flex align-items-center">
-                <div class="milestone-icon {{ $progress >= 100 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas {{ $progress >= 100 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
-                </div>
-                <div>
-                    <h6 class="mb-1">100% Complete</h6>
-                    <small class="text-muted">ASOM Graduate!</small>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                    <div class="col-lg-4">
+                                        <div class="progress-overview">
+                                            <h5 class="mb-4">Progress Milestones</h5>
+                                            @php
+                                                $progress = $stats['overall_progress'] ?? 0;
+                                            @endphp
+                                            <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 25 ? '' : 'opacity-50' }}">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="milestone-icon {{ $progress >= 25 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="fas {{ $progress >= 25 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1">25% Complete</h6>
+                                                        <small class="text-muted">First milestone reward</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 50 ? '' : 'opacity-50' }}">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="milestone-icon {{ $progress >= 50 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="fas {{ $progress >= 50 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1">50% Complete</h6>
+                                                        <small class="text-muted">Halfway there!</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 75 ? '' : 'opacity-50' }}">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="milestone-icon {{ $progress >= 75 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="fas {{ $progress >= 75 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1">75% Complete</h6>
+                                                        <small class="text-muted">Almost there!</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="milestone-item mb-3 p-3 bg-light rounded {{ $progress >= 100 ? '' : 'opacity-50' }}">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="milestone-icon {{ $progress >= 100 ? 'bg-success' : 'bg-secondary' }} text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="fas {{ $progress >= 100 ? 'fa-unlock' : 'fa-lock' }} fa-sm"></i>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1">100% Complete</h6>
+                                                        <small class="text-muted">ASOM Graduate!</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Certificates Tab -->
-    <div class="tab-pane fade" id="certificates" role="tabpanel">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <h4 class="mb-4"><i class="fas fa-certificate me-2 text-primary"></i>Your Certificates</h4>
-                    
-                    @php
-                        $userCertificates = Auth::user()?->certificates()?->with('course')?->orderBy('issued_at', 'desc')?->get() ?? collect();
-                    @endphp
-                    
-                    @if($userCertificates->isEmpty())
-                        <div class="text-center py-5">
-                            <i class="fas fa-certificate text-muted mb-3" style="font-size: 4rem;"></i>
-                            <h5 class="text-muted mb-3">No Certificates Yet</h5>
-                            <p class="text-muted mb-4">Complete courses and pass exams to earn certificates</p>
-                            <a href="#courses-tab" class="btn btn-primary" onclick="switchTab('courses')">
-                                <i class="fas fa-book me-2"></i>View Courses
-                            </a>
-                        </div>
-                    @else
+                 <!-- Certificates Tab -->
+                <div class="tab-pane fade" id="certificates" role="tabpanel">
+                    <div class="container-fluid">
                         <div class="row">
-                            @foreach($userCertificates as $certificate)
-                                <div class="col-md-6 col-lg-4 mb-4">
-                                    <div class="card h-100 border-0 shadow-sm">
-                                        <div class="card-body">
-                                            <div class="d-flex align-items-center mb-3">
-                                                <i class="fas fa-certificate text-primary me-3" style="font-size: 2rem;"></i>
-                                                <div>
-                                                    <h6 class="card-title mb-1">{{ $certificate->course->title }}</h6>
-                                                    <small class="text-muted">{{ $certificate->certificate_id }}</small>
+                            <div class="col-12">
+                                <h4 class="mb-4"><i class="fas fa-certificate me-2 text-primary"></i>Your Certificates</h4>
+                                
+                                @php
+                                    $userCertificates = Auth::user()?->certificates()?->with('course')?->orderBy('issued_at', 'desc')?->get() ?? collect();
+                                @endphp
+                                
+                                @if($userCertificates->isEmpty())
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-certificate text-muted mb-3" style="font-size: 4rem;"></i>
+                                        <h5 class="text-muted mb-3">No Certificates Yet</h5>
+                                        <p class="text-muted mb-4">Complete courses and pass exams to earn certificates</p>
+                                        <a href="#courses-tab" class="btn btn-primary" onclick="switchTab('courses')">
+                                            <i class="fas fa-book me-2"></i>View Courses
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="row">
+                                        @foreach($userCertificates as $certificate)
+                                            <div class="col-md-6 col-lg-4 mb-4">
+                                                <div class="card h-100 border-0 shadow-sm">
+                                                    <div class="card-body">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <i class="fas fa-certificate text-primary me-3" style="font-size: 2rem;"></i>
+                                                            <div>
+                                                                <h6 class="card-title mb-1">{{ $certificate->course->title }}</h6>
+                                                                <small class="text-muted">{{ $certificate->certificate_id }}</small>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="mb-3">
+                                                            @if($certificate->is_approved)
+                                                                <span class="badge bg-success">
+                                                                    <i class="fas fa-check-circle me-1"></i>Approved
+                                                                </span>
+                                                            @else
+                                                                <span class="badge bg-warning">
+                                                                    <i class="fas fa-clock me-1"></i>Pending Approval
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        
+                                                        <div class="small text-muted mb-3">
+                                                            <div><strong>Issued:</strong> {{ $certificate->issued_at->format('M j, Y') }}</div>
+                                                            @if($certificate->final_grade)
+                                                                <div><strong>Grade:</strong> {{ number_format($certificate->final_grade, 1) }}%</div>
+                                                            @endif
+                                                        </div>
+                                                        
+                                                        <div class="d-grid gap-2">
+                                                            <a href="{{ route('lms.certificates.show', $certificate) }}" 
+                                                            class="btn btn-outline-primary btn-sm">
+                                                                <i class="fas fa-eye me-2"></i>View Certificate
+                                                            </a>
+                                                            @if($certificate->is_approved)
+                                                                <a href="{{ route('lms.certificates.download', $certificate) }}" 
+                                                                class="btn btn-success btn-sm">
+                                                                    <i class="fas fa-download me-2"></i>Download PDF
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            
-                                            <div class="mb-3">
-                                                @if($certificate->is_approved)
-                                                    <span class="badge bg-success">
-                                                        <i class="fas fa-check-circle me-1"></i>Approved
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-warning">
-                                                        <i class="fas fa-clock me-1"></i>Pending Approval
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            
-                                            <div class="small text-muted mb-3">
-                                                <div><strong>Issued:</strong> {{ $certificate->issued_at->format('M j, Y') }}</div>
-                                                @if($certificate->final_grade)
-                                                    <div><strong>Grade:</strong> {{ number_format($certificate->final_grade, 1) }}%</div>
-                                                @endif
-                                            </div>
-                                            
-                                            <div class="d-grid gap-2">
-                                                <a href="{{ route('lms.certificates.show', $certificate) }}" 
-                                                   class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-eye me-2"></i>View Certificate
-                                                </a>
-                                                @if($certificate->is_approved)
-                                                    <a href="{{ route('lms.certificates.download', $certificate) }}" 
-                                                       class="btn btn-success btn-sm">
-                                                        <i class="fas fa-download me-2"></i>Download PDF
-                                                    </a>
-                                                @endif
-                                            </div>
-                                        </div>
+                                        @endforeach
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        
-                        <div class="text-center mt-4">
-                            <a href="{{ route('lms.certificates.index') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-list me-2"></i>View All Certificates
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                    
+                                    <div class="text-center mt-4">
+                                        <a href="{{ route('lms.certificates.index') }}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-list me-2"></i>View All Certificates
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -1175,6 +1169,35 @@
                     tab.show();
                 }
             }
+
+            // Function to switch tabs programmatically
+            function switchTab(tabName) {
+                const tabTrigger = document.querySelector(`#${tabName}-tab`);
+                if (tabTrigger) {
+                    const tab = new bootstrap.Tab(tabTrigger);
+                    tab.show();
+                }
+            }
+
+
+            const tabTriggerEls = document.querySelectorAll('#asomTabs button[data-bs-toggle="tab"]');
+                tabTriggerEls.forEach(function (triggerEl) {
+                    triggerEl.addEventListener('shown.bs.tab', function (event) {
+                        // Remove `show active` from all panes
+                        document.querySelectorAll('#asomTabsContent .tab-pane').forEach(function (pane) {
+                            pane.classList.remove('show', 'active');
+                        });
+
+                        // Add `show active` only to the target pane
+                        const targetId = event.target.getAttribute('data-bs-target');
+                        const targetPane = document.querySelector(targetId);
+                        if (targetPane) {
+                            targetPane.classList.add('show', 'active');
+                        }
+                    });
+                });
+
+
             
             // Animate progress ring with real data
             const progressRing = document.querySelector('.progress-circle.filled');
@@ -1259,6 +1282,8 @@
                 }
             });
         }
+        
+        
     </script>
 </body>
 </html>
