@@ -108,6 +108,6 @@ class Certificate extends Model
      */
     public function getVerificationUrlAttribute(): string
     {
-        return route('certificates.verify', $this->certificate_id);
+        return route('certificates.public.verify', $this->certificate_id);
     }
 }

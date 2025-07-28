@@ -68,7 +68,7 @@ Route::get('/contact', [ContactController::class, 'show'])->name('contact.show')
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
 
 // Public Certificate Verification Route
-Route::get('/certificates/verify/{certificateId}', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'verify'])->name('certificates.verify');
+Route::get('/certificates/verify/{certificateId}', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'verify'])->name('certificates.public.verify');
 
 // Partnership Routes
 Route::get('/partners/{type}', [PartnerController::class, 'create'])->name('partners.create');
