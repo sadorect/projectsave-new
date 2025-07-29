@@ -45,10 +45,9 @@ Route::middleware('auth', 'verified')->group(function () {
 
     // Add this route in your authenticated user routes
 Route::post('/asom/join', [RegisteredAsomUserController::class, 'convertToAsomStudent'])->name('asom.join');
+});
 
-    
-    Route::get('verify-email', EmailVerificationPromptController::class)
-                ->name('verification.notice');
+
 
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
                 ->middleware(['signed', 'throttle:6,1'])
@@ -67,4 +66,6 @@ Route::post('/asom/join', [RegisteredAsomUserController::class, 'convertToAsomSt
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('logout');
-});
+
+Route::get('verify-email', EmailVerificationPromptController::class)
+                ->name('verification.notice');
