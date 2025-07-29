@@ -39,7 +39,7 @@ class DashboardController extends Controller
     }
 
     public function enroll(Course $course)
-{
+    {
     if (!auth()->user()->courses()->where('course_id', $course->id)->exists()) {
         auth()->user()->courses()->attach($course->id, [
             'enrolled_at' => now(),
@@ -48,8 +48,8 @@ class DashboardController extends Controller
     }
     
     return redirect()->back()
-                    ->with('success', 'Successfully enrolled in course');
-}
+                    ->with('success', 'Successfully enrolled in course')->withFragment('courses-tab');
+    }
 
 public function unenroll(Course $course)
 {
