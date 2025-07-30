@@ -122,7 +122,7 @@
                         @else
                             <div class="d-flex align-items-center">
                                 <a href="{{ route('user.dashboard') }}" class="nav-item nav-link">Dashboard</a>
-                                <a class="nav-link" href="{{ route('lms.dashboard') }}">My Learning</a>
+                                <a class="nav-link" href="{{ route('asom.welcome') }}#courses-tab">My Learning</a>
                                 <form class="form-inline m-0" action="{{ route('logout') }}" method="POST">
                                     @csrf
                                     <button type="submit" class="nav-link btn btn-link">Logout</button>
