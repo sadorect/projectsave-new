@@ -215,10 +215,10 @@ class RegisteredAsomUserController extends Controller
         
         // Get available exams for completed courses
         $availableExams = \App\Models\Exam::whereIn('course_id', $completedCourses->pluck('id'))
-    ->where('is_active', true)
-    ->with('course', 'questions')
-    ->get()
-    ->filter(function($exam) {
+            ->where('is_active', true)
+            ->with('course', 'questions')
+            ->get()
+            ->filter(function($exam) {
         return $exam->questions->count() >= 5;
     });
         

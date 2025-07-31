@@ -21,8 +21,8 @@
                         <i class="bi bi-person me-2"></i> My Profile
                     </a>
 
-            <a class="nav-link text-white {{ request()->routeIs('lms.dashboard') ? 'active' : '' }}" 
-               href="{{route('lms.dashboard')}}">
+            <a class="nav-link text-white {{ request()->routeIs('asom.welcome') ? 'active' : '' }}" 
+               href="{{route('asom.welcome')}}">
                 <i class="bi bi-people me-2"></i> ASOM
             </a>
                     <!-- Add to sidebar menu -->
