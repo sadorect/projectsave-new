@@ -108,6 +108,34 @@
         </li>
     
     <li class="nav-item">
+        <a class="nav-link text-white {{ request()->routeIs('admin.forms.*') ? 'bg-primary' : '' }}" data-bs-toggle="collapse" href="#formsManagement" role="button" aria-expanded="{{ request()->routeIs('admin.forms.*') ? 'true' : 'false' }}" aria-controls="formsManagement">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Forms Management
+            @php
+                $pendingSubmissions = \App\Models\FormSubmission::whereDate('created_at', today())->count();
+            @endphp
+            @if($pendingSubmissions > 0)
+                <span class="badge bg-success ms-1">{{ $pendingSubmissions }}</span>
+            @endif
+        </a>
+        <div class="collapse {{ request()->routeIs('admin.forms.*') || request()->routeIs('admin.submissions.*') ? 'show' : '' }}" id="formsManagement">
+            <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                    <a class="nav-link text-white {{ request()->routeIs('admin.forms.index') ? 'active' : '' }}" href="{{ route('admin.forms.index') }}">
+                        <i class="fas fa-list me-2"></i> All Forms
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white {{ request()->routeIs('admin.forms.create') ? 'active' : '' }}" href="{{ route('admin.forms.create') }}">
+                        <i class="fas fa-plus me-2"></i> Create Form
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </li>
+
+    <li class="nav-item">
         <a class="nav-link text-white" data-bs-toggle="collapse" href="#lms" role="button" aria-expanded="false" aria-controls="lms">
             <i class="bi bi-mortarboard me-2"></i>
             LMS Management

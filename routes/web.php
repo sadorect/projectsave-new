@@ -37,7 +37,7 @@ use App\Http\Controllers\Admin\LMS\ExamAttemptController;
 use App\Http\Controllers\Admin\AdminPrayerForceController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\Admin\NotificationSettingsController;
-
+use App\Http\Controllers\FormController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes
@@ -235,7 +235,20 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
     Route::resource('mail-templates', MailTemplateController::class);
     Route::post('/mail/preview/{template}', [MailController::class, 'preview'])->name('mail.preview');
 
+// Form Routes
 
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/forms', [FormController::class, 'adminIndex'])->name('forms.index');
+    Route::get('/forms/create', [FormController::class, 'create'])->name('forms.create');
+    Route::get('/forms/{form}/edit', [FormController::class, 'edit'])->name('forms.edit');
+    Route::post('/forms', [FormController::class, 'store'])->name('forms.store');
+    Route::put('/forms/{form}', [FormController::class, 'update'])->name('forms.update');
+    Route::delete('/forms/{form}', [FormController::class, 'destroy'])->name('forms.destroy');
+    Route::get('/forms/{form}/submissions', [FormController::class, 'submissions'])->name('forms.submissions');
+    Route::get('/forms/{form}/download', [FormController::class, 'downloadSubmissions'])->name('forms.download');
+    Route::get('/submissions', [FormController::class, 'submissionsIndex'])->name('submissions.index');
+});
 });
 
 require __DIR__.'/auth.php';
@@ -243,3 +256,10 @@ require __DIR__.'/lms.php';
 
 
 Route::get('/blog/dates/{year}/{month}', [BlogController::class, 'getDates'])->name('blog.dates');
+
+
+
+
+
+Route::get('/forms/{form}', [FormController::class, 'show'])->name('forms.show');
+Route::post('/forms/{form}/submit', [FormController::class, 'submit'])->name('forms.submit');
