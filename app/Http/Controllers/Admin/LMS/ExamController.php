@@ -290,7 +290,7 @@ public function importPreview(Request $request, Exam $exam)
 
     // Save the file locally
     $path = $request->file('docx_file')->store('temp', 'public');
-$fullPath = Storage::disk('public')->path($path);
+$fullPath = storage_path('app/public/' . $path);
     if (!file_exists($fullPath)) {
     Log::error("DOCX file not found at: {$fullPath}");
     return back()->withErrors(['docx_file' => 'Error processing the uploaded file. Please try again.']);
