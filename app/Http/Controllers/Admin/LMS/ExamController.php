@@ -87,6 +87,7 @@ class ExamController extends Controller
     return view('admin.lms.exams.import_questions', compact('exam'));
 }
 
+/*
 public function importPreview(Request $request, Exam $exam)
 {
     $request->validate([
@@ -101,6 +102,9 @@ public function importPreview(Request $request, Exam $exam)
     $data = $this->extractQuestionsFromInlineOptions($fullPath);
     $questions = $data['questions'];
     $skipped = $data['skipped'];
+
+    $exam->load('questions');
+        return view('admin.lms.exams.preview', compact('exam'));
 
     Exam::create([
         'course_id' => $exam->course_id,
@@ -140,7 +144,7 @@ public function importPreview(Request $request, Exam $exam)
 
     return back()->with('success', $message);
 }
-
+*/
 
     /**
      * Remove the specified resource from storage.
@@ -277,7 +281,7 @@ public function importConfirm(Request $request, Exam $exam)
     return redirect()->route('admin.exams.edit', $exam)->with('success', "$created questions imported successfully.");
 }
 
-/*
+
 public function importPreview(Request $request, Exam $exam)
 {
     $request->validate([
@@ -294,13 +298,11 @@ public function importPreview(Request $request, Exam $exam)
     Cache::put("import_exam_{$exam->id}_questions", $result['questions'], now()->addMinutes(15));
     Cache::put("import_exam_{$exam->id}_skipped", $result['skipped'], now()->addMinutes(15));
 
-    return view('admin.exams.import_preview', [
+    return view('admin.lms.exams.import_preview', [
         'exam' => $exam,
         'questions' => $result['questions'],
         'skipped' => $result['skipped']
     ]);
 }
-    */
-
 
 }
