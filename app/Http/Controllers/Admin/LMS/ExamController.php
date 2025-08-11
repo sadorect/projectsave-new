@@ -94,7 +94,7 @@ public function importPreview(Request $request, Exam $exam)
         'docx_file' => 'required|file|mimes:docx',
     ]);
 
-    $path = $request->file('docx_file')->store('temp', 'local');
+    $path = $request->file('docx_file')->store('temp', 'public');
     $fullPath = storage_path("app/{$path}");
     if (!file_exists($fullPath)) {
         return back()->withErrors(['docx_file' => 'The uploaded file does not exist.']);
@@ -289,7 +289,7 @@ public function importPreview(Request $request, Exam $exam)
     ]);
 
     // Save the file locally
-    $path = $request->file('docx_file')->store('temp', 'local');
+    $path = $request->file('docx_file')->store('temp', 'public');
     $fullPath = storage_path("app/{$path}");
 
     $result = $this->extractQuestionsFromInlineOptions($fullPath);
