@@ -23,7 +23,7 @@
                         @foreach($question->options as $index => $option)
                             <div class="option-row mb-2">
                                 <div class="input-group">
-                                    <span class="input-group-text">{{ chr(65 + $index) }}</span>
+                                    <span class="input-group-text">{{ chr(65 + (int)$index) }}</span>
                                     <input type="text" name="options[]" class="form-control" required value="{{ $option }}">
                                     <button type="button" class="btn btn-danger remove-option" {{ $index < 2 ? 'disabled' : '' }}>
                                         <i class="bi bi-trash"></i>
@@ -43,7 +43,7 @@
                         <option value="">Select correct answer</option>
                         @foreach($question->options as $index => $option)
                             <option value="{{ $option }}" {{ $question->correct_answer === $option ? 'selected' : '' }}>
-                                {{ chr(65 + $index) }}: {{ $option }}
+                                {{ chr(65 + (int)$index) }}: {{ $option }}
                             </option>
                         @endforeach
                     </select>

@@ -187,6 +187,16 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
    // Admin LMS Routes
    Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // LMS Management
+
+Route::get('exams/{exam}/import-questions', [ExamController::class, 'showImportForm'])->name('exams.import-questions');
+Route::post('exams/{exam}/import-questions', [ExamController::class, 'importDocx'])->name('exams.import-questions.upload');
+// Step 1: Preview
+Route::post('exams/{exam}/import-preview', [ExamController::class, 'importPreview'])->name('exams.import-preview');
+
+// Step 2: Confirm import
+Route::post('exams/{exam}/import-confirm', [ExamController::class, 'importConfirm'])->name('exams.import-confirm');
+
+Route::get('exams/{exam}/questions', [ExamController::class, 'questions'])->name('exams.questions.import');
     Route::resource('courses', AdminCourseController::class);
     Route::resource('lessons', AdminLessonController::class);
     Route::get('enrollments', [AdminEnrollmentController::class, 'index'])->name('enrollments.index');

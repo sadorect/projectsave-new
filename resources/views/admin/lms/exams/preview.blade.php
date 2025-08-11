@@ -28,7 +28,7 @@
                                                value="{{ $option }}"
                                                id="q{{ $question->id }}_{{ $optionIndex }}">
                                         <label class="form-check-label" for="q{{ $question->id }}_{{ $optionIndex }}">
-                                            {{ chr(65 + $optionIndex) }}. {{ $option }}
+                                            {{ chr(65 + (int)$optionIndex) }}. {{ $option }}
                                         </label>
                                         @if($option === $question->correct_answer)
                                             <span class="badge bg-success ms-2">Correct Answer</span>

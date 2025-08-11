@@ -53,8 +53,11 @@
                     <label class="form-label">Points</label>
                     <input type="number" name="points" class="form-control" required min="1" value="1">
                 </div>
-
+           
+                   
+                
                 <div class="text-end">
+                    <a href="{{ route('admin.exams.questions.import', $exam) }}" class="btn btn-secondary">Import Question</a>
                     <button type="submit" class="btn btn-primary">Save Question</button>
                 </div>
             </form>
