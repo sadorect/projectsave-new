@@ -9,6 +9,7 @@ use App\Models\Activity;
 use App\Models\UserFile;
 use App\Models\Enrollment;
 use App\Models\LessonProgress;
+use App\Models\VideoInteraction;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -57,6 +58,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_admin' => 'boolean',
     ];
 
+    public function videoInteractions()
+    {
+    return $this->hasMany(VideoInteraction::class);
+    }
+    
     public function files()
     {
         return $this->hasMany(UserFile::class);

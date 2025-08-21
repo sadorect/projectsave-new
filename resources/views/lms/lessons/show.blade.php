@@ -1,5 +1,47 @@
 <x-layouts.asom-auth page-title="{{ $lesson->title }}" subtitle="Lesson {{ $lesson->order ?? 1 }} of {{ $course->lessons->count() }} • {{ round($courseProgress) }}% Course Progress">
     <style>
+        .video-placeholder {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.play-button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: white;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.play-button:hover {
+    transform: scale(1.1);
+    background: rgba(0,0,0,0.8);
+}
+
+.video-access-denied {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
         .lesson-card {
             border: none;
             border-radius: 15px;
@@ -187,15 +229,30 @@
             <div class="col-lg-8">
                 <div class="lesson-card">
                     <div class="card-body p-4">
-                        @if($lesson->video_url)
-                            <div class="video-container">
-                                <iframe src="{{ $lesson->embed_video_url }}" 
-                                        frameborder="0" 
-                                        allowfullscreen
-                                        loading="lazy">
-                                </iframe>
+                        <div class="mb-4 user-appeal">
+                            <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <span>
+                                    Enjoy your lesson video below! If you have any issues viewing it, please contact support or check your internet connection.
+                                </span>
                             </div>
-                        @endif
+                            @if($lesson->video_url)
+                                <div class="video-placeholder mt-5" style="background-image: url('{{ $lesson->thumbnail_url ?? '' }}');">
+                                    <button class="play-button" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">
+                                        <!-- SVG Play Icon -->
+                                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                                            <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.5)"/>
+                                            <polygon points="20,16 36,24 20,32" fill="#fff"/>
+                                        </svg>
+                                    </button>
+                                    <!-- Optionally, overlay for click-to-play, or wire up with JS/Livewire -->
+                                    @livewire('lesson-video-player', [
+                                        'lessonId' => $lesson->id,
+                                        'courseId' => $course->id
+                                    ])
+                                </div>
+                            @endif
+                        </div>
 
                         <div class="lesson-content">
                             {!! $lesson->content !!}
@@ -327,6 +384,32 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
         @vite(['resources/js/lms-progress.js'])
+<script>
+    document.addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+        // Show a message when right-click is attempted
+        let msg = document.getElementById('context-msg');
+        if (!msg) {
+            msg = document.createElement('div');
+            msg.id = 'context-msg';
+            msg.textContent = 'Action not allowed';
+            msg.style.position = 'fixed';
+            msg.style.top = '20px';
+            msg.style.right = '20px';
+            msg.style.background = 'rgba(0,0,0,0.85)';
+            msg.style.color = '#fff';
+            msg.style.padding = '10px 18px';
+            msg.style.borderRadius = '8px';
+            msg.style.zIndex = 9999;
+            msg.style.fontSize = '1rem';
+            document.body.appendChild(msg);
+        }
+        msg.style.display = 'block';
+        setTimeout(() => { msg.style.display = 'none'; }, 1500);
+    });
+</script>
+</script>
+
     @endpush
 
 </x-layouts.asom-auth>

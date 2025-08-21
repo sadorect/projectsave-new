@@ -4,14 +4,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LMS\ExamController;
 use App\Http\Controllers\LMS\CourseController;
 use App\Http\Controllers\LMS\LessonController;
+use App\Http\Controllers\VideoStreamController;
 use App\Http\Controllers\LMS\ProgressController;
 use App\Http\Controllers\LMS\QuestionController;
 use App\Http\Controllers\LMS\DashboardController;
 use App\Http\Controllers\LMS\EnrollmentController;
-use App\Http\Controllers\LMS\ExamAttemptController;
-use App\Http\Controllers\LMS\LessonProgressController;
-use App\Http\Controllers\LMS\StudentExamController;
 use App\Http\Controllers\LMS\CertificateController;
+use App\Http\Controllers\LMS\ExamAttemptController;
+use App\Http\Controllers\LMS\StudentExamController;
+use App\Http\Controllers\LMS\LessonProgressController;
 
 
 // Public access to courses
@@ -33,10 +34,13 @@ Route::middleware(['auth'])->prefix('learn')->group(function () {
         ->name('lms.courses.enroll');
     Route::delete('/courses/{course:slug}/unenroll', [DashboardController::class, 'unenroll'])
         ->name('lms.courses.unenroll');
-    
+      
     // Lesson routes
     Route::get('/courses/{course:slug}/lessons', [LessonController::class, 'index'])->name('lms.lessons.index');
     Route::get('/courses/{course:slug}/lessons/{lesson:slug}', [LessonController::class, 'show'])->name('lms.lessons.show');
+    //Secure streaming route
+    Route::get('video/stream', [VideoStreamController::class, 'stream'])
+        ->name('video.stream');
 
     // Progress tracking routes
     Route::post('/courses/{course:slug}/lessons/{lesson:slug}/complete', [LessonProgressController::class, 'markComplete'])
