@@ -237,20 +237,14 @@
                                 </span>
                             </div>
                             @if($lesson->video_url)
-                                <div class="video-placeholder mt-5" style="background-image: url('{{ $lesson->thumbnail_url ?? '' }}');">
-                                    <button class="play-button" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 2;">
-                                        <!-- SVG Play Icon -->
-                                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                            <circle cx="24" cy="24" r="24" fill="rgba(0,0,0,0.5)"/>
-                                            <polygon points="20,16 36,24 20,32" fill="#fff"/>
-                                        </svg>
-                                    </button>
-                                    <!-- Optionally, overlay for click-to-play, or wire up with JS/Livewire -->
-                                    @livewire('lesson-video-player', [
-                                        'lessonId' => $lesson->id,
-                                        'courseId' => $course->id
-                                    ])
-                                </div>
+                                <div class="video-container">
+        {{-- Place the Livewire component directly, not nested in other positioned divs --}}
+        @livewire('lesson-video-player', [
+            'lessonId' => $lesson->id,
+            'courseId' => $course->id,
+            'thumbnailUrl' => $lesson->thumbnail_url
+        ])
+    </div>
                             @endif
                         </div>
 
@@ -376,11 +370,7 @@
         @include('lms.lessons._completion_modal')
     </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-      
    
-
-
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
         @vite(['resources/js/lms-progress.js'])
@@ -407,7 +397,6 @@
         msg.style.display = 'block';
         setTimeout(() => { msg.style.display = 'none'; }, 1500);
     });
-</script>
 </script>
 
     @endpush

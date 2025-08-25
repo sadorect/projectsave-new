@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VideoStreamController extends Controller
 {
+    private const VIDEO_EMBED_PARAMS = '?rel=0&controls=0&showinfo=0&modestbranding=0';
+
     public function stream(Request $request)
     {
         try {
@@ -26,8 +28,12 @@ class VideoStreamController extends Controller
             $videoUrl = $lesson->video_url;
             
             // For YouTube/Vimeo videos, redirect to embed URL
-            if (strpos($videoUrl, 'youtube.com') !== false || strpos($videoUrl, 'vimeo.com') !== false) {
-                return redirect()->to($lesson->embed_video_url . '?rel=0&controls=1&showinfo=0&modestbranding=1');
+            if (stripos($videoUrl, 'youtube.com') !== false || stripos($videoUrl, 'vimeo.com') !== false) {
+                if (!empty($lesson->embed_video_url) && filter_var($lesson->embed_video_url, FILTER_VALIDATE_URL)) {
+                    return redirect()->to($lesson->embed_video_url . self::VIDEO_EMBED_PARAMS);
+                } else {
+                    abort(404, 'Video embed URL not available');
+                }
             }
             
             // For self-hosted videos, stream the file

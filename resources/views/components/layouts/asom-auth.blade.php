@@ -146,6 +146,7 @@
             }
         }
     </style>
+    @stack('styles')
     @livewireStyles
 </head>
 <body>
@@ -160,7 +161,7 @@
                         </h1>
                     </div>
                     @isset($subtitle)
-                        <p class="mb-0 opacity-75 mt-1">{{ $subtitle }}</p>
+                        <div class="mb-0 opacity-75 mt-1">{!! $subtitle !!}</div>
                     @endisset
                 </div>
                 <div class="col-md-6">

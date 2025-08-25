@@ -2,13 +2,13 @@
     {{-- A good traveler has no fixed plans and is not intent upon arriving. --}}
     @if($userCanAccess)
         <div class="video-container" 
-             id="video-wrapper" 
+             id="video-wrapper-{{ $lesson->id }}" 
              wire:key="video-{{ $lesson->id }}"
              oncontextmenu="return false;">
             
             @if(!$isWatching)
                 <div class="video-placeholder d-flex align-items-center justify-content-center" 
-                     style="background-image: url('{{ $lesson->thumbnail_url ?? asset('images/video-placeholder.jpg') }}')">
+                     style="background-image: url('{{ $thumbnailUrl ?? asset('images/video-placeholder.jpg') }}')">
                     <button wire:click="startWatching" class="play-button">
                         <i class="fas fa-play"></i>
                     </button>
@@ -21,43 +21,12 @@
                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
                         frameborder="0" 
                         allowfullscreen
-                        allow="autoplay; encrypted-media"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         loading="lazy">
                     </iframe>
                 </div>
             @endif
         </div>
-        
-        <script>
-            document.addEventListener('livewire:load', function () {
-                // Set up heartbeat to track video progress
-                let player;
-                let heartbeatInterval;
-                
-                window.addEventListener('message', function(event) {
-                    // Listen for messages from the iframe player
-                    if (event.data && event.data.event === 'playerReady') {
-                        player = event.source;
-                        
-                        // Start heartbeat to track video time
-                        heartbeatInterval = setInterval(() => {
-                            player.postMessage({ action: 'getCurrentTime' }, '*');
-                        }, 5000);
-                    }
-                    
-                    // Handle video time updates
-                    if (event.data && event.data.currentTime) {
-                        @this.call('heartbeat', event.data.currentTime);
-                    }
-                    
-                    // Handle video completion
-                    if (event.data && event.data.event === 'videoEnded') {
-                        clearInterval(heartbeatInterval);
-                        @this.call('markVideoWatched');
-                    }
-                });
-            });
-        </script>
     @else
         <div class="video-access-denied">
             <div class="alert alert-warning">
