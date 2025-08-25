@@ -33,7 +33,7 @@ class VideoStreamController extends Controller
             // Convert YouTube URLs to embed format
             if ($this->isYouTubeUrl($videoUrl)) {
                 $embedUrl = $this->getYouTubeEmbedUrl($videoUrl);
-                return view('video.youtube-embed', [
+                return view('lms.lessons.youtube-embed', [
                     'embedUrl' => $embedUrl,
                     'lessonId' => $lesson->id
                 ]);
