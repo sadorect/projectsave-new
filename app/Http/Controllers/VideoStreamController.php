@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 use App\Models\Lesson;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+//use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class VideoStreamController extends Controller
 {
@@ -23,23 +24,26 @@ class VideoStreamController extends Controller
             }
             
             $lesson = Lesson::findOrFail($tokenData['lesson_id']);
-            
-            // Get the actual video URL (previously hidden from frontend)
             $videoUrl = $lesson->video_url;
             
-            // For YouTube/Vimeo videos, redirect to embed URL
-            if (stripos($videoUrl, 'youtube.com') !== false || stripos($videoUrl, 'vimeo.com') !== false) {
-                if (!empty($lesson->embed_video_url) && filter_var($lesson->embed_video_url, FILTER_VALIDATE_URL)) {
-                    return redirect()->to($lesson->embed_video_url . self::VIDEO_EMBED_PARAMS);
-                } else {
-                    abort(404, 'Video embed URL not available');
-                }
+            if (empty($videoUrl)) {
+                abort(404, 'Video URL not found');
             }
             
-            // For self-hosted videos, stream the file
-            return $this->streamVideo($videoUrl);
+            // Convert YouTube URLs to embed format
+            if ($this->isYouTubeUrl($videoUrl)) {
+                $embedUrl = $this->getYouTubeEmbedUrl($videoUrl);
+                return view('video.youtube-embed', [
+                    'embedUrl' => $embedUrl,
+                    'lessonId' => $lesson->id
+                ]);
+            }
+            
+            // If not YouTube, display error
+            abort(400, 'Unsupported video type');
             
         } catch (\Exception $e) {
+            Log::error('Video streaming error: ' . $e->getMessage());
             abort(403, 'Access denied');
         }
     }
@@ -59,20 +63,34 @@ class VideoStreamController extends Controller
         return true;
     }
     
-    private function streamVideo($path)
+    private function isYouTubeUrl($url)
     {
-        // Implementation for streaming self-hosted videos
-        // This is a simplified example - production code would need more robust handling
-        $response = new StreamedResponse(function() use ($path) {
-            $stream = fopen($path, 'r');
-            while (!feof($stream)) {
-                echo fread($stream, 1024 * 8);
-                flush();
-            }
-            fclose($stream);
-        });
+        return (
+            strpos($url, 'youtube.com') !== false || 
+            strpos($url, 'youtu.be') !== false
+        );
+    }
+    
+    private function getYouTubeEmbedUrl($url)
+    {
+        // Extract video ID from URL
+        $videoId = null;
         
-        $response->headers->set('Content-Type', 'video/mp4');
-        return $response;
+        // Handle youtube.com/watch?v=VIDEO_ID
+        if (strpos($url, 'youtube.com/watch') !== false) {
+            parse_str(parse_url($url, PHP_URL_QUERY), $params);
+            $videoId = $params['v'] ?? null;
+        } 
+        // Handle youtu.be/VIDEO_ID
+        elseif (strpos($url, 'youtu.be/') !== false) {
+            $videoId = substr(parse_url($url, PHP_URL_PATH), 1);
+        }
+        
+        if (!$videoId) {
+            return null;
+        }
+        
+        // Return embed URL with secure parameters
+        return "https://www.youtube.com/embed/{$videoId}" . self::VIDEO_EMBED_PARAMS;
     }
 }
