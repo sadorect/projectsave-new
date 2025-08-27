@@ -174,6 +174,10 @@ Route::prefix('admin')->group(function() {
 Route::prefix('content')->middleware(['auth'])->group(function() {
     Route::middleware('permission:edit-content,admin')->group(function() {
         Route::resource('posts', PostController::class)->names('admin.posts');
+        // Add new routes for enhanced post management
+        Route::post('posts/bulk-action', [PostController::class, 'bulkAction'])->name('admin.posts.bulk-action');
+        Route::post('posts/create-category', [PostController::class, 'createCategory'])->name('admin.posts.create-category');
+        
         Route::resource('events', AdminEventController::class)->names('admin.events');
         Route::resource('categories', CategoryController::class)->names('admin.categories');
         Route::resource('tags', TagController::class)->names('admin.tags');
@@ -181,6 +185,8 @@ Route::prefix('content')->middleware(['auth'])->group(function() {
         Route::resource('videos', VideoReelController::class);
 
          Route::resource('faqs', \App\Http\Controllers\FaqController::class)->names('admin.faqs');
+         // Add bulk action route for FAQs
+         Route::post('faqs/bulk-action', [\App\Http\Controllers\FaqController::class, 'bulkAction'])->name('admin.faqs.bulk-action');
     });
 });
 
