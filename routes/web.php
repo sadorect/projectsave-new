@@ -223,6 +223,10 @@ Route::get('exams/{exam}/questions', [ExamController::class, 'questions'])->name
     //Route::put('exams/{exam}', [ExamController::class, 'update'])->name('exams.update');
     Route::post('exams/{exam}/attempt', [ExamAttemptController::class, 'start'])->name('exams.attempt.start');
     Route::get('exam-attempts', [ExamAttemptController::class, 'index'])->name('exam-attempts.index');
+    Route::get('exam-attempts/{attempt}', [ExamAttemptController::class, 'show'])->name('exam-attempts.show');
+    Route::delete('exam-attempts/{attempt}', [ExamAttemptController::class, 'destroy'])->name('exam-attempts.destroy');
+    Route::get('exams/{exam}/manual-pass', [ExamAttemptController::class, 'manualPass'])->name('exams.manual-pass');
+    Route::post('exams/{exam}/manual-pass', [ExamAttemptController::class, 'storeManualPass'])->name('exams.manual-pass.store');
     Route::post('exams/{exam}/reset-attempts/{user?}', [ExamAttemptController::class, 'resetAttempts'])->name('exams.reset-attempts');
     Route::post('exams/{exam}/submit', [ExamAttemptController::class, 'submit'])->name('exams.attempt.submit');
     Route::get('exams/{exam}/results', [ExamAttemptController::class, 'results'])->name('exams.results');

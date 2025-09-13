@@ -48,6 +48,9 @@
                               <a href="{{ route('admin.questions.create', $exam) }}" class="btn btn-sm btn-success">
                                   <i class="bi bi-plus"></i> Questions
                               </a>
+                              <a href="{{ route('admin.exams.manual-pass', $exam) }}" class="btn btn-sm btn-warning" title="Manually pass a student">
+                                  <i class="bi bi-person-check"></i> Manual Pass
+                              </a>
                               <form action="{{ route('admin.exams.destroy', $exam) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
