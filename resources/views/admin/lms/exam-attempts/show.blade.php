@@ -120,15 +120,19 @@
                                     <i class="fas fa-list-alt me-2"></i>
                                     Detailed Answers
                                 </h5>
+                                <small class="text-muted">
+                                    Questions: {{ $attempt->exam->questions->count() }} | 
+                                    Answered: {{ count(array_filter($attempt->answers, fn($answer) => !is_null($answer) && $answer !== '')) }}
+                                </small>
                             </div>
                             <div class="card-body">
                                 @foreach($attempt->exam->questions as $index => $question)
                                     @php
                                         $userAnswer = $attempt->answers[$question->id] ?? null;
-                                        // Ensure we're comparing strings
-                                        $userAnswerString = is_string($userAnswer) ? $userAnswer : (is_array($userAnswer) ? json_encode($userAnswer) : (string)$userAnswer);
-                                        $isCorrect = $userAnswerString === $question->correct_answer;
+                                        // Simple string comparison - both should be strings
+                                        $isCorrect = $userAnswer === $question->correct_answer;
                                         $questionNumber = $index + 1;
+                                        $options = json_decode($question->options, true);
                                     @endphp
                                     
                                     <div class="mb-4 pb-3 border-bottom">
@@ -142,10 +146,6 @@
                                             </span>
                                         </div>
                                         
-                                        @php
-                                            $options = json_decode($question->options, true);
-                                        @endphp
-                                        
                                         @if(is_array($options))
                                             <div class="row">
                                                 @foreach($options as $optionKey => $optionText)
@@ -153,20 +153,28 @@
                                                         <div class="p-2 rounded 
                                                             @if($optionKey === $question->correct_answer) 
                                                                 bg-success text-white
-                                                            @elseif($optionKey === $userAnswerString && !$isCorrect)
+                                                            @elseif($optionKey === $userAnswer && !$isCorrect)
                                                                 bg-danger text-white
+                                                            @elseif($optionKey === $userAnswer && $isCorrect)
+                                                                bg-success text-white
                                                             @else
                                                                 bg-light
                                                             @endif
                                                         ">
-                                                            <strong>{{ strtoupper($optionKey) }}.</strong> {{ $optionText }}
+                                                            <strong>
+                                                                @if(is_string($optionKey))
+                                                                    {{ strtoupper($optionKey) }}.
+                                                                @else
+                                                                    {{ $optionKey }}.
+                                                                @endif
+                                                            </strong> {{ $optionText }}
                                                             
                                                             @if($optionKey === $question->correct_answer)
-                                                                <i class="fas fa-check ms-2" title="Correct Answer"></i>
+                                                                <i class="fas fa-check-circle ms-2" title="Correct Answer"></i>
                                                             @endif
                                                             
-                                                            @if($optionKey === $userAnswerString)
-                                                                <i class="fas fa-arrow-left ms-2" title="Student's Answer"></i>
+                                                            @if($optionKey === $userAnswer)
+                                                                <i class="fas fa-arrow-circle-right ms-2" title="Student's Choice"></i>
                                                             @endif
                                                         </div>
                                                     </div>
@@ -176,22 +184,44 @@
                                             <div class="text-muted">No options available for this question.</div>
                                         @endif
                                         
-                                        <div class="mt-2">
-                                            <small class="text-muted">
-                                                <strong>Student's Answer:</strong> 
+                                        <div class="mt-3">
+                                            <div class="alert alert-light">
+                                                <strong><i class="fas fa-user-check me-2"></i>Student's Choice:</strong> 
                                                 @if($userAnswer)
-                                                    @if(is_string($userAnswer))
-                                                        {{ strtoupper($userAnswer) }} 
-                                                        @if(isset($options[$userAnswer]))
-                                                            - {{ $options[$userAnswer] }}
+                                                    <span class="badge bg-{{ $isCorrect ? 'success' : 'warning' }} text-white me-2">
+                                                        @if(is_string($userAnswer))
+                                                            {{ strtoupper($userAnswer) }}
+                                                        @elseif(is_array($userAnswer))
+                                                            {{ json_encode($userAnswer) }}
+                                                        @else
+                                                            {{ $userAnswer }}
                                                         @endif
+                                                    </span>
+                                                    @if(is_string($userAnswer) && isset($options[$userAnswer]))
+                                                        {{ $options[$userAnswer] }}
+                                                    @elseif(!is_string($userAnswer))
+                                                        <em class="text-muted">(Non-standard answer format)</em>
                                                     @else
-                                                        {{ json_encode($userAnswer) }}
+                                                        <em class="text-muted">(Option text not found)</em>
                                                     @endif
                                                 @else
-                                                    <em>Not answered</em>
+                                                    <span class="text-muted"><em>Not answered</em></span>
                                                 @endif
-                                            </small>
+                                            </div>
+                                            
+                                            <div class="alert alert-light">
+                                                <strong><i class="fas fa-check-circle me-2"></i>Correct Answer:</strong>
+                                                <span class="badge bg-success text-white me-2">
+                                                    @if(is_string($question->correct_answer))
+                                                        {{ strtoupper($question->correct_answer) }}
+                                                    @else
+                                                        {{ $question->correct_answer }}
+                                                    @endif
+                                                </span>
+                                                @if(is_string($question->correct_answer) && isset($options[$question->correct_answer]))
+                                                    {{ $options[$question->correct_answer] }}
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
