@@ -83,12 +83,14 @@
                                 <p class="form-control-plaintext">
                                     @if($user->email_verified_at)
                                         <span class="badge bg-success fs-6">
-                                            <i class="bi bi-check-circle"></i> Verified
+                                                <i class="bi bi-check-circle"></i> Verified
                                         </span>
                                         <small class="text-muted d-block">{{ $user->email_verified_at ? \Carbon\Carbon::parse($user->email_verified_at)->format('M d, Y H:i') : '' }}</small>
                                     @else
                                         <span class="badge bg-warning fs-6">
-                                            <i class="bi bi-exclamation-triangle"></i> Unverified
+                                                <span id="email-verified-badge" class="badge bg-warning fs-6">
+                                                    <i class="bi bi-exclamation-triangle"></i> Unverified
+                                                </span>
                                         </span>
                                     @endif
                                 </p>
@@ -176,9 +178,26 @@
                             <i class="bi bi-pencil"></i> Edit User
                         </a>
                         @if(!$user->email_verified_at)
-                            <button class="btn btn-outline-warning" onclick="resendVerification({{ $user->id }})">
+                            <form id="admin-verify-form" action="{{ route('admin.users.verify', $user) }}" method="POST" class="mb-2">
+                                @csrf
+                                @method('PATCH')
+                                <button id="admin-verify-btn" type="submit" class="btn btn-outline-warning">
+                                    <i class="bi bi-check2-all"></i> Mark Email Verified
+                                </button>
+                            </form>
+                            <button class="btn btn-outline-secondary mb-2" onclick="resendVerification({{ $user->id }})">
                                 <i class="bi bi-envelope"></i> Resend Verification
                             </button>
+                        @endif
+                        @if(\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active'))
+                        <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST" class="mb-2">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-outline-{{ $user->is_active ? 'danger' : 'success' }}">
+                                <i class="bi {{ $user->is_active ? 'bi-person-x' : 'bi-person-check' }}"></i>
+                                {{ $user->is_active ? 'Deactivate User' : 'Activate User' }}
+                            </button>
+                        </form>
                         @endif
                         @if(!$user->is_admin)
                             <button class="btn btn-outline-success" onclick="toggleAdminStatus({{ $user->id }})">
@@ -253,17 +272,66 @@ function confirmDelete(userId) {
 }
 
 function resendVerification(userId) {
-    if (confirm('Resend email verification to this user?')) {
-        // Add your resend verification logic here
-        alert('Verification email resent successfully!');
-    }
+    if (!confirm('Resend email verification to this user?')) return;
+
+    fetch('/email/verification-notification', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ user_id: userId })
+    }).then(res => {
+        if (res.ok) {
+            alert('Verification email resent successfully!');
+            location.reload();
+        } else {
+            alert('Failed to resend verification email.');
+        }
+    }).catch(() => alert('Failed to resend verification email.'));
 }
 
 function toggleAdminStatus(userId) {
-    if (confirm('Make this user an administrator?')) {
-        // Add your admin toggle logic here
-        alert('User admin status updated successfully!');
-    }
+    if (!confirm('Make this user an administrator?')) return;
+
+    // Redirect to edit page for now
+    window.location.href = `/admin/users/${userId}/edit`;
 }
+
+// Handle admin verify form via fetch to allow in-place UI update
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('admin-verify-form');
+    if (!form) return;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!confirm('Mark this user email as verified?')) return;
+
+        const url = form.action;
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token
+            },
+            body: JSON.stringify({})
+        }).then(res => res.json())
+        .then(data => {
+            if (data && data.success) {
+                // update badge
+                const badge = document.getElementById('email-verified-badge');
+                if (badge) {
+                    badge.className = 'badge bg-success fs-6';
+                    badge.innerHTML = '<i class="bi bi-check-circle"></i> Verified';
+                }
+                alert(data.message || 'User email verified successfully');
+            } else {
+                alert(data.message || 'Failed to verify user email');
+            }
+        }).catch(() => alert('Failed to verify user email'));
+    });
+});
 </script>
 @endpush

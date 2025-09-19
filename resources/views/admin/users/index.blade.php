@@ -17,11 +17,29 @@
         </div>
     @endif
 
+    @php
+        // Prefer the controller-provided $activeSessions; fallback to a quick DB query if missing
+        if (!isset($activeSessions)) {
+            try {
+                $sessionTable = config('session.table', 'sessions');
+                $activeSessions = \Illuminate\Support\Facades\DB::table($sessionTable)
+                    ->whereNotNull('user_id')
+                    ->pluck('user_id')
+                    ->unique()
+                    ->map(fn($v) => (int) $v)
+                    ->toArray();
+            } catch (\Throwable $e) {
+                $activeSessions = [];
+            }
+        }
+    @endphp
+
     <div class="card">
         <div class="card-body">
             <table class="table">
                 <thead>
                     <tr>
+                        <th>Logged In</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>User Type</th>
@@ -33,6 +51,13 @@
                 <tbody>
                     @foreach($users as $user)
                     <tr>
+                        <td>
+                            @if(in_array($user->id, $activeSessions))
+                                <span class="badge bg-success">Online</span>
+                            @else
+                                <span class="badge bg-secondary">Offline</span>
+                            @endif
+                        </td>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
                         <td>

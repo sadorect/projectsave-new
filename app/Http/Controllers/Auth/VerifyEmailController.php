@@ -15,22 +15,42 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            // Check if user is ASOM student and should be redirected to welcome page
-            if ($this->shouldRedirectToAsomWelcome($request->user())) {
+        // The EmailVerificationRequest is signed and throttled by middleware.
+        // However, the user may not be authenticated when they click the email link.
+        // Handle both cases: authenticated (request->user()) and unauthenticated.
+
+        $user = $request->user();
+
+        // If no authenticated user, attempt to resolve user by route id
+        if (!$user) {
+            $id = $request->route('id');
+            $user = \App\Models\User::find($id);
+        }
+
+        // If user not found, redirect with error
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Invalid verification link or user not found.');
+        }
+
+        // Verify the incoming hash matches the user's email verification hash
+        $hash = $request->route('hash');
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return redirect()->route('login')->with('error', 'Invalid verification link.');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            if ($this->shouldRedirectToAsomWelcome($user)) {
                 return redirect()->route('asom.welcome')->with('verified', true);
             }
-            
+
             return redirect()->intended(RouteServiceProvider::HOME.'?verified=1');
         }
 
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
         }
 
-        // After successful verification, check if user should go to ASOM welcome
-        if ($this->shouldRedirectToAsomWelcome($request->user())) {
-            // Clear the session flag
+        if ($this->shouldRedirectToAsomWelcome($user)) {
             session()->forget('asom_redirect_after_verification');
             return redirect()->route('asom.welcome')->with('verified', true);
         }

@@ -137,7 +137,13 @@ Route::prefix('admin')->group(function() {
     });       
 
         // User Management
-        Route::resource('users', AdminUserController::class)->names('admin.users');
+    Route::resource('users', AdminUserController::class)->names('admin.users');
+    // Admin actions for manual user verification and activation
+    Route::patch('users/{user}/verify', [\App\Http\Controllers\AdminUserController::class, 'verify'])->name('admin.users.verify');
+    Route::patch('users/{user}/toggle-active', [\App\Http\Controllers\AdminUserController::class, 'toggleActive'])->name('admin.users.toggle-active');
+    // Session management for admins: list active sessions and terminate
+    Route::get('sessions', [\App\Http\Controllers\Admin\AdminSessionController::class, 'index'])->name('admin.sessions.index');
+    Route::delete('sessions/{session}', [\App\Http\Controllers\Admin\AdminSessionController::class, 'destroy'])->name('admin.sessions.destroy');
         Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('admin.deletion-requests.index');
         Route::get('/deletion-requests/{request}', [DeletionRequestController::class, 'show'])->name('admin.deletion-requests.show');
         Route::post('/deletion-requests/{request}/process', [DeletionRequestController::class, 'process'])->name('admin.deletion-requests.process');

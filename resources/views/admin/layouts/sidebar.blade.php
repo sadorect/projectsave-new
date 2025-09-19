@@ -62,6 +62,11 @@
         Users
       </a>
 
+            <a href="{{ route('admin.sessions.index') }}" class="nav-link text-white {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}">
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Sessions (Logged in)
+            </a>
+
       <li class="nav-item">
         <a class="nav-link {{ request()->routeIs('admin.celebrations.*') ? 'active' : '' }}" 
            href="#celebrationsSubmenu" 
