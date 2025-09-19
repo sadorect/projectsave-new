@@ -44,7 +44,6 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                            <th><input type="checkbox" id="select-all"></th>
                         <th>ID</th>
                         <th>When</th>
                         <th>Admin</th>
@@ -52,13 +51,11 @@
                         <th>Target</th>
                         <th>Meta</th>
                         <th>IP</th>
-                            <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($logs as $log)
                     <tr>
-                        <td><input type="checkbox" name="ids[]" value="{{ $log->id }}"></td>
                         <td>{{ $log->id }}</td>
                         <td>{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
                         <td>@if($log->adminUser)<a href="{{ route('admin.users.show', $log->adminUser) }}">{{ $log->adminUser->name }} ({{ $log->adminUser->id }})</a>@else System @endif</td>
@@ -66,36 +63,10 @@
                         <td>{{ $log->target_type }} #{{ $log->target_id }}</td>
                         <td><pre style="white-space:pre-wrap;">{{ json_encode($log->meta) }}</pre></td>
                         <td>{{ $log->ip_address }}</td>
-                        <td>
-                            <form method="POST" action="{{ route('admin.audit.destroy', $log->id) }}" style="display:inline">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this log?')">Delete</button>
-                            </form>
-                        </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
-
-            <form id="bulk-delete-form" method="POST" action="{{ route('admin.audit.bulkDestroy') }}" style="display:none">
-                @csrf
-                <div id="bulk-hidden-inputs"></div>
-            </form>
-
-            <div class="d-flex gap-2">
-                <button id="bulk-delete-btn" class="btn btn-danger">Delete Selected</button>
-            </div>
-
-            <div class="mt-3">
-                <form method="POST" action="{{ route('admin.audit.toggle') }}">
-                    @csrf
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="errorAuditToggle" name="enabled" value="1" {{ data_get($errorAuditEnabled, 'enabled') ? 'checked' : '' }} onchange="this.form.submit()">
-                        <label class="form-check-label" for="errorAuditToggle">Enable server error audit (500+)</label>
-                    </div>
-                </form>
-            </div>
 
             <div class="mt-3">
                 {{ $logs->withQueryString()->links('pagination::bootstrap-4') }}
@@ -104,38 +75,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const selectAll = document.getElementById('select-all');
-    if (selectAll) {
-        selectAll.addEventListener('change', function () {
-            document.querySelectorAll('input[name="ids[]"]').forEach(cb => cb.checked = selectAll.checked);
-        });
-    }
-
-    const bulkBtn = document.getElementById('bulk-delete-btn');
-    bulkBtn?.addEventListener('click', function () {
-        const checked = Array.from(document.querySelectorAll('input[name="ids[]"]:checked')).map(i => i.value);
-        if (!checked.length) {
-            alert('No items selected.');
-            return;
-        }
-        if (!confirm('Delete selected logs?')) return;
-
-        const container = document.getElementById('bulk-hidden-inputs');
-        container.innerHTML = '';
-        checked.forEach(id => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'ids[]';
-            input.value = id;
-            container.appendChild(input);
-        });
-
-        document.getElementById('bulk-delete-form').submit();
-    });
-});
-</script>
-@endpush

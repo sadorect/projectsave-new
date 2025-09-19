@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\AdminAuditLog;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use App\Models\AppSetting;
-
 
 class AuditLogController extends Controller
 {
@@ -77,59 +75,6 @@ class AuditLogController extends Controller
 
         $logs = $query->paginate(25);
 
-        // current toggle for error audit
-        $errorAuditEnabled = AppSetting::get('error_audit_enabled', ['enabled' => false]);
-
-        return view('admin.audit.index', compact('logs', 'actions', 'errorAuditEnabled'));
-    }
-
-    /**
-     * Delete a single audit log entry
-     */
-    public function destroy($id)
-    {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-
-        $log = AdminAuditLog::findOrFail($id);
-        $log->delete();
-
-        return redirect()->back()->with('success', 'Audit log deleted.');
-    }
-
-    /**
-     * Bulk delete audit logs
-     */
-    public function bulkDestroy(Request $request)
-    {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-
-        $ids = $request->input('ids', []);
-        if (!is_array($ids) || empty($ids)) {
-            return redirect()->back()->with('error', 'No items selected.');
-        }
-
-        AdminAuditLog::whereIn('id', $ids)->delete();
-
-        return redirect()->back()->with('success', 'Selected audit logs deleted.');
-    }
-
-    /**
-     * Toggle error audit on/off
-     */
-    public function toggleErrorAudit(Request $request)
-    {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-
-        $enabled = $request->boolean('enabled');
-
-        AppSetting::set('error_audit_enabled', ['enabled' => $enabled]);
-
-        return redirect()->back()->with('success', 'Error audit setting updated.');
+        return view('admin.audit.index', compact('logs', 'actions'));
     }
 }

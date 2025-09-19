@@ -146,9 +146,6 @@ Route::prefix('admin')->group(function() {
     Route::delete('sessions/{session}', [\App\Http\Controllers\Admin\AdminSessionController::class, 'destroy'])->name('admin.sessions.destroy');
     // Audit log viewer
     Route::get('audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('admin.audit.index');
-    Route::delete('audit-logs/{id}', [\App\Http\Controllers\Admin\AuditLogController::class, 'destroy'])->name('admin.audit.destroy');
-    Route::post('audit-logs/bulk-delete', [\App\Http\Controllers\Admin\AuditLogController::class, 'bulkDestroy'])->name('admin.audit.bulkDestroy');
-    Route::post('audit-logs/toggle', [\App\Http\Controllers\Admin\AuditLogController::class, 'toggleErrorAudit'])->name('admin.audit.toggle');
         Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('admin.deletion-requests.index');
         Route::get('/deletion-requests/{request}', [DeletionRequestController::class, 'show'])->name('admin.deletion-requests.show');
         Route::post('/deletion-requests/{request}/process', [DeletionRequestController::class, 'process'])->name('admin.deletion-requests.process');
