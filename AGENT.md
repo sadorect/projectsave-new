@@ -156,6 +156,17 @@ php artisan pint
 
 ---
 
+## ⚠️ Site-wide Error Audit (new)
+
+Recent changes added a site-wide error auditing system that records server (500+) errors to the existing `admin_audit_logs` table. Key points:
+
+- Dedupe: Identical errors within a short window (default 10 minutes) are grouped using an `error_fingerprint` (sha1 of exception class + top trace file/line + route/method). Repeats increment a `count` in the `meta` column instead of creating new rows.
+- Prune: A new artisan command `prune:audit-logs {days=90}` deletes old audit rows. It's scheduled daily at 00:10 UTC in the console Kernel.
+- Toggle: Enable writes with `ERROR_AUDIT=true` in `.env`. Configure dedupe window with `ERROR_AUDIT_DEDUPE_WINDOW_MINUTES`.
+
+This integrates with the existing admin UI at `admin.audit.index` (no UI changes required to view grouped errors).
+
+
 **Last Updated**: {{ now()->format('Y-m-d H:i:s') }}
 **Status**: Phase A completed, Phase B-D pending
 **Priority**: Fix lesson completion bug first, then layout unification

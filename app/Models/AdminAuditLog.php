@@ -14,6 +14,7 @@ class AdminAuditLog extends Model
         'target_type',
         'target_id',
         'meta',
+        'error_fingerprint',
         'ip_address',
         'user_agent',
     ];
