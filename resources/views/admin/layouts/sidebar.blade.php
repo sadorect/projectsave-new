@@ -67,6 +67,13 @@
                 Sessions (Logged in)
             </a>
 
+                            @if(auth()->check() && auth()->user()->is_admin)
+                            <a href="{{ route('admin.audit.index') }}" class="nav-link text-white {{ request()->routeIs('admin.audit.*') ? 'active' : '' }}">
+                                <i class="bi bi-clipboard-data me-2"></i>
+                                Audit Log
+                            </a>
+                            @endif
+
       <li class="nav-item">
         <a class="nav-link {{ request()->routeIs('admin.celebrations.*') ? 'active' : '' }}" 
            href="#celebrationsSubmenu" 

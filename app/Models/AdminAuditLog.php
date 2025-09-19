@@ -21,4 +21,9 @@ class AdminAuditLog extends Model
     protected $casts = [
         'meta' => 'array',
     ];
+
+    public function adminUser()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'admin_user_id');
+    }
 }

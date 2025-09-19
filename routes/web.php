@@ -144,6 +144,8 @@ Route::prefix('admin')->group(function() {
     // Session management for admins: list active sessions and terminate
     Route::get('sessions', [\App\Http\Controllers\Admin\AdminSessionController::class, 'index'])->name('admin.sessions.index');
     Route::delete('sessions/{session}', [\App\Http\Controllers\Admin\AdminSessionController::class, 'destroy'])->name('admin.sessions.destroy');
+    // Audit log viewer
+    Route::get('audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('admin.audit.index');
         Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('admin.deletion-requests.index');
         Route::get('/deletion-requests/{request}', [DeletionRequestController::class, 'show'])->name('admin.deletion-requests.show');
         Route::post('/deletion-requests/{request}/process', [DeletionRequestController::class, 'process'])->name('admin.deletion-requests.process');
