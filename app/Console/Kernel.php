@@ -15,6 +15,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('check:anniversaries')
             ->dailyAt('00:01')
             ->timezone('UTC');
+
+        // Prune old audit logs daily at 00:10 UTC
+        $schedule->command('prune:audit-logs')->dailyAt('00:10')->timezone('UTC');
     }
 
     /**
@@ -29,6 +32,7 @@ class Kernel extends ConsoleKernel
 
     protected $commands = [
         Commands\OptimizeImages::class,
+        Commands\PruneAuditLogs::class,
     ];
 }
 
