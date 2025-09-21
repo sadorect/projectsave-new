@@ -283,21 +283,25 @@ class AdminCertificateController extends Controller
         $admin = Auth::user();
         $createdDiplomaCerts = 0;
 
-        // 2) Diploma-level certificates: ASOM specific list
-        $asomCourseTitles = [
-            'Bible Introduction',
-            'Hermeneutics',
-            'Ministry Vitals',
-            'Spiritual Gifts & Ministry',
-            'Biblical Counseling',
-            'Homiletics'
-        ];
+        // Determine program courses dynamically: published courses that have at least one valid active exam (>= 5 questions)
+        $allCourses = Course::where('status', 'published')
+            ->with(['exams' => function($q){
+                $q->where('is_active', true)->withCount('questions');
+            }])->get();
 
-    $asomCourses = Course::whereIn('title', $asomCourseTitles)->with('exams')->get();
+        $programCourses = $allCourses->filter(function($course){
+            return $course->exams->where('questions_count', '>=', 5)->count() > 0;
+        });
+
+        if ($programCourses->isEmpty()) {
+            Log::warning('Scan missing certificates: No program courses found (no published courses with valid exams).');
+            return redirect()->route('admin.certificates.index')
+                ->with('info', 'No program courses found (need published courses with active exams of at least 5 questions).');
+        }
 
         // Find all users enrolled in any of the ASOM courses
         $userIds = DB::table('course_user')
-            ->whereIn('course_id', $asomCourses->pluck('id'))
+            ->whereIn('course_id', $programCourses->pluck('id'))
             ->pluck('user_id')
             ->unique();
 
@@ -310,9 +314,9 @@ class AdminCertificateController extends Controller
                 ->first();
             if ($existingDiploma) continue;
 
-            // Ensure PASSED exams across all ASOM courses (active with enough questions)
+            // Ensure PASSED exams across all program courses (active with enough questions)
             $totalScore = 0; $examCount = 0; $allPassed = true; $completedDates = [];
-            foreach ($asomCourses as $course) {
+            foreach ($programCourses as $course) {
                 $courseExams = $course->exams()
                     ->where('is_active', true)
                     ->withCount('questions')
@@ -349,7 +353,7 @@ class AdminCertificateController extends Controller
                 'completed_at' => $completedAt,
                 'issued_at' => null,
                 'is_approved' => false,
-                'notes' => 'Auto-generated Diploma in Ministry certificate by admin scan (pending approval)'
+                'notes' => 'Auto-generated diploma certificate by admin scan (pending approval)'
             ]);
             $createdDiplomaCerts++;
         }
