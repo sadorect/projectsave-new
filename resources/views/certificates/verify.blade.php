@@ -72,7 +72,7 @@
                                 <div class="mb-2">
                                     <strong>Type:</strong>
                                     @if($certificate->course_id)
-                                        <span class="badge bg-secondary ms-2">{{ SAMPLE CERTIFICATE }}</span>
+                                        <span class="badge bg-secondary ms-2">Course Certificate</span>
                                     @else
                                         <span class="badge bg-primary ms-2">
                                             <i class="bi bi-mortarboard"></i> Diploma in Ministry
@@ -149,7 +149,7 @@
                                     </p>
                                 </div>
                                 <div class="col-md-4 text-end">
-                                    <img src="/path/to/ministry/logo.png" alt="Ministry Logo" class="img-fluid" style="max-height: 60px;">
+                                    <img src="{{ asset('frontend/img/psave_logo.png') }}" alt="Ministry Logo" class="img-fluid" style="max-height: 60px;">
                                 </div>
                             </div>
                         </div>
