@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
+use App\Models\Course;
+use App\Models\ExamAttempt;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Notifications\CertificateApprovedNotification;
 
 class AdminCertificateController extends Controller
 {
@@ -119,8 +123,16 @@ class AdminCertificateController extends Controller
             'certificate_type' => $certificate->course_id ? 'course' : 'diploma'
         ]);
 
-        // TODO: Send notification to student about certificate approval
-        // $certificate->user->notify(new CertificateApprovedNotification($certificate));
+        // Notify student about certificate approval
+        try {
+            $certificate->user->notify(new CertificateApprovedNotification($certificate));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send CertificateApprovedNotification', [
+                'certificate_id' => $certificate->id,
+                'user_id' => $certificate->user_id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return back()->with('success', 'Certificate approved successfully!');
     }
@@ -260,6 +272,95 @@ class AdminCertificateController extends Controller
     {
         // TODO: Implement CSV/Excel export functionality
         return back()->with('info', 'Export functionality will be implemented soon.');
+    }
+
+    /**
+     * Scan system for students who have passed ALL ASOM program exams but lack a diploma certificate.
+     * Creates pending Diploma in Ministry certificates for admin approval.
+     */
+    public function scanMissing(Request $request)
+    {
+        $admin = Auth::user();
+        $createdDiplomaCerts = 0;
+
+        // 2) Diploma-level certificates: ASOM specific list
+        $asomCourseTitles = [
+            'Bible Introduction',
+            'Hermeneutics',
+            'Ministry Vitals',
+            'Spiritual Gifts & Ministry',
+            'Biblical Counseling',
+            'Homiletics'
+        ];
+
+    $asomCourses = Course::whereIn('title', $asomCourseTitles)->with('exams')->get();
+
+        // Find all users enrolled in any of the ASOM courses
+        $userIds = DB::table('course_user')
+            ->whereIn('course_id', $asomCourses->pluck('id'))
+            ->pluck('user_id')
+            ->unique();
+
+        $users = User::whereIn('id', $userIds)->get();
+
+        foreach ($users as $user) {
+            // Skip if diploma certificate already exists
+            $existingDiploma = Certificate::where('user_id', $user->id)
+                ->whereNull('course_id')
+                ->first();
+            if ($existingDiploma) continue;
+
+            // Ensure PASSED exams across all ASOM courses (active with enough questions)
+            $totalScore = 0; $examCount = 0; $allPassed = true; $completedDates = [];
+            foreach ($asomCourses as $course) {
+                $courseExams = $course->exams()
+                    ->where('is_active', true)
+                    ->withCount('questions')
+                    ->get()
+                    ->filter(fn($exam) => $exam->questions_count >= 5);
+
+                if ($courseExams->isEmpty()) { $allPassed = false; break; }
+
+                foreach ($courseExams as $exam) {
+                    $bestAttempt = ExamAttempt::where('user_id', $user->id)
+                        ->where('exam_id', $exam->id)
+                        ->where('score', '>=', $exam->passing_score)
+                        ->whereNotNull('completed_at')
+                        ->orderBy('score', 'desc')
+                        ->first();
+                    if ($bestAttempt) {
+                        $totalScore += $bestAttempt->score; $examCount++;
+                        $completedDates[] = $bestAttempt->completed_at;
+                    } else {
+                        $allPassed = false; break 2;
+                    }
+                }
+            }
+
+            if (!$allPassed || $examCount === 0) continue;
+
+            $finalGrade = round($totalScore / $examCount, 2);
+            $completedAt = collect($completedDates)->filter()->max() ?? now();
+
+            Certificate::create([
+                'user_id' => $user->id,
+                'course_id' => null,
+                'final_grade' => $finalGrade,
+                'completed_at' => $completedAt,
+                'issued_at' => null,
+                'is_approved' => false,
+                'notes' => 'Auto-generated Diploma in Ministry certificate by admin scan (pending approval)'
+            ]);
+            $createdDiplomaCerts++;
+        }
+
+        Log::info('Admin scan for missing certificates completed', [
+            'admin_id' => $admin->id,
+            'created_diploma_certs' => $createdDiplomaCerts,
+        ]);
+
+        return redirect()->route('admin.certificates.index')
+            ->with('success', "Scan complete. Created {$createdDiplomaCerts} diploma certificate(s). New certificates are pending approval.");
     }
 
     /**

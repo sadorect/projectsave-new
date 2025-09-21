@@ -251,6 +251,7 @@ Route::get('exams/{exam}/questions', [ExamController::class, 'questions'])->name
     Route::prefix('certificates')->name('certificates.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'index'])->name('index');
         Route::get('/pending', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'pending'])->name('pending');
+        Route::post('/scan-missing', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'scanMissing'])->name('scan-missing');
         Route::post('/generate-sample', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'generateSample'])->name('generate-sample');
         Route::post('/generate-sample-course', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'generateSampleCourse'])->name('generate-sample-course');
         Route::delete('/cleanup-samples', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'cleanupSamples'])->name('cleanup-samples');

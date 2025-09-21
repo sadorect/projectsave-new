@@ -13,6 +13,12 @@
             <a href="{{ route('admin.certificates.pending') }}" class="btn btn-warning">
                 <i class="bi bi-clock"></i> Pending Certificates ({{ $stats['pending'] }})
             </a>
+            <form method="POST" action="{{ route('admin.certificates.scan-missing') }}" class="d-inline">
+                @csrf
+                <button type="submit" class="btn btn-outline-secondary" onclick="return confirm('Scan for students who completed courses and passed exams but don\'t have certificates yet?')">
+                    <i class="bi bi-search"></i> Scan Missing Certificates
+                </button>
+            </form>
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="bi bi-plus-circle"></i> Generate Sample
