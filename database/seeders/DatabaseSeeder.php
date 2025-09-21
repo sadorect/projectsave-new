@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             PostSeeder::class,
             EventSeeder::class,
             RolesAndPermissionsSeeder::class,
-            
+            ASOMDiplomaSeeder::class,
         ]);
     }
 }

@@ -55,7 +55,8 @@ class CertificateController extends Controller
         $user = Auth::user();
         
         // Check if user has completed the course
-        if (!$user->getCourseProgress($course) >= 100) {
+        $progress = $user->getCourseProgress($course);
+        if ($progress < 100) {
             return redirect()->back()->with('error', 'You must complete the course before generating a certificate.');
         }
 
@@ -75,7 +76,7 @@ class CertificateController extends Controller
             ->whereHas('exam', function($query) use ($course) {
                 $query->where('course_id', $course->id);
             })
-            ->where('status', 'completed')
+            ->whereNotNull('completed_at')
             ->get();
 
         if ($examAttempts->isNotEmpty()) {

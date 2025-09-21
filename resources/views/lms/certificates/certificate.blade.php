@@ -153,7 +153,7 @@
 
             <!-- Course Title -->
             <div class="course-title">
-                {{ $course->title }}
+                {{ optional($course)->title ?? $certificate->course_title ?? 'Certificate of Completion' }}
             </div>
 
             <!-- Grade Information (if exam passed) -->
@@ -165,7 +165,7 @@
 
             <!-- Completion Date -->
             <div class="completion-date">
-                {{ $completionDate->format('F j, Y') }}
+                {{ optional($completionDate)->format('F j, Y') ?? 'Pending' }}
             </div>
 
             <!-- Certificate ID for verification -->

@@ -59,7 +59,7 @@ class LessonProgressController extends Controller
                     ->whereHas('exam', function($query) use ($course) {
                         $query->where('course_id', $course->id);
                     })
-                    ->where('status', 'completed')
+                    ->whereNotNull('completed_at')
                     ->get();
 
                 if ($examAttempts->isNotEmpty()) {

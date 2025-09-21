@@ -85,9 +85,32 @@ public function users()
 
     public function isCompletedByStudent(User $student)
     {
-        // Implement your course completion logic here
-        // Example: Check if student has completed all required lessons/modules
-        return $this->getProgressAttribute() === 100;
+        // Compute progress specifically for the provided student instead of relying on auth()
+        return $this->getProgressFor($student) === 100;
+    }
+
+    /**
+     * Compute course progress (percentage) for a specific student.
+     */
+    public function getProgressFor(User $student)
+    {
+        if (!$student || !$student->id) {
+            return 0;
+        }
+
+        $totalLessons = $this->lessons()->count();
+        if ($totalLessons === 0) {
+            return 0;
+        }
+
+        $completedLessons = $this->lessons()
+            ->whereHas('progress', function($query) use ($student) {
+                $query->where('user_id', $student->id)
+                    ->where('completed', true);
+            })
+            ->count();
+
+        return ($completedLessons / $totalLessons) * 100;
     }
     
     public function isAvailableForStudent(User $student)

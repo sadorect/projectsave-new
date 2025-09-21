@@ -1098,7 +1098,7 @@
                                                         <div class="d-flex align-items-center mb-3">
                                                             <i class="fas fa-certificate text-primary me-3" style="font-size: 2rem;"></i>
                                                             <div>
-                                                                <h6 class="card-title mb-1">{{ $certificate->course->title }}</h6>
+                                                                <h6 class="card-title mb-1">{{ optional($certificate->course)->title ?? $certificate->course_title ?? 'Diploma Certificate' }}</h6>
                                                                 <small class="text-muted">{{ $certificate->certificate_id }}</small>
                                                             </div>
                                                         </div>
@@ -1116,7 +1116,7 @@
                                                         </div>
                                                         
                                                         <div class="small text-muted mb-3">
-                                                            <div><strong>Issued:</strong> {{ $certificate->issued_at->format('M j, Y') }}</div>
+                                                            <div><strong>Issued:</strong> {{ optional($certificate->issued_at)->format('M j, Y') ?? 'Pending' }}</div>
                                                             @if($certificate->final_grade)
                                                                 <div><strong>Grade:</strong> {{ number_format($certificate->final_grade, 1) }}%</div>
                                                             @endif

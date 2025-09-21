@@ -387,19 +387,20 @@ class StudentExamController extends Controller
                     return false;
                 }
 
-                // Check if user has passed at least one exam for this course
-                foreach ($course->exams as $courseExam) {
-                    $passingAttempt = ExamAttempt::where('user_id', $user->id)
+                // Require that the course has exams and that ALL exams have been passed by the user
+                if ($course->exams->count() === 0) {
+                    return false; // No exams means the course can't qualify for diploma's exam requirement
+                }
+
+                $allExamsPassed = $course->exams->every(function($courseExam) use ($user) {
+                    return ExamAttempt::where('user_id', $user->id)
                         ->where('exam_id', $courseExam->id)
                         ->where('score', '>=', $courseExam->passing_score)
                         ->whereNotNull('completed_at')
-                        ->first();
-                    
-                    if ($passingAttempt) {
-                        return true;
-                    }
-                }
-                return false;
+                        ->exists();
+                });
+
+                return $allExamsPassed;
             });
 
         // If user has completed all required ASOM courses with passing exams

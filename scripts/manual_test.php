@@ -86,11 +86,17 @@ echo "Testing course progress -> certificate simulation...\n";
 
 $course = Course::first();
 if (!$course) {
-    $course = Course::create(['title' => 'Manual Test Course', 'slug' => 'manual-test-course', 'description' => 'Test course']);
-    // create 2 lessons
-    $l1 = Lesson::create(['course_id' => $course->id, 'title' => 'L1', 'slug' => 'l1']);
-    $l2 = Lesson::create(['course_id' => $course->id, 'title' => 'L2', 'slug' => 'l2']);
-    echo "Created test course and lessons.\n";
+    $course = Course::create(['title' => 'Manual Test Course', 'slug' => 'manual-test-course', 'description' => 'Test course', 'instructor_id' => $user->id]);
+    echo "Created test course id={$course->id}\n";
+}
+
+// If the course exists but has no lessons, create a couple of lessons with required fields
+if ($course->lessons()->count() === 0) {
+    $l1 = Lesson::create(['course_id' => $course->id, 'title' => 'L1', 'slug' => 'l1', 'content' => 'Test content', 'instructor_id' => $user->id]);
+    $l2 = Lesson::create(['course_id' => $course->id, 'title' => 'L2', 'slug' => 'l2', 'content' => 'Test content', 'instructor_id' => $user->id]);
+    echo "Created test lessons for course id={$course->id}\n";
+} else {
+    echo "Course id={$course->id} already has {$course->lessons()->count()} lessons.\n";
 }
 
 // Enroll user to course pivot
