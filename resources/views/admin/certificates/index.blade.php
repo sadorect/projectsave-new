@@ -7,6 +7,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Certificate Management</h1>
         <div>
+            <a href="{{ route('admin.certificate-settings') }}" class="btn btn-outline-primary">
+                <i class="bi bi-gear"></i> Certificate Settings
+            </a>
             <a href="{{ route('admin.certificates.pending') }}" class="btn btn-warning">
                 <i class="bi bi-clock"></i> Pending Certificates ({{ $stats['pending'] }})
             </a>

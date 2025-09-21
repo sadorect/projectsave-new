@@ -41,9 +41,10 @@ class CertificateController extends Controller
         $completionDate = $certificate->completed_at;
         $certificateId = $certificate->certificate_id;
         $finalGrade = $certificate->final_grade;
+        $isPdf = false; // Flag to indicate browser view
 
         return view('lms.certificates.certificate', compact(
-            'student', 'course', 'completionDate', 'certificateId', 'finalGrade', 'certificate'
+            'student', 'course', 'completionDate', 'certificateId', 'finalGrade', 'certificate', 'isPdf'
         ));
     }
 
@@ -117,12 +118,23 @@ class CertificateController extends Controller
         $completionDate = $certificate->completed_at;
         $certificateId = $certificate->certificate_id;
         $finalGrade = $certificate->final_grade;
+        $isPdf = true; // Flag to indicate PDF generation
 
         $pdf = Pdf::loadView('lms.certificates.certificate', compact(
-            'student', 'course', 'completionDate', 'certificateId', 'finalGrade', 'certificate'
+            'student', 'course', 'completionDate', 'certificateId', 'finalGrade', 'certificate', 'isPdf'
         ));
 
-        $fileName = "Certificate_{$course->slug}_{$student->name}_{$certificateId}.pdf";
+        // Configure PDF options for better color rendering
+        $pdf->setPaper('A4', 'landscape');
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isPhpEnabled' => true,
+            'defaultFont' => 'sans-serif',
+            'dpi' => 150,
+        ]);
+
+        $courseSlug = $course ? $course->slug : 'unknown';
+        $fileName = "Certificate_{$courseSlug}_{$student->name}_{$certificateId}.pdf";
         
         return $pdf->download($fileName);
     }

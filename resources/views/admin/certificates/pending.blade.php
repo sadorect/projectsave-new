@@ -7,6 +7,9 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Pending Certificates</h1>
         <div>
+            <a href="{{ route('admin.certificate-settings') }}" class="btn btn-outline-primary">
+                <i class="bi bi-gear"></i> Settings
+            </a>
             <a href="{{ route('admin.certificates.index') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> All Certificates
             </a>

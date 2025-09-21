@@ -261,6 +261,12 @@ Route::get('exams/{exam}/questions', [ExamController::class, 'questions'])->name
         Route::get('/export', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'export'])->name('export');
     });
 
+    // Certificate Settings
+    Route::get('/certificate-settings', [\App\Http\Controllers\Admin\CertificateSettingsController::class, 'index'])->name('certificate-settings');
+    Route::put('/certificate-settings', [\App\Http\Controllers\Admin\CertificateSettingsController::class, 'update'])->name('certificate-settings.update');
+
+    Route::put('/certificate-settings', [\App\Http\Controllers\Admin\CertificateSettingsController::class, 'update'])->name('certificate-settings.update');
+
     Route::get('/mail/compose', [MailController::class, 'compose'])->name('mail.compose');
     Route::post('/mail/send', [MailController::class, 'send'])->name('mail.send');
     Route::resource('mail-templates', MailTemplateController::class);
