@@ -172,7 +172,7 @@
                                 @endif
                             </div>
                             <div class="verify">
-                                Verify at: {{ rtrim(config('app.url',''), '/') }}/verify/{{ optional($certificate)->certificate_id ?? '' }}
+                                Verify at: {{ $certificate?->verification_url ?? (isset($certificateId) ? route('certificates.public.verify', $certificateId) : '') }}
                             </div>
                         </div>
 
