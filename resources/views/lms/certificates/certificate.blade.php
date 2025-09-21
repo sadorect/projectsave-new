@@ -137,7 +137,7 @@
                         </div>
                         <div class="org-block">
                             <div class="org-name">{{ $orgName }}</div>
-                            <div class="org-sub">Certificate Services</div>
+                            <div class="org-sub">{{ App\Models\CertificateSetting::get('organization_tagline', 'Raising Competent New Testament Ministers') }}</div>
                         </div>
                     </div>
 

@@ -256,8 +256,11 @@ Route::get('exams/{exam}/questions', [ExamController::class, 'questions'])->name
         Route::post('/generate-sample-course', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'generateSampleCourse'])->name('generate-sample-course');
         Route::delete('/cleanup-samples', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'cleanupSamples'])->name('cleanup-samples');
         Route::get('/{certificate}', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'show'])->name('show');
+    Route::get('/{certificate}/preview', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'preview'])->name('preview');
         Route::patch('/{certificate}/approve', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'approve'])->name('approve');
         Route::patch('/{certificate}/reject', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'reject'])->name('reject');
+    Route::post('/{certificate}/regenerate', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'regenerate'])->name('regenerate');
+        Route::delete('/{certificate}', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'destroy'])->name('destroy');
         Route::post('/bulk-approve', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'bulkApprove'])->name('bulk-approve');
         Route::get('/export', [\App\Http\Controllers\Admin\AdminCertificateController::class, 'export'])->name('export');
     });

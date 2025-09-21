@@ -95,10 +95,23 @@
                                         onclick="quickApprove({{ $certificate->id }})">
                                     <i class="bi bi-check-circle"></i> Quick Approve
                                 </button>
+                                <form method="POST" action="{{ route('admin.certificates.regenerate', $certificate) }}" onsubmit="return confirm('Regenerate this certificate? The current one will be archived and replaced.')">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-warning">
+                                        <i class="bi bi-arrow-repeat"></i> Regenerate
+                                    </button>
+                                </form>
                                 <button type="button" class="btn btn-outline-danger" 
                                         onclick="rejectModal({{ $certificate->id }})">
                                     <i class="bi bi-x-circle"></i> Reject
                                 </button>
+                                <form method="POST" action="{{ route('admin.certificates.destroy', $certificate) }}" onsubmit="return confirm('Delete this certificate? This cannot be undone.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Delete
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>

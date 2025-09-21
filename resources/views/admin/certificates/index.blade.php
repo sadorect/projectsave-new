@@ -221,6 +221,10 @@
                                                class="btn btn-sm btn-outline-primary">
                                                 <i class="bi bi-eye"></i>
                                             </a>
+                                            <a href="{{ route('admin.certificates.preview', $certificate) }}" target="_blank"
+                                               class="btn btn-sm btn-outline-secondary" title="Preview with settings">
+                                                <i class="bi bi-aspect-ratio"></i>
+                                            </a>
                                             @if(!$certificate->is_approved)
                                                 <button type="button" class="btn btn-sm btn-success" 
                                                         onclick="approveModal({{ $certificate->id }})">
@@ -230,7 +234,20 @@
                                                         onclick="rejectModal({{ $certificate->id }})">
                                                     <i class="bi bi-x"></i>
                                                 </button>
+                                                <form action="{{ route('admin.certificates.regenerate', $certificate) }}" method="POST" onsubmit="return confirm('Regenerate this certificate? Current one will be archived and a new pending certificate created.')">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Regenerate certificate">
+                                                        <i class="bi bi-arrow-repeat"></i>
+                                                    </button>
+                                                </form>
                                             @endif
+                                            <form action="{{ route('admin.certificates.destroy', $certificate) }}" method="POST" onsubmit="return confirm('Delete this certificate? This will invalidate its verification link if already approved. This cannot be undone.')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete certificate">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

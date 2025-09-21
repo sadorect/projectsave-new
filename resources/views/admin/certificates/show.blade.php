@@ -10,13 +10,29 @@
             <a href="{{ route('admin.certificates.index') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Certificates
             </a>
+            <a href="{{ route('admin.certificates.preview', $certificate) }}" target="_blank" class="btn btn-outline-primary">
+                <i class="bi bi-aspect-ratio"></i> Preview
+            </a>
             @if(!$certificate->is_approved)
+                <form action="{{ route('admin.certificates.regenerate', $certificate) }}" method="POST" class="d-inline" onsubmit="return confirm('Regenerate this certificate? The current one will be archived and replaced with a new pending certificate.')">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-repeat"></i> Regenerate
+                    </button>
+                </form>
                 <button type="button" class="btn btn-success" onclick="approveModal()">
                     <i class="bi bi-check-circle"></i> Approve
                 </button>
                 <button type="button" class="btn btn-danger" onclick="rejectModal()">
                     <i class="bi bi-x-circle"></i> Reject
                 </button>
+                <form action="{{ route('admin.certificates.destroy', $certificate) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this certificate? This cannot be undone.')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </form>
             @endif
         </div>
     </div>

@@ -20,6 +20,14 @@
       </div>
       <div class="card-body">
         <form action="{{ route('admin.certificate-settings.update') }}" method="POST" enctype="multipart/form-data">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="organization_tagline" class="form-label">Organization Tagline</label>
+                <input type="text" class="form-control" id="organization_tagline" name="organization_tagline" 
+                     value="{{ old('organization_tagline', $settings['organization_tagline']) }}" placeholder="e.g., Certificate Services">
+                <small class="text-muted">This appears under the organization name on the certificate.</small>
+              </div>
+            </div>
           @csrf
           @method('PUT')
 
@@ -223,7 +231,7 @@
             </div>
             <div>
               <div style="font-size: 12px; font-weight: bold;">{{ $settings['organization_name'] }}</div>
-              <div style="font-size: 16px; font-weight: bold;">Certificate</div>
+              <div style="font-size: 14px; opacity: 0.9;">{{ $settings['organization_tagline'] }}</div>
             </div>
           </div>
           <div style="font-size: 11px; margin-bottom: 4px;">This certifies that</div>
