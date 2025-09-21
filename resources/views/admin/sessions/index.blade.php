@@ -12,7 +12,26 @@
     @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
 
-    @if(empty($sessions))
+    <div class="mb-3">
+        <form method="GET" class="form-inline">
+            <div class="form-check mr-3">
+                <input class="form-check-input" type="checkbox" name="show_guests" id="show_guests" value="1" {{ request()->boolean('show_guests') ? 'checked' : '' }}>
+                <label class="form-check-label" for="show_guests">Show guest sessions</label>
+            </div>
+
+            <div class="mr-3">
+                <label for="direction" class="mr-2">Sort</label>
+                <select name="direction" id="direction" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <option value="desc" {{ request('direction', 'desc') === 'desc' ? 'selected' : '' }}>Newest first</option>
+                    <option value="asc" {{ request('direction') === 'asc' ? 'selected' : '' }}>Oldest first</option>
+                </select>
+            </div>
+
+            <button class="btn btn-sm btn-primary" type="submit">Apply</button>
+        </form>
+    </div>
+
+    @if($sessions->isEmpty())
         <div class="alert alert-info">No active sessions found or session driver not supported.</div>
     @else
         <table class="table table-striped">
@@ -70,6 +89,10 @@
                 @endforeach
             </tbody>
         </table>
+
+        <div class="d-flex justify-content-center">
+            {{ $sessions->appends(request()->query())->links() }}
+        </div>
     @endif
 </div>
 @endsection
