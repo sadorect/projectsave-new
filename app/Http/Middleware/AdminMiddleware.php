@@ -11,11 +11,9 @@ class AdminMiddleware
     {
         $user = auth()->user();
 
-        if (!auth()->check() || !$user->is_admin || !$user->is_active) {
-            auth()->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-            abort(403, 'Unauthorized access.');
+        if (!auth()->check() || !$user->is_admin) {
+            return redirect()->route('admin.login.form')
+                ->with('error', 'You must be an administrator to access this area.');
         }
 
         return $next($request);

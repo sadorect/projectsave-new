@@ -10,11 +10,15 @@ class AdminSeeder extends Seeder
 {
     public function run()
     {
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('admin123'),
-            'is_admin' => true,
-        ]);
+        $user = User::firstOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name'     => 'Admin User',
+                'password' => Hash::make('admin123'),
+            ]
+        );
+
+        // forceFill bypasses $guarded so privileged fields can be set by seeders/migrations
+        $user->forceFill(['is_admin' => true])->save();
     }
 }

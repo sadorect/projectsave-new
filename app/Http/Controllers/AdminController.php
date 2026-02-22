@@ -34,11 +34,6 @@ class AdminController extends Controller
                 return back()->withErrors(['email' => 'You do not have admin privileges.']);
             }
 
-            if (!$user->is_active) {
-                Auth::logout();
-                return back()->withErrors(['email' => 'Your account has been deactivated. Please contact support.']);
-            }
-
             $request->session()->regenerate();
             return redirect()->intended('admin/dashboard');
         }
