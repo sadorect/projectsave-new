@@ -136,7 +136,8 @@ Route::prefix('admin')->group(function() {
         Route::post('/cleanup-expired', [AdminFileController::class, 'cleanupExpired'])->name('cleanup-expired');
     });       
 
-        // User Management
+        // User Management — explicit non-{user} routes MUST come before the resource
+    Route::post('users/bulk-action', [\App\Http\Controllers\AdminUserController::class, 'bulkAction'])->name('admin.users.bulk-action');
     Route::resource('users', AdminUserController::class)->names('admin.users');
     // Admin actions for manual user verification and activation
     Route::patch('users/{user}/verify', [\App\Http\Controllers\AdminUserController::class, 'verify'])->name('admin.users.verify');

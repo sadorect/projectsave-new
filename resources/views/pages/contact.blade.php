@@ -58,12 +58,7 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-                <div class="form-group">
-                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-                    @error('g-recaptcha-response')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+                <x-math-captcha />
                 
                 <button class="btn btn-custom" type="submit">Send Message</button>
             </form>

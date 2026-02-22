@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Partner;
+use App\Rules\MathCaptchaRule;
 use Illuminate\Http\Request;
 use App\Notifications\PartnerStatusUpdate;
 
@@ -57,7 +58,7 @@ class PartnerController extends Controller
             'leadership_experience' => ['required', 'in:yes,no'],
             'calling' => ['required', 'string'],
             'commitment_answer' => ['required'],
-            'g-recaptcha-response' => 'required|recaptcha',
+            'math_captcha' => ['required', new MathCaptchaRule],
         ]);
 
         $validated['partner_type'] = $type;

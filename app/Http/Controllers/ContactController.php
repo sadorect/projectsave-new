@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Mail;
+use App\Rules\MathCaptchaRule;
 use Illuminate\Http\Request;
 use App\Mail\ContactFormSubmission;
 
@@ -19,7 +20,7 @@ class ContactController extends Controller
             'name' => 'required|min:2',
             'email' => 'required|email',
             'message' => 'required|min:10',
-            'g-recaptcha-response' => 'required|recaptcha'
+            'math_captcha' => ['required', new MathCaptchaRule]
         ]);
 
         try {

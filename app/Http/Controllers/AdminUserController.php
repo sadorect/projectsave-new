@@ -13,15 +13,52 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminUserController extends Controller
 {
-    public function index()
-    { 
-        $roles = Role::all();
-        $users = User::latest()->paginate(10);
+    public function index(Request $request)
+    {
+        $roles   = Role::all();
+        $perPage = in_array((int) $request->get('per_page', 25), [25, 50, 100])
+            ? (int) $request->get('per_page', 25)
+            : 25;
+
+        $query = User::with('roles')->latest();
+
+        // Search by name or email
+        if ($search = $request->get('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by user_type
+        if ($userType = $request->get('user_type')) {
+            if ($userType === 'regular') {
+                $query->whereNull('user_type');
+            } else {
+                $query->where('user_type', $userType);
+            }
+        }
+
+        // Filter by admin flag
+        if ($request->filled('is_admin')) {
+            $query->where('is_admin', (bool) $request->get('is_admin'));
+        }
+
+        // Filter by verification status
+        if ($request->filled('verified')) {
+            if ($request->get('verified') === '1') {
+                $query->whereNotNull('email_verified_at');
+            } else {
+                $query->whereNull('email_verified_at');
+            }
+        }
+
+        $users = $query->paginate($perPage)->withQueryString();
 
         // Find active sessions mapped to user IDs (database sessions)
         $activeSessions = [];
         try {
-            $sessionTable = config('session.table', 'sessions');
+            $sessionTable   = config('session.table', 'sessions');
             $activeSessions = DB::table($sessionTable)
                 ->whereNotNull('user_id')
                 ->pluck('user_id')
@@ -29,16 +66,123 @@ class AdminUserController extends Controller
                 ->map(fn($v) => (int) $v)
                 ->toArray();
         } catch (\Throwable $e) {
-            // ignore; fallback in view will show offline
             $activeSessions = [];
         }
 
-        return view('admin.users.index', compact('users', 'roles', 'activeSessions'));
+        return view('admin.users.index', compact('users', 'roles', 'activeSessions', 'perPage'));
     }
 
     public function create()
     {
         return view('admin.users.create');
+    }
+
+    /**
+     * Perform a bulk action on selected users.
+     *
+     * Actions: delete | verify | activate | deactivate
+     */
+    public function bulkAction(Request $request)
+    {
+        $validated = $request->validate([
+            'action'   => ['required', 'in:delete,verify,activate,deactivate'],
+            'user_ids' => ['required', 'array', 'min:1'],
+            'user_ids.*' => ['integer', 'exists:users,id'],
+        ]);
+
+        $action  = $validated['action'];
+        $userIds = collect($validated['user_ids']);
+        $adminId = Auth::id();
+
+        // Prevent acting on yourself in destructive operations
+        if (in_array($action, ['delete', 'deactivate']) && $userIds->contains($adminId)) {
+            return redirect()->route('admin.users.index')
+                ->with('error', 'You cannot perform that action on your own account.');
+        }
+
+        $users = User::whereIn('id', $userIds)->get();
+
+        foreach ($users as $user) {
+            switch ($action) {
+                case 'delete':
+                    try {
+                        AdminAuditLog::create([
+                            'admin_user_id' => $adminId,
+                            'action'        => 'bulk_delete_user',
+                            'target_type'   => 'User',
+                            'target_id'     => $user->id,
+                            'meta'          => ['email' => $user->email],
+                            'ip_address'    => $request->ip(),
+                            'user_agent'    => $request->userAgent(),
+                        ]);
+                    } catch (\Throwable $e) {}
+                    $this->safeDeleteUser($user);
+                    break;
+
+                case 'verify':
+                    if (!$user->hasVerifiedEmail()) {
+                        $user->forceFill(['email_verified_at' => now()])->save();
+                        try {
+                            event(new \Illuminate\Auth\Events\Verified($user));
+                            AdminAuditLog::create([
+                                'admin_user_id' => $adminId,
+                                'action'        => 'bulk_verify_user',
+                                'target_type'   => 'User',
+                                'target_id'     => $user->id,
+                                'meta'          => null,
+                                'ip_address'    => $request->ip(),
+                                'user_agent'    => $request->userAgent(),
+                            ]);
+                        } catch (\Throwable $e) {}
+                    }
+                    break;
+
+                case 'activate':
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active')) {
+                        $user->forceFill(['is_active' => true])->save();
+                        try {
+                            AdminAuditLog::create([
+                                'admin_user_id' => $adminId,
+                                'action'        => 'bulk_activate_user',
+                                'target_type'   => 'User',
+                                'target_id'     => $user->id,
+                                'meta'          => null,
+                                'ip_address'    => $request->ip(),
+                                'user_agent'    => $request->userAgent(),
+                            ]);
+                        } catch (\Throwable $e) {}
+                    }
+                    break;
+
+                case 'deactivate':
+                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active')) {
+                        $user->forceFill(['is_active' => false])->save();
+                        try {
+                            AdminAuditLog::create([
+                                'admin_user_id' => $adminId,
+                                'action'        => 'bulk_deactivate_user',
+                                'target_type'   => 'User',
+                                'target_id'     => $user->id,
+                                'meta'          => null,
+                                'ip_address'    => $request->ip(),
+                                'user_agent'    => $request->userAgent(),
+                            ]);
+                        } catch (\Throwable $e) {}
+                    }
+                    break;
+            }
+        }
+
+        $count  = $users->count();
+        $labels = [
+            'delete'     => 'deleted',
+            'verify'     => 'verified',
+            'activate'   => 'activated',
+            'deactivate' => 'deactivated',
+        ];
+
+        return redirect()->route('admin.users.index', $request->only(['search', 'user_type', 'is_admin', 'verified', 'per_page']))
+            ->with('success', "{$count} user(s) {$labels[$action]} successfully.");
     }
 
     public function store(Request $request)
@@ -108,10 +252,33 @@ class AdminUserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
     }
 
+    /**
+     * Nullify non-cascade FK references before deleting a user,
+     * so the delete can never fail due to a constraint violation.
+     * After the migration runs these are handled by the DB automatically;
+     * this is a belt-and-suspenders guard during the transition.
+     */
+    private function safeDeleteUser(User $user): void
+    {
+        DB::table('courses')
+            ->where('instructor_id', $user->id)
+            ->update(['instructor_id' => null]);
+
+        DB::table('anniversary_wish_logs')
+            ->where('sent_by', $user->id)
+            ->update(['sent_by' => null]);
+
+        DB::table('partners')
+            ->where('user_id', $user->id)
+            ->update(['user_id' => null]);
+
+        $user->delete();
+    }
+
     public function destroy(User $user)
     {
         $id = $user->id;
-        $user->delete();
+        $this->safeDeleteUser($user);
 
         try {
             AdminAuditLog::create([

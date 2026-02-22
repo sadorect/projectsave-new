@@ -118,14 +118,7 @@
                                     </div>
                                 @endforeach
 
-                                @if(config('services.recaptcha.site_key'))
-                                    <div class="mb-4">
-                                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
-                                        @error('g-recaptcha-response')
-                                            <div class="text-danger mt-2">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                @endif
+                                <x-math-captcha />
 
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-primary btn-lg">
@@ -144,8 +137,5 @@
                 </div>
             </div>
         </div>
-        @if(config('services.recaptcha.site_key'))
-            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        @endif
   </div>
 </x-layouts.app>

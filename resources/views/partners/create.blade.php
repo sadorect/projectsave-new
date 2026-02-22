@@ -26,9 +26,8 @@
                     @include('partners.partials.leadership')
                     @include('partners.partials.commitment')
                     
-                    <div class="g-recaptcha mb-3" 
-                    data-sitekey="{{ config('services.recaptcha.site_key') }}">
-               </div>
+                    <x-math-captcha />
+
                     <div class="form-group text-center mt-4">
                         <button type="submit" class="btn btn-custom">Submit Application</button>
                     </div>

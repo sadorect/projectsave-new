@@ -41,7 +41,7 @@
                             <label for="password_confirmation">Confirm Password</label>
                             <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
                         </div>
-                        <div class="form-group g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                        <x-math-captcha />
                         <button type="submit" class="btn btn-custom">Register</button>
 
                         <p class="mt-3">

@@ -3,10 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,15 +22,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
-        Validator::extend('recaptcha', function ($attribute, $value, $parameters, $validator) {
-            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
-                'secret' => config('services.recaptcha.secret_key'),
-                'response' => $value,
-                'ip' => request()->ip(),
-            ]);
-
-            return $response->json()['success'];
-        });
         View::addNamespace('mail', resource_path('views/emails'));
     }
 }

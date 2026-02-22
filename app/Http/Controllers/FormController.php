@@ -142,12 +142,10 @@ class FormController extends Controller
             return redirect()->route('login')->with('warning', 'Please login to submit this form.');
         }
 
-        // Skip reCAPTCHA validation if no site key is configured
-        if (config('services.recaptcha.site_key')) {
-            $request->validate([
-                'g-recaptcha-response' => ['required', new \App\Rules\Recaptcha],
-            ]);
-        }
+        // Always validate math captcha on public form submissions
+        $request->validate([
+            'math_captcha' => ['required', new \App\Rules\MathCaptchaRule],
+        ]);
 
         // Dynamic validation
         $rules = [];

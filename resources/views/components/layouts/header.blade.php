@@ -38,7 +38,6 @@
         <!-- Template Stylesheet -->
         <link href="{{ asset('frontend/css/style.css') }}" rel="stylesheet">
         <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
 
     <body>
