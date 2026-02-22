@@ -9,8 +9,13 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            return redirect()->route('home')->with('error', 'Unauthorized access');
+        $user = auth()->user();
+
+        if (!auth()->check() || !$user->is_admin || !$user->is_active) {
+            auth()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            abort(403, 'Unauthorized access.');
         }
 
         return $next($request);

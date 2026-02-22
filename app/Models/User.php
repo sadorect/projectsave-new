@@ -33,6 +33,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'wedding_anniversary',
         'bio',
         'user_type',
+    ];
+
+    /**
+     * Attributes that must never be mass-assigned (privilege escalation guard).
+     *
+     * @var array<int, string>
+     */
+    protected $guarded = [
         'is_admin',
         'is_active',
     ];

@@ -114,7 +114,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('admin')->group(function() {
     // Authentication Routes
     Route::get('/login', [AdminController::class, 'loginForm'])->name('admin.login.form');
-    Route::post('/login', [AdminController::class, 'login'])->name('admin.login');
+    Route::post('/login', [AdminController::class, 'login'])->name('admin.login')->middleware('throttle:5,1');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
     
     // Protected Admin Routes
@@ -182,7 +182,7 @@ Route::prefix('admin')->group(function() {
 
 
 // Content Management
-Route::prefix('content')->middleware(['auth'])->group(function() {
+Route::prefix('content')->middleware(['auth', 'verified'])->group(function() {
     Route::middleware('permission:edit-content,admin')->group(function() {
         Route::resource('posts', PostController::class)->names('admin.posts');
         // Add new routes for enhanced post management

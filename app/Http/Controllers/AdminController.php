@@ -28,14 +28,19 @@ class AdminController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            
-            if ($user->is_admin) {
-                $request->session()->regenerate();
-                return redirect()->intended('admin/dashboard');
+
+            if (!$user->is_admin) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'You do not have admin privileges.']);
             }
-            
-            Auth::logout();
-            return back()->withErrors(['email' => 'You do not have admin privileges']);
+
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Your account has been deactivated. Please contact support.']);
+            }
+
+            $request->session()->regenerate();
+            return redirect()->intended('admin/dashboard');
         }
 
         return back()->withErrors(['email' => 'Invalid credentials']);

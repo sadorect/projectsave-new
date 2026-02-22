@@ -2,52 +2,53 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Projectsave International</title>
-        <!-- Update existing viewport tag and add new ones -->
+        <title>@yield('title', 'Projectsave International')</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-        <meta name="HandheldFriendly" content="true">
-        <meta name="MobileOptimized" content="320">
         <meta name="format-detection" content="telephone=no">
         <meta property="og:title" content="@yield('og_title', config('app.name'))">
-        <meta property="og:description" content="@yield('og_description', 'ProjectSave International Ministry - Winning the losts, building the saints.')">
+        <meta property="og:description" content="@yield('og_description', 'ProjectSave International Ministry - Winning the lost, building the saints.')">
         <meta property="og:image" content="@yield('og_image', asset('frontend/img/logo.png'))">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:type" content="website">
         <meta name="description" content="@yield('meta_description', 'ProjectSave International Ministry - Winning the lost, building the saints through evangelism and discipleship across nations.')">
-<meta name="keywords" content="@yield('meta_keywords', 'christian ministry, evangelism, missions, projectsave devotionals, discipleship, outreach, projectsave missions outreaches, winning the lost, building the saints nigeria, africa')">
         <meta name="author" content="ProjectSave International Ministry">
+        <meta name="robots" content="@yield('meta_robots', 'index, follow')">
         <link rel="canonical" href="{{ url()->current() }}" />
         <link rel="alternate" type="application/rss+xml" title="ProjectSave International Blog Feed" href="{{ route('feed') }}">
-        <!-- Add after existing meta tags -->
-<meta name="robots" content="@yield('meta_robots', 'index, follow')">
 
         <!-- Favicon -->
         <link href="{{ asset('frontend/img/psave_logo.png') }}" rel="icon">
 
-        <!-- Preload critical fonts -->
+        <!-- Critical font preload -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        
-        <!-- CSS Libraries -->
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+        <!-- CSS Libraries (SRI hashes ensure CDN supply-chain integrity) -->
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
+              integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+              crossorigin="anonymous">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet"
+              integrity="sha384-slN8GvtUJGnv6ca26v8EiFRo8pJ/5QGYccwBPYR1RtnATAIDsDEb8tlsD7HxW8I2"
+              crossorigin="anonymous">
         <link href="{{ asset('frontend/lib/flaticon/font/flaticon.css') }}" rel="stylesheet">
-<link href="{{ asset('frontend/lib/animate/animate.min.css') }}" rel="stylesheet">
-<link href="{{ asset('frontend/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('frontend/lib/animate/animate.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('frontend/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
 
         <!-- Template Stylesheet -->
         <link href="{{ asset('frontend/css/style.css') }}" rel="stylesheet">
         <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        
-        <div id="fb-root"></div>
-        <script async defer crossorigin="anonymous" 
-                src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0&appId=YOUR_APP_ID" 
-                nonce="NONCE_VALUE">
-        </script>
     </head>
 
     <body>
+        {{-- Facebook SDK (only loaded when FACEBOOK_APP_ID is set in .env) --}}
+        @if(config('services.facebook.client_id'))
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+                src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0&appId={{ config('services.facebook.client_id') }}">
+        </script>
+        @endif
         <!-- Top Bar Start -->
         <div class="top-bar d-none d-md-block">
             <div class="container-fluid">

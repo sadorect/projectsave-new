@@ -23,7 +23,7 @@ Route::prefix('learn')->group(function() {
     Route::get('/', [CourseController::class, 'index'])->name('lms.courses.index');
     Route::get('/courses/{course:slug}', [CourseController::class, 'show'])->name('lms.courses.show');
 });
-Route::middleware(['auth'])->prefix('learn')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('learn')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('lms.dashboard');
     
@@ -53,7 +53,7 @@ Route::middleware(['auth'])->prefix('learn')->group(function () {
 
 
 // Student Exam Routes (using StudentExamController)
-Route::prefix('exams')->name('lms.exams.')->middleware(['auth'])->group(function () {
+Route::prefix('exams')->name('lms.exams.')->middleware(['auth', 'verified'])->group(function () {
     Route::get('/', [StudentExamController::class, 'index'])->name('index');
     Route::get('/{exam}', [StudentExamController::class, 'show'])->name('show');
     Route::post('/{exam}/start', [StudentExamController::class, 'start'])->name('start');
@@ -64,7 +64,7 @@ Route::prefix('exams')->name('lms.exams.')->middleware(['auth'])->group(function
 });
 
 // Certificate routes
-Route::middleware(['auth'])->prefix('learn')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('learn')->group(function () {
     Route::prefix('certificates')->name('lms.certificates.')->group(function () {
         Route::get('/', [CertificateController::class, 'index'])->name('index');
         Route::get('/{certificate}', [CertificateController::class, 'show'])->name('show');
