@@ -21,9 +21,15 @@ public function index()
         ->orderBy('display_order')
         ->get();
 
-    $latestEvents = Event::latest()->take(2)->get();
+    $latestEvents = Event::upcoming()
+        ->take(3)
+        ->get();
          
-    $posts = Post::latest()->take(3)->get();
+    $posts = Post::with('categories')
+        ->published()
+        ->orderBy('published_at', 'desc')
+        ->take(3)
+        ->get();
 
   
     return view('home.index', compact('latestEvents','newsUpdates', 'videoReels', 'posts'));

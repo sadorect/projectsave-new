@@ -36,6 +36,11 @@ class Exam extends Model
         return $this->belongsTo(Course::class);
     }
 
+    public function attempts()
+    {
+        return $this->hasMany(ExamAttempt::class);
+    }
+
     // Scope for active exams (has 5+ questions OR marked active)
     public function scopeAvailable($query)
     {

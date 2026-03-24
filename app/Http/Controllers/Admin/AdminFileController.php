@@ -11,6 +11,14 @@ use Carbon\Carbon;
 
 class AdminFileController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . UserFile::class)->only(['index', 'storageAnalysis']);
+        $this->middleware('can:view,file')->only(['show', 'download']);
+        $this->middleware('can:delete,file')->only('destroy');
+        $this->middleware('can:manage,' . UserFile::class)->only(['bulkDelete', 'updatePrivacy', 'cleanupExpired']);
+    }
+
     public function index(Request $request)
     {
         $query = UserFile::with('user');
@@ -67,8 +75,10 @@ class AdminFileController extends Controller
         // Get file info
         $fileExists = Storage::disk('private')->exists($file->path);
         $fileSize = $fileExists ? Storage::disk('private')->size($file->path) : 0;
+        $ownerFileCount = $file->user->files()->count();
+        $ownerFileSize = (int) $file->user->files()->sum('size');
         
-        return view('admin.files.show', compact('file', 'fileExists', 'fileSize'));
+        return view('admin.files.show', compact('file', 'fileExists', 'fileSize', 'ownerFileCount', 'ownerFileSize'));
     }
 
     public function download(UserFile $file)

@@ -25,7 +25,11 @@ class PasswordResetTest extends TestCase
 
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $this->withSession(['math_captcha_answer' => 8])
+            ->post('/forgot-password', [
+                'email' => $user->email,
+                'math_captcha' => 8,
+            ]);
 
         Notification::assertSentTo($user, ResetPassword::class);
     }
@@ -36,7 +40,11 @@ class PasswordResetTest extends TestCase
 
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $this->withSession(['math_captcha_answer' => 8])
+            ->post('/forgot-password', [
+                'email' => $user->email,
+                'math_captcha' => 8,
+            ]);
 
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
             $response = $this->get('/reset-password/'.$notification->token);
@@ -53,15 +61,21 @@ class PasswordResetTest extends TestCase
 
         $user = User::factory()->create();
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $this->withSession(['math_captcha_answer' => 8])
+            ->post('/forgot-password', [
+                'email' => $user->email,
+                'math_captcha' => 8,
+            ]);
 
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-            $response = $this->post('/reset-password', [
-                'token' => $notification->token,
-                'email' => $user->email,
-                'password' => 'password',
-                'password_confirmation' => 'password',
-            ]);
+            $response = $this->withSession(['math_captcha_answer' => 8])
+                ->post('/reset-password', [
+                    'token' => $notification->token,
+                    'email' => $user->email,
+                    'password' => 'password',
+                    'password_confirmation' => 'password',
+                    'math_captcha' => 8,
+                ]);
 
             $response
                 ->assertSessionHasNoErrors()
@@ -69,5 +83,24 @@ class PasswordResetTest extends TestCase
 
             return true;
         });
+    }
+
+    public function test_reset_password_requests_are_rate_limited(): void
+    {
+        Notification::fake();
+
+        $request = fn (string $email) => $this->withServerVariables(['REMOTE_ADDR' => '127.0.0.200'])
+            ->withSession(['math_captcha_answer' => 8])
+            ->post('/forgot-password', [
+                'email' => $email,
+                'math_captcha' => 8,
+            ]);
+
+        foreach (range(1, 6) as $attempt) {
+            $request("attempt{$attempt}@example.com");
+        }
+
+        $request('blocked@example.com')
+            ->assertStatus(429);
     }
 }

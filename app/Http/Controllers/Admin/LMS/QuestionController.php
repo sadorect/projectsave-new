@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:view,exam')->only(['create', 'edit']);
+        $this->middleware('can:update,exam')->only(['store', 'update', 'destroy']);
+    }
+
     public function create(Exam $exam)
     {
         return view('admin.lms.questions.create', compact('exam'));

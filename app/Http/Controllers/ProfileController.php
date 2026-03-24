@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\FileUploadService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,7 @@ class ProfileController extends Controller
     /**
       * Update the user's profile information.
       */
-    public function update(Request $request)
+    public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -36,15 +37,28 @@ class ProfileController extends Controller
         ]);
 
         $user = auth()->user();
+        $emailChanged = $validated['email'] !== $user->email;
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
+            $path = FileUploadService::uploadImage(
+                $request->file('avatar'),
+                'avatars',
+                'public',
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'avatar'
+            );
             $validated['avatar'] = $path;
         }
 
-        $user->update($validated);
+        $user->fill($validated);
 
-        return back()->with('success', 'Profile updated successfully.');
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('success', 'Profile updated successfully.');
     }
     /**
      * Delete the user's account.

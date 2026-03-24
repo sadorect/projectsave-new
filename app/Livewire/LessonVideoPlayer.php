@@ -18,6 +18,8 @@ class LessonVideoPlayer extends Component
     public $watchTimeLogged = 0;
     public $lastHeartbeat = null;
     public $encryptedToken = null;
+    private ?Lesson $resolvedLesson = null;
+    private ?Course $resolvedCourse = null;
     
     protected $listeners = [
         'heartbeat' => 'logWatchTime',
@@ -40,7 +42,7 @@ class LessonVideoPlayer extends Component
     public function render()
     {
         return view('livewire.lesson-video-player', [
-            'lesson' => Lesson::find($this->lessonId),
+            'lesson' => $this->lessonModel(),
             'userCanAccess' => $this->userCanAccessVideo(),
         ]);
     }
@@ -119,7 +121,7 @@ class LessonVideoPlayer extends Component
                 $this->lastHeartbeat = $now;
                 
                 // Auto-mark as completed if watched 80% of the video
-                $lesson = Lesson::find($this->lessonId);
+                $lesson = $this->lessonModel();
                 if ($lesson->video_duration && $this->watchTimeLogged > ($lesson->video_duration * 0.8)) {
                     $this->markVideoWatched();
                 }
@@ -132,14 +134,20 @@ class LessonVideoPlayer extends Component
     public function markVideoWatched()
     {
         try {
-            $lesson = Lesson::find($this->lessonId);
+            $lesson = $this->lessonModel();
             $user = auth()->user();
             
-            if (!$lesson->isCompleted($user)) {
-                // Complete the lesson
-                $user->completedLessons()->attach($lesson->id, [
-                    'completed_at' => now()
-                ]);
+            if ($lesson && ! $lesson->isCompleted($user)) {
+                $user->lessonProgress()->updateOrCreate(
+                    [
+                        'lesson_id' => $lesson->id,
+                        'user_id' => $user->id,
+                    ],
+                    [
+                        'completed' => true,
+                        'completed_at' => now(),
+                    ]
+                );
                 
                 $this->emit('lessonCompleted');
             }
@@ -151,9 +159,8 @@ class LessonVideoPlayer extends Component
     private function userCanAccessVideo()
     {
         $user = auth()->user();
-        $course = Course::find($this->courseId);
+        $course = $this->courseModel();
         
-        // Check user is enrolled in the course
         return $user && $course && $user->courses()->where('course_id', $course->id)->exists();
     }
     
@@ -171,7 +178,16 @@ class LessonVideoPlayer extends Component
     
     private function getVideoUrl()
     {
-        // Return the route that requires the token
         return route('video.stream', ['token' => $this->encryptedToken]);
+    }
+
+    private function lessonModel(): ?Lesson
+    {
+        return $this->resolvedLesson ??= Lesson::find($this->lessonId);
+    }
+
+    private function courseModel(): ?Course
+    {
+        return $this->resolvedCourse ??= Course::find($this->courseId);
     }
 }

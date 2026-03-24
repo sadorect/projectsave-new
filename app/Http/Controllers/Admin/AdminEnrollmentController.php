@@ -4,11 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminEnrollmentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . Enrollment::class)->only(['index', 'create', 'show']);
+        $this->middleware('can:create,' . Enrollment::class)->only('store');
+        $this->middleware('can:manage,' . Enrollment::class)->only(['updateStatus', 'destroy']);
+    }
+
     public function index()
     {
         $enrollments = Course::with(['instructor', 'users'])

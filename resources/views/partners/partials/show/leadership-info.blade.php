@@ -8,12 +8,12 @@
                         <h6 class="card-title text-primary">{{ $detail['church_name'] }}</h6>
                         <div class="row">
                             <div class="col-md-6">
-                                <p class="mb-1"><i class="fas fa-user-tie mr-2"></i>{{ $detail['post_held'] }}</p>
-                                <p class="mb-1"><i class="fas fa-calendar-alt mr-2"></i>{{ $detail['year'] }}</p>
+                                <p class="mb-1"><i class="fas fa-user-tie me-2"></i>{{ $detail['post_held'] }}</p>
+                                <p class="mb-1"><i class="fas fa-calendar-alt me-2"></i>{{ $detail['year'] }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p class="mb-1"><i class="fas fa-user mr-2"></i>{{ $detail['referee_name'] }}</p>
-                                <p class="mb-1"><i class="fas fa-phone mr-2"></i>{{ $detail['referee_phone'] }}</p>
+                                <p class="mb-1"><i class="fas fa-user me-2"></i>{{ $detail['referee_name'] }}</p>
+                                <p class="mb-1"><i class="fas fa-phone me-2"></i>{{ $detail['referee_phone'] }}</p>
                             </div>
                         </div>
                     </div>
@@ -22,7 +22,7 @@
         </div>
     @else
         <div class="alert alert-info">
-            <i class="fas fa-info-circle mr-2"></i>No leadership experience reported
+            <i class="fas fa-info-circle me-2"></i>No leadership experience reported
         </div>
     @endif
 </div>

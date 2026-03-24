@@ -4,11 +4,14 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\Lesson;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Course extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'description',
@@ -143,7 +146,6 @@ public function users()
     }
 
 }
-
 
 
 

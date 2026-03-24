@@ -23,9 +23,12 @@ class PasswordConfirmationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'password',
-        ]);
+        $response = $this->actingAs($user)
+            ->withSession(['math_captcha_answer' => 8])
+            ->post('/confirm-password', [
+                'password' => 'password',
+                'math_captcha' => 8,
+            ]);
 
         $response->assertRedirect();
         $response->assertSessionHasNoErrors();
@@ -35,9 +38,12 @@ class PasswordConfirmationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
-        ]);
+        $response = $this->actingAs($user)
+            ->withSession(['math_captcha_answer' => 8])
+            ->post('/confirm-password', [
+                'password' => 'wrong-password',
+                'math_captcha' => 8,
+            ]);
 
         $response->assertSessionHasErrors();
     }

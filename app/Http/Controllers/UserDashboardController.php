@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Services\FileUploadService;
 use App\Models\DeletionRequest;
 use App\Notifications\DataDeletionRequestNotification;
 
@@ -15,28 +17,59 @@ class UserDashboardController extends Controller
         $activities = $user->activities()->latest()->take(5)->get();
         $partnerships = $user->partnerships()->get();
         $notifications = $user->notifications()->latest()->take(3)->get();
+        $asomSummary = null;
 
-        if ($user->hasPermission('edit-content')) {
+        if ($user->user_type === 'asom_student') {
+            $programCourseTitles = [
+                'Bible Introduction',
+                'Hermeneutics',
+                'Ministry Vitals',
+                'Spiritual Gifts & Ministry',
+                'Biblical Counseling',
+                'Homiletics',
+            ];
+            $enrolledCourses = $user->courses()
+                ->whereIn('title', $programCourseTitles)
+                ->get();
+            $overallProgress = $enrolledCourses->isEmpty()
+                ? 0
+                : round($enrolledCourses->sum(fn ($course) => $user->getCourseProgress($course)) / $enrolledCourses->count(), 1);
+
+            $asomSummary = [
+                'overall_progress' => $overallProgress,
+                'enrolled_courses_count' => $enrolledCourses->count(),
+                'program_courses_count' => Course::query()
+                    ->whereIn('title', $programCourseTitles)
+                    ->count(),
+            ];
+        }
+
+        if ($user->canAccessContentAdmin()) {
             return view('user.dashboard', [
                 'showContentManagement' => true,
                 'activities' => $activities,
                 'partnerships' => $partnerships,
                 'notifications' => $notifications,
+                'asomSummary' => $asomSummary,
             ]);
         }
 
-        return view('user.dashboard', compact('activities', 'partnerships', 'notifications'));
+        return view('user.dashboard', compact('activities', 'partnerships', 'notifications', 'asomSummary'));
     }
 
     public function files(Request $request)
     {
+        abort_unless(auth()->user()->isAdmin() || auth()->user()->hasPermission('manage-files'), 403);
+
         $files = auth()->user()->files()
             ->when($request->category, fn($q) => $q->where('category', $request->category))
             ->when($request->search, fn($q) => $q->where('original_name', 'like', "%{$request->search}%"))
             ->latest()
             ->paginate(20);
-            $totalSize = auth()->user()->files()->sum('size');
-        return view('user.files', compact('files', 'totalSize'));
+
+        $totalSize = auth()->user()->files()->sum('size');
+
+        return view('user.files.index', compact('files', 'totalSize'));
     }
 
     public function profile()
@@ -52,13 +85,19 @@ class UserDashboardController extends Controller
 
     public function notifications()
     {
-        $notifications = auth()->user()->notifications()->paginate(10);
-        return view('user.notifications', compact('notifications'));
+        $user = auth()->user();
+
+        return view('user.notifications', [
+            'notifications' => $user->notifications()->paginate(10),
+            'accountPreferences' => $this->accountPreferences($user),
+        ]);
     }
 
     public function settings()
     {
-        return view('user.settings');
+        return view('user.settings', [
+            'accountPreferences' => $this->accountPreferences(auth()->user()),
+        ]);
     }
 
 
@@ -78,7 +117,13 @@ class UserDashboardController extends Controller
         $user = auth()->user();
 
         if ($request->hasFile('avatar')) {
-            $path = $request->file('avatar')->store('avatars', 'public');
+            $path = FileUploadService::uploadImage(
+                $request->file('avatar'),
+                'avatars',
+                'public',
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'avatar'
+            );
             $validated['avatar'] = $path;
         }
 
@@ -94,42 +139,65 @@ class UserDashboardController extends Controller
         $validated = $request->validate([
             'preferences' => 'array',
             'preferences.*' => 'boolean',
-            'language' => 'string|in:en,fr',
-            'timezone' => 'string|timezone',
+            'language' => 'nullable|string|in:en,fr',
+            'timezone' => 'nullable|string|timezone',
         ]);
 
         $user = auth()->user();
-        $user->update([
-            'preferences' => $validated['preferences'] ?? [],
-            'language' => $validated['language'] ?? 'en',
-            'timezone' => $validated['timezone'] ?? 'UTC',
-        ]);
+        $mergedPreferences = array_merge(
+            $this->accountPreferences($user),
+            $validated['preferences'] ?? []
+        );
+
+        $user->forceFill([
+            'preferences' => $mergedPreferences,
+            'notification_preferences' => $mergedPreferences,
+            'language' => $validated['language'] ?? $user->language ?? 'en',
+            'timezone' => $validated['timezone'] ?? $user->timezone ?? 'UTC',
+        ])->save();
 
         return back()->with('status', 'Preferences updated successfully');
     }
 
     public function showDeletionForm()
-{
-    return view('user.account-deletion');
-}
+    {
+        return view('user.account-deletion');
+    }
 
-public function requestDeletion(Request $request)
-{
-    $deletionRequest = DeletionRequest::create([
-        'user_id' => auth()->id(),
-        'reason' => $request->reason,
-        'status' => 'pending'
-    ]);
+    public function requestDeletion(Request $request)
+    {
+        $deletionRequest = DeletionRequest::create([
+            'user_id' => auth()->id(),
+            'reason' => $request->reason,
+            'status' => 'pending',
+        ]);
 
-    // Notify admin
-    $admin = User::where('is_admin', true)->first();
-    $admin->notify(new DataDeletionRequestNotification($deletionRequest));
+        $admin = User::where('is_admin', true)->first();
 
-    auth()->logout();
+        if ($admin) {
+            $admin->notify(new DataDeletionRequestNotification($deletionRequest));
+        }
 
-    return redirect()->route('login')
-        ->with('success', 'Your account deletion request has been submitted. You will receive confirmation once processed.');
-}
+        auth()->logout();
 
+        return redirect()->route('login')
+            ->with('success', 'Your account deletion request has been submitted. You will receive confirmation once processed.');
+    }
 
+    private function accountPreferences(User $user): array
+    {
+        return array_merge(
+            [
+                'email' => true,
+                'prayer_updates' => false,
+                'event_reminders' => false,
+                'newsletter' => false,
+                'blog_posts' => false,
+                'events' => false,
+                'prayer_requests' => false,
+            ],
+            (array) $user->preferences,
+            (array) $user->notification_preferences,
+        );
+    }
 }

@@ -6,6 +6,7 @@ use Mail;
 use App\Rules\MathCaptchaRule;
 use Illuminate\Http\Request;
 use App\Mail\ContactFormSubmission;
+use Illuminate\Support\Facades\Log;
 
 class ContactController extends Controller
 {
@@ -30,16 +31,16 @@ class ContactController extends Controller
             $contact->message = $validated['message'];
             $contact->save();
 
-            Mail::to(config('mail.admin_email', 'admin@example.com'))->send(
+            Mail::to(config('mail.admin_email', 'admin@example.com'))->queue(
                 new ContactFormSubmission($contact)
             );
 
-            \Log::info('New contact form submission', ['contact_id' => $contact->id]);
+            Log::info('New contact form submission queued', ['contact_id' => $contact->id]);
 
             return redirect()->back()->with('success', 'Thank you for your message. We will get back to you soon!');
             
         } catch (\Exception $e) {
-            \Log::error('Contact form submission failed', ['error' => $e->getMessage()]);
+            Log::error('Contact form submission failed', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Something went wrong. Please try again later.');
         }
     

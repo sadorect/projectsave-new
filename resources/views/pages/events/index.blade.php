@@ -1,56 +1,79 @@
-<x-layouts.app>
-    <!-- Page Header Start -->
-    <div class="page-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2>Upcoming Events</h2>
-                </div>
-                <div class="col-12">
-                    <a href="">Home</a>
-                    <a href="">Events</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Page Header End -->
-    
-    
-    <!-- Event Start -->
-    <div class="event">
-        <div class="container">
-            <div class="section-header text-center">
-                <p>Upcoming Events</p>
-                <h2>Be ready for our upcoming missions outreach</h2>
-            </div>
-            <div class="row">
-                @foreach($events as $event)
+<x-layouts.app
+    title="Projectsave Events"
+    meta-description="Browse upcoming Projectsave events, ministry gatherings, and outreach opportunities."
+>
+    <x-ui.public-page-hero
+        eyebrow="Events"
+        title="Upcoming events and ministry gatherings"
+        subtitle="Stay informed about outreach opportunities, teaching events, and moments where you can gather, serve, and participate."
+    >
+        <x-slot:actions>
+            <a href="{{ route('contact.show') }}" class="surface-button-primary">Ask about an event</a>
+            <a href="{{ route('partners.create', ['type' => 'ground']) }}" class="surface-button-secondary">Volunteer with us</a>
+        </x-slot:actions>
+    </x-ui.public-page-hero>
+
+    <section class="surface-section pt-2">
+        <div class="surface-frame">
+            <x-ui.public-section-heading
+                eyebrow="Events overview"
+                title="Plan your next ministry moment"
+                description="Use this page to track where the ministry will be next and how to prepare for it."
+            />
+
+            <div class="row g-4 mt-1">
+                @forelse($events as $event)
                     <div class="col-lg-6">
-                        <div class="event-item">
-                                                    @if($event->image)
-                                                        <img src="{{ asset('storage/' . $event->image) }}" alt="Event Image">
-                                                    @endif                            <div class="event-content">
-                                <div class="event-meta">
-                                    <p><i class="fa fa-calendar-alt"></i>{{ \Carbon\Carbon::parse($event->start_date)->format('d-M-Y') }}</p>
-                                    <p><i class="far fa-clock"></i>{{ \Carbon\Carbon::parse($event->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($event->end_time)->format('H:i') }}</p>
-                                    <p><i class="fa fa-map-marker-alt"></i>{{ $event->location }}</p>
+                        <article class="public-card overflow-hidden">
+                            @if($event->image)
+                                <div class="public-image-frame rounded-bottom-0">
+                                    <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" loading="lazy">
                                 </div>
-                                <div class="event-text">
-                                    <a href="{{ route('events.show', $event) }}"><h3>{{ $event->title }}</h3></a>
-                                    <p>{{ $event->description }}</p>
-                                    <a class="btn btn-custom" href="">Join Now</a>
+                            @endif
+
+                            <div class="p-4 p-lg-5">
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="public-chip">{{ \Carbon\Carbon::parse($event->start_date)->format('M d, Y') }}</span>
+                                    @if($event->end_date && $event->end_date !== $event->start_date)
+                                        <span class="public-chip">to {{ \Carbon\Carbon::parse($event->end_date)->format('M d, Y') }}</span>
+                                    @endif
                                 </div>
+
+                                <h3 class="h4 mb-3">{{ $event->title }}</h3>
+
+                                <div class="public-meta-list mb-3">
+                                    <span><i class="bi bi-geo-alt me-2 text-brand-700"></i>{{ $event->location }}</span>
+                                    @if($event->start_time)
+                                        <span>
+                                            <i class="bi bi-clock me-2 text-brand-700"></i>
+                                            {{ \Carbon\Carbon::parse($event->start_time)->format('g:i A') }}
+                                            @if($event->end_time)
+                                                - {{ \Carbon\Carbon::parse($event->end_time)->format('g:i A') }}
+                                            @endif
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <p class="mb-4 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($event->description), 170) }}</p>
+
+                                <a href="{{ route('events.show', $event) }}" class="surface-button-secondary">View event details</a>
                             </div>
-                        </div>
+                        </article>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-12">
+                        <x-ui.empty-state
+                            title="No events published yet"
+                            message="Upcoming events will appear here as soon as the ministry schedule is published."
+                            icon="bi bi-calendar-event"
+                        />
+                    </div>
+                @endforelse
             </div>
-            <div class="row">
-                <div class="col-12">
-                    {{ $events->links() }}
-                </div>
+
+            <div class="mt-5">
+                {{ $events->links() }}
             </div>
         </div>
-    </div>
-    <!-- Event End -->
+    </section>
 </x-layouts.app>

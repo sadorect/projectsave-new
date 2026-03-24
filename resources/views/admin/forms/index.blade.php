@@ -1,116 +1,103 @@
 @extends('admin.layouts.app')
 
+@section('title', 'Forms')
+@section('page_kicker', 'Forms And Intake')
+@section('page_subtitle', 'Create, monitor, and export ministry forms from one shared operations workspace.')
+
 @section('content')
-<div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="h3 mb-2 text-gray-800"><i class="fas fa-clipboard-list me-2"></i>Forms Management</h1>
-      <p class="text-muted">Create and manage custom forms for data collection</p>
-    </div>
-    <a href="{{ route('admin.forms.create') }}" class="btn btn-primary">
-      <i class="fas fa-plus me-2"></i>Create New Form
-    </a>
-  </div>
+<div class="admin-page-shell">
+    <section class="admin-stat-grid">
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Forms</span>
+            <strong class="admin-stat-value">{{ number_format($summary['forms']) }}</strong>
+            <p class="admin-stat-note mb-0">Active form definitions currently available to operators.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Public forms</span>
+            <strong class="admin-stat-value">{{ number_format($summary['public_forms']) }}</strong>
+            <p class="admin-stat-note mb-0">Forms available to unauthenticated visitors.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Login-gated</span>
+            <strong class="admin-stat-value">{{ number_format($summary['gated_forms']) }}</strong>
+            <p class="admin-stat-note mb-0">Forms that require members to sign in first.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Submissions</span>
+            <strong class="admin-stat-value">{{ number_format($summary['submissions']) }}</strong>
+            <p class="admin-stat-note mb-0">Total responses collected across every form.</p>
+        </article>
+    </section>
 
-  @include('components.alerts')
+    <x-ui.panel title="Forms Management" subtitle="Open, edit, or export the forms that currently power your ministry workflows.">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <a href="{{ route('admin.forms.create') }}" class="surface-button-primary">Create new form</a>
+            <a href="{{ route('admin.submissions.index') }}" class="surface-button-secondary">View all submissions</a>
+        </div>
 
-  @if($forms && $forms->count() > 0)
-    <div class="card shadow mb-4">
-      <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary">All Forms ({{ $forms->total() }})</h6>
-        <a href="{{ route('admin.submissions.index') }}" class="btn btn-outline-primary btn-sm">
-          <i class="fas fa-list me-1"></i>View All Submissions
-        </a>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-            <thead>
-              <tr>
-                <th width="5%">#</th>
-                <th width="25%">Form Title</th>
-                <th width="30%">Description</th>
-                <th width="10%">Fields</th>
-                <th width="10%">Submissions</th>
-                <th width="10%">Access</th>
-                <th width="10%">Created</th>
-                <th width="10%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($forms as $form)
-                <tr>
-                  <td>{{ $loop->iteration + ($forms->currentPage() - 1) * $forms->perPage() }}</td>
-                  <td>
-                    <strong>{{ $form->title ?? 'Untitled Form' }}</strong>
-                    @if(!empty($form->notify_emails))
-                      <br><small class="text-info">
-                        <i class="fas fa-envelope me-1"></i>{{ count($form->notify_emails) }} notification(s)
-                      </small>
-                    @endif
-                  </td>
-                  <td>
-                    <small>{{ Str::limit($form->description ?? 'No description', 100) }}</small>
-                  </td>
-                  <td>
-                    <span class="badge bg-info">{{ count($form->fields ?? []) }} fields</span>
-                  </td>
-                  <td>
-                    <span class="badge bg-success">{{ $form->submissions()->count() }}</span>
-                  </td>
-                  <td>
-                    @if($form->require_login)
-                      <span class="badge bg-warning">Login Required</span>
-                    @else
-                      <span class="badge bg-success">Public</span>
-                    @endif
-                  </td>
-                  <td>
-                    <small>{{ $form->created_at->format('M d, Y') }}</small>
-                  </td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <a href="{{ route('forms.show', $form) }}" class="btn btn-info btn-sm" title="View Form">
-                        <i class="fas fa-eye"></i>
-                      </a>
-                      <a href="{{ route('admin.forms.edit', $form) }}" class="btn btn-warning btn-sm" title="Edit Form">
-                        <i class="fas fa-edit"></i>
-                      </a>
-                      <a href="{{ route('admin.forms.submissions', $form) }}" class="btn btn-success btn-sm" title="View Submissions">
-                        <i class="fas fa-list"></i>
-                      </a>
-                      <form action="{{ route('admin.forms.destroy', $form) }}" method="POST" class="d-inline" 
-                            onsubmit="return confirm('Are you sure you want to delete this form and all its submissions?');">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-danger btn-sm" type="submit" title="Delete Form">
-                          <i class="fas fa-trash"></i>
-                        </button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-        
-        <div class="d-flex justify-content-center">
-          {{ $forms->links() }}
-        </div>
-      </div>
-    </div>
-  @else
-    <div class="card shadow">
-      <div class="card-body text-center py-5">
-        <i class="fas fa-clipboard-list text-muted mb-4" style="font-size: 4rem;"></i>
-        <h4 class="text-muted mb-3">No Forms Found</h4>
-        <p class="text-muted mb-4">You haven't created any forms yet. Start by creating your first form to collect data from users.</p>
-        <a href="{{ route('admin.forms.create') }}" class="btn btn-primary">
-          <i class="fas fa-plus me-2"></i>Create Your First Form
-        </a>
-      </div>
-    </div>
-  @endif
+        @if($forms->isNotEmpty())
+            <div class="surface-table-shell">
+                <table class="table admin-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Form</th>
+                            <th>Access</th>
+                            <th>Fields</th>
+                            <th>Submissions</th>
+                            <th>Created</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($forms as $form)
+                            <tr>
+                                <td>
+                                    <strong class="d-block">{{ $form->title ?: 'Untitled form' }}</strong>
+                                    <small class="text-muted">{{ Str::limit($form->description ?: 'No description provided.', 90) }}</small>
+                                </td>
+                                <td>
+                                    <span class="admin-status-chip {{ $form->require_login ? 'is-warning' : 'is-success' }}">
+                                        {{ $form->require_login ? 'Login required' : 'Public' }}
+                                    </span>
+                                </td>
+                                <td>{{ count($form->fields ?? []) }}</td>
+                                <td>{{ number_format($form->submissions_count) }}</td>
+                                <td>
+                                    <strong class="d-block">{{ $form->created_at->format('M j, Y') }}</strong>
+                                    <small class="text-muted">{{ $form->created_at->diffForHumans() }}</small>
+                                </td>
+                                <td class="text-end">
+                                    <div class="admin-action-row justify-content-end">
+                                        <a href="{{ route('forms.show', $form) }}" class="btn btn-sm btn-outline-secondary" target="_blank">Preview</a>
+                                        <a href="{{ route('admin.forms.edit', $form) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <a href="{{ route('admin.forms.submissions', $form) }}" class="btn btn-sm btn-outline-success">Submissions</a>
+                                        <form action="{{ route('admin.forms.destroy', $form) }}" method="POST" class="d-inline-flex" data-admin-confirm="Delete this form and every submission attached to it?">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $forms->links() }}
+            </div>
+        @else
+            <x-ui.empty-state
+                title="No forms have been created yet"
+                message="Start with a new form to begin collecting ministry responses."
+                icon="bi bi-ui-checks-grid"
+            >
+                <x-slot:actions>
+                    <a href="{{ route('admin.forms.create') }}" class="surface-button-primary">Create first form</a>
+                </x-slot:actions>
+            </x-ui.empty-state>
+        @endif
+    </x-ui.panel>
 </div>
 @endsection

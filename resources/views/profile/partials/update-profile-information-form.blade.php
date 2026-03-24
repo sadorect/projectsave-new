@@ -38,6 +38,10 @@
                         </button>
                     </p>
 
+                    <div class="mt-3">
+                        <x-math-captcha input-class="mt-1 block w-full" form-id="send-verification" />
+                    </div>
+
                     @if (session('status') === 'verification-link-sent')
                         <p class="mt-2 font-medium text-sm text-green-600">
                             {{ __('A new verification link has been sent to your email address.') }}

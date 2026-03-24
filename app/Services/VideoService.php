@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class VideoService
 {
@@ -19,13 +18,11 @@ class VideoService
 
     private function storeVideo(UploadedFile $video, $courseId, $lessonId)
     {
-        $filename = Str::random(40) . '.' . $video->getClientOriginalExtension();
         $path = "videos/courses/{$courseId}/lessons/{$lessonId}";
-        
-        $video->storeAs($path, $filename, 'public');
+        $storedPath = FileUploadService::uploadVideo($video, $path, 'public', ['mp4', 'mov', 'ogg', 'webm'], 'video');
         
         return [
-            'video_url' => Storage::url($path . '/' . $filename),
+            'video_url' => Storage::url($storedPath),
             'video_type' => 'file'
         ];
     }

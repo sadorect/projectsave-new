@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -10,7 +11,9 @@ class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::latest()->paginate(6);
+        $events = Event::upcoming()
+            ->paginate(6);
+
         return view('pages.events.index', compact('events'));
     }
 
@@ -37,7 +40,13 @@ class EventController extends Controller
         $validated['user_id'] = auth()->id();
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('events', 'public');
+            $validated['image'] = FileUploadService::uploadImage(
+                $request->file('image'),
+                'events',
+                'public',
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'image'
+            );
         }
 
         Event::create($validated);
@@ -69,7 +78,13 @@ class EventController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('events', 'public');
+            $validated['image'] = FileUploadService::uploadImage(
+                $request->file('image'),
+                'events',
+                'public',
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'image'
+            );
         }
 
         $event->update($validated);
@@ -82,5 +97,3 @@ class EventController extends Controller
         return redirect()->route('events.index')->with('success', 'Event deleted successfully');
     }
 }
-
-

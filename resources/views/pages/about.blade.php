@@ -1,387 +1,203 @@
-<x-layouts.app>
-     <!-- Page Header Start -->
-     <div class="page-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2>About Us</h2>
-                </div>
-                <div class="col-12">
-                    <a href="{{ route('home') }}">Home</a>
-                    <a href="{{ route('about') }}">About Us</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Page Header End -->
-        <!-- About Start -->
-        <div class="about">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <div class="about-img" data-parallax="scroll" data-image-src="{{asset ('frontend/img/about.jpg')}}"></div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="section-header">
-                            <p>Learn About Us</p>
-                            <h2>Projectsave International</h2><span>winning the lost, building the saints</span>
-                        </div>
-                        <div class="about-tab">
-                            <ul class="nav nav-pills nav-justified">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-toggle="pill" href="#tab-content-1">About</a>
-                                </li>
-                                
-                            </ul>
+<x-layouts.app
+    title="About Projectsave International"
+    meta-description="Learn the story, beliefs, and ministry channels behind Projectsave International."
+>
+    <section class="surface-section about-hero-section pt-0 pb-3">
+        <div class="about-hero-banner" style="--about-hero-image: url('{{ asset('frontend/img/about.jpg') }}');">
+            <div class="surface-frame">
+                <div class="about-hero-content">
+                    <div class="about-hero-copy">
+                        <div class="about-hero-kicker">About Projectsave International</div>
+                        <h1 class="about-hero-title">A Gospel ministry with a clear mission, a global outlook, and a discipleship mandate.</h1>
+                        <p class="about-hero-lead">
+                            Projectsave International exists to proclaim Christ, disciple believers through sound biblical teaching, and equip men and women for effective kingdom service in their communities and across nations.
+                        </p>
 
-                            <div class="tab-content">
-                                <div id="tab-content-1" class="container tab-pane active">
-                                    ProjectSave Int&#39;l Ministry, a.k.a HarvestField Ministry is a non-
-                                    denominational Christian ministry that is committed to preaching the
-                                    gospel of our Lord Jesus Christ to the nations of the world as
-                                    commanded in Mark 16:15 and also to build the saints of God with the
-                                    revealed truth of God&#39;s word (Acts 20:32). Our mission projects are
-                                    centred on evangelism and discipleship through the teaching of God’s
-                                    undiluted word. We have a message to the lost, unreached and to the
-                                    dying world- THE GOSPEL.
-                                </div>
-                                
+                        <div class="about-hero-actions">
+                            <a href="{{ route('events.index') }}" class="surface-button-primary">See upcoming events</a>
+                            <a href="{{ route('contact.show') }}" class="surface-button-secondary">Contact the team</a>
+                        </div>
+
+                        <div class="about-hero-stats">
+                            <div class="about-hero-stat">
+                                <strong>Mission</strong>
+                                <span>Reach the lost, build believers, and strengthen workers for Gospel ministry.</span>
+                            </div>
+                            <div class="about-hero-stat">
+                                <strong>Vision</strong>
+                                <span>See Christ-centered communities transformed through evangelism, discipleship, and service.</span>
+                            </div>
+                            <div class="about-hero-stat">
+                                <strong>Commitment</strong>
+                                <span>Present biblical truth with clarity, compassion, and practical ministry action.</span>
                             </div>
                         </div>
                     </div>
+
+                    <aside class="about-hero-panel" aria-label="Ministry distinctives">
+                        <div class="public-kicker mb-3 text-white">How we serve</div>
+                        <h2 class="h3 mb-3">Projecting the ministry with clarity, credibility, and service.</h2>
+                        <p class="mb-4">
+                            We present the ministry as a trusted Christian voice for outreach, theological formation, and sustained support for believers, leaders, and communities.
+                        </p>
+
+                        <ul class="about-hero-list">
+                            <li>
+                                <i class="bi bi-globe2"></i>
+                                <span>Global-minded mission expression through outreach, partnership, publishing, and digital discipleship.</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-book-half"></i>
+                                <span>Scripture-first teaching that helps believers grow in conviction, character, and service.</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-people"></i>
+                                <span>Practical equipping for pastors, evangelists, volunteers, and emerging ministry leaders.</span>
+                            </li>
+                        </ul>
+                    </aside>
                 </div>
             </div>
         </div>
-        <!-- About End -->
-        
-    <!-- Our Beliefs Start -->
-    <div class="beliefs">
-        <div class="container">
-            <div class="section-header text-center">
-                <p>Our Beliefs</p>
-                <h2>What We Stand For</h2>
-            </div>
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-bible"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>The Bible</h3>
-                            <p>We believe THE BIBLE is the inspired and only authoritative written Word of God.</p>
-                        </div>
-                    </div>
-                </div>
+    </section>
 
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-cross"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Trinity</h3>
-                            <p>We believe in ONE GOD, eternally existent in three Persons: The Father, The Son, and The Holy Spirit.</p>
-                        </div>
+    <section class="surface-section pt-2">
+        <div class="surface-frame">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-6">
+                    <div class="public-image-frame">
+                        <img src="{{ asset('frontend/img/about.jpg') }}" alt="Projectsave ministry outreach" loading="lazy">
                     </div>
                 </div>
+                <div class="col-lg-6">
+                    <x-ui.public-section-heading
+                        eyebrow="Our story"
+                        title="Winning the lost, building the saints"
+                        description="Projectsave International, also known as HarvestField Ministry, is a non-denominational Christian ministry devoted to preaching the Gospel and grounding believers in the revealed truth of God's Word."
+                    />
 
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-church"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Jesus Christ</h3>
-                            <p>We believe in the Deity of our LORD JESUS CHRIST, His virgin birth, sinless life, miracles, and resurrection.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-dove"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Holy Spirit</h3>
-                            <p>We believe in the HOLY SPIRIT as essential for personal salvation and the gifts of the Spirit.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-heart"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Salvation</h3>
-                            <p>We believe in cleansing from sin through the precious BLOOD OF JESUS CHRIST shed for our redemption.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-hands-helping"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Mission</h3>
-                            <p>We believe in Evangelistic missions to reach the unreached and unsaved with the message of salvation.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-cloud-sun"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Blessed Hope</h3>
-                            <p>We believe in the BLESSED HOPE - the rapture of the Church.</p>
-                        </div>
-                    </div>
-                </div>
-            
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-pray"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Divine Healing</h3>
-                            <p>The redemptive work of Christ on THE CROSS provides healing for the body in response to believing prayer and miracles.</p>
-                        </div>
-                    </div>
-                </div>
-            
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-fire"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Holy Spirit Baptism</h3>
-                            <p>The BAPTISM IN THE HOLY SPIRIT is given to believers who ask for it, with the evidence of "speaking in tongues".</p>
-                        </div>
-                    </div>
-                </div>
-            
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-hand-holding-heart"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Spiritual Gifts</h3>
-                            <p>We believe in the GIFTS OF THE HOLYSPIRIT and the FIVE-FOLD ministry gifts.</p>
-                        </div>
-                    </div>
-                </div>
-            
-                <div class="col-lg-4">
-                    <div class="beliefs-item">
-                        <div class="beliefs-icon">
-                            <i class="fa fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="beliefs-text">
-                            <h3>Eternal Life</h3>
-                            <p>We believe that HELL and eternal damnation is the lot of everyone that is unsaved.</p>
-                        </div>
+                    <div class="public-richtext">
+                        <p>Our mission is centered on evangelism and discipleship. We reach the lost with the message of Jesus Christ and help believers grow through teaching, training, and practical ministry engagement.</p>
+                        <p>From field outreaches to ministry development, our aim is to see lives transformed by the Gospel and communities strengthened through Christ-centered service.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>   
-    <!-- Our Beliefs End -->
-   
+    </section>
 
-    <!-- What We Do Start -->
-    <div class="what-we-do">
-        <div class="container">
-            <div class="section-header text-center">
-                <p>Our Channels of Impact</p>
-                <h2>What We Do</h2>
+    <section class="surface-section">
+        <div class="surface-frame">
+            <x-ui.public-section-heading
+                eyebrow="Core beliefs"
+                title="What we stand for"
+                description="Our ministry convictions are shaped by Scripture, centered on Christ, and expressed through faithful mission."
+            />
+
+            <div class="row g-3">
+                <div class="col-md-6 col-xl-4">
+                    <div class="public-card p-4">
+                        <h3 class="h5">The Bible</h3>
+                        <p class="mb-0 text-muted">We believe the Bible is the inspired and authoritative written Word of God.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="public-card p-4">
+                        <h3 class="h5">The Trinity</h3>
+                        <p class="mb-0 text-muted">We believe in one God, eternally existent as Father, Son, and Holy Spirit.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="public-card p-4">
+                        <h3 class="h5">Salvation in Christ</h3>
+                        <p class="mb-0 text-muted">We believe salvation and cleansing from sin are available through the blood of Jesus Christ.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="public-card p-4">
+                        <h3 class="h5">The Holy Spirit</h3>
+                        <p class="mb-0 text-muted">We believe in the person, work, gifts, and empowering presence of the Holy Spirit.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="public-card p-4">
+                        <h3 class="h5">Mission</h3>
+                        <p class="mb-0 text-muted">We believe the Gospel must be taken to unreached and unevangelized peoples with urgency and compassion.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-4">
+                    <div class="public-card p-4">
+                        <h3 class="h5">Hope and Healing</h3>
+                        <p class="mb-0 text-muted">We believe in divine healing, spiritual transformation, and the blessed hope of Christ's return.</p>
+                    </div>
+                </div>
             </div>
-            <div class="row">
-                <div class="col-lg-4">
-                    <div class="service-item" data-toggle="collapse" href="#outreach-details" role="button" aria-expanded="false">
-                        <div class="service-icon">
-                            <i class="fa fa-hands-helping"></i>
-                        </div>
-                        <div class="service-text">
-                            <h3>Outreaches <i class="fa fa-chevron-down float-right"></i></h3>
-                            <p>Reaching communities with love and support through various outreach programs and initiatives.</p>
-                        </div>
-                    </div>
-                    <div class="collapse" id="outreach-details">
-                        <div class="card card-body">
-                            <h4>Our Outreach Programs</h4>
-                            <ul>
-                                <li>Community Support Services</li>
-                                <li>Food Distribution Programs</li>
-                                <li>Medical Missions</li>
-                                <li>Youth Engagement Initiatives</li>
-                            </ul>
-                            <p>Our evangelistic campaigns have held in several countries across West
-                                Africa, East and South Africa. The power of God is always with us to
-                                save, heal and deliver. Majorly, we work with missionaries labouring
-                                among the people groups that are unreached &amp; unevangelized to
-                                organize evangelistic crusades, medical missions, welfare programmes,
-                                community service and children ministry. In the coming days, we are
-                                spreading the net of the Gospel to other parts of Africa and the entire
-                                globe amongst the unreached and unevangelized.</p>
-                        </div>
-                    </div>
-                </div>
+        </div>
+    </section>
 
-                <div class="col-lg-4">
-                    <div class="service-item" data-toggle="collapse" href="#teaching-details" role="button" aria-expanded="false">
-                        <div class="service-icon">
-                            <i class="fa fa-chalkboard-teacher"></i>
-                        </div>
-                        <div class="service-text">
-                            <h3>Teaching and Training <i class="fa fa-chevron-down float-right"></i></h3>
-                            <p>Equipping individuals with biblical knowledge and practical life skills through structured programs.</p>
-                        </div>
-                    </div>
-                    <div class="collapse" id="teaching-details">
-                        <div class="card card-body">
-                            <h4>Our Teaching Programs</h4>
-                            <ul>
-                                <li>Bible Study Classes</li>
-                                <li>Leadership Training</li>
-                                <li>Life Skills Workshops</li>
-                                <li>Discipleship Programs</li>
-                            </ul>
-                            <p>Teaching and training is a vital aspect of our vision. We win the lost by
-                                preaching the Gospel to them but we build the saints through the
-                                teaching of the Gospel. We organize conference meetings and seminars.
-                            </p><p>
-                                where we teach God’s people the word of God. We are open to churches,
-                                campus fellowships and organizations that value what we do. We have a
-                                mobile training school for Pastors, Evangelists, Apostles, Prophets,
-                                Teachers, Deacons, Elders and Christian workers on how to win souls
-                                effectively using various methods. We would love to train everyone in
-                                your ministry on how they can effectively win souls. Feel free to contact
-                                us for details and modus operandi of training: info@projectsaveng.org</p>
-                        </div>
-                    </div>
-                </div>
+    <section class="surface-section">
+        <div class="surface-frame">
+            <x-ui.public-section-heading
+                eyebrow="Channels of impact"
+                title="How the ministry serves"
+                description="Projectsave serves through outreach, training, publishing, partnership, and daily discipleship content."
+            />
 
-                <div class="col-lg-4">
-                    <div class="service-item" data-toggle="collapse" href="#mission-details" role="button" aria-expanded="false">
-                        <div class="service-icon">
-                            <i class="fa fa-handshake"></i>
-                        </div>
-                        <div class="service-text">
-                            <h3>Mission Support and Partnership <i class="fa fa-chevron-down float-right"></i></h3>
-                            <p>Collaborating with partners worldwide to extend our reach and impact.</p>
-                        </div>
+            <div class="impact-disclosure-group">
+                <details class="impact-disclosure" open>
+                    <summary>Outreaches</summary>
+                    <div class="impact-disclosure-content">
+                        We partner with missionaries and local workers to organize evangelistic campaigns, medical missions, welfare efforts, community service, and children-focused ministry across Africa and beyond.
                     </div>
-                    <div class="collapse" id="mission-details">
-                        <div class="card card-body">
-                            <h4>Our Mission Support</h4>
-                            <ul>
-                                <li>Global Partnerships</li>
-                                <li>Missionary Training</li>
-                                <li>Resource Sharing</li>
-                                <li>Cross-Cultural Initiatives</li>
-                            </ul>
-                            <p>Salvation is free but spreading the gospel comes at a huge cost. So far, we
-                                have ministry partners God has been using to support our ministry
-                                activities on the field of souls. We are trusting God to raise One Million
-                                Star partners before the end of the year. To join our league of Star
-                                Partners, kindly fill the form below.</p>
-                        </div>
-                    </div>
-                </div>
+                </details>
 
-                <div class="col-lg-4">
-                    <div class="service-item" data-toggle="collapse" href="#publishing-details" role="button" aria-expanded="false">
-                        <div class="service-icon">
-                            <i class="fa fa-book-open"></i>
-                        </div>
-                        <div class="service-text">
-                            <h3>We Publish the Gospel <i class="fa fa-chevron-down float-right"></i></h3>
-                            <p>Spreading the good news through various media and publications.</p>
-                        </div>
+                <details class="impact-disclosure">
+                    <summary>Teaching and training</summary>
+                    <div class="impact-disclosure-content">
+                        We organize conferences, seminars, and training programs that equip pastors, evangelists, leaders, and Christian workers to handle Scripture faithfully and serve effectively.
                     </div>
-                    <div class="collapse" id="publishing-details">
-                        <div class="card card-body">
-                            <h4>Our Publishing Initiatives</h4>
-                            <ul>
-                                <li>Christian Literature</li>
-                                <li>Digital Media Content</li>
-                                <li>Gospel Tracts</li>
-                                <li>Online Evangelism</li>
-                            </ul>
-                            <p>We have been spreading the Gospel in prints for years. Thousands of
-                                prints are rolled out yearly. We believe in the power of the printed word
-                                brooded upon by the Holy Spirit to win Souls. We print gospel tracts in
-                                thousands to be distributed at Christian bookshops. Our tracts and
-                                bulletin publications have blessed lives and gained wide acceptance on
-                                campuses, in different Christian circles within and outside Nigeria. In
-                                Nigeria, If you need our tracts, kindly contact: +2347049154934.</p>
-                        </div>
-                    </div>
-                </div>
+                </details>
 
-                <div class="col-lg-4">
-                    <div class="service-item" data-toggle="collapse" href="#devotional-details" role="button" aria-expanded="false">
-                        <div class="service-icon">
-                            <i class="fa fa-pray"></i>
-                        </div>
-                        <div class="service-text">
-                            <h3>Online Daily Devotionals <i class="fa fa-chevron-down float-right"></i></h3>
-                            <p>Providing daily spiritual nourishment through online devotional content.</p>
-                        </div>
+                <details class="impact-disclosure">
+                    <summary>Mission support and partnership</summary>
+                    <div class="impact-disclosure-content">
+                        Ministry partnership makes Gospel work possible. We welcome prayer partners, skilled partners, volunteers, and financial supporters who want to help carry the message of Christ to the nations.
                     </div>
-                    <div class="collapse" id="devotional-details">
-                        <div class="card card-body">
-                            <h4>Projectsave Devotional</h4>
-                            <p>
-                                Across the globe, we reach out to thousands of people with God’s word
-on daily basis. Testimonies are pouring from different parts of the world,
-Canada, U.S., South Africa, Nigeria and other nations of the world about
-the impact of our daily devotional. God has been transforming lives
-through our daily devotional. You can enrich your spiritual life by joining
-our team of online daily devotional readers. <a href="https://www.facebook.com/projectsave/02" target="_blank">Like Our Facebook Page.</a>
-                            </p>
+                </details>
+
+                <details class="impact-disclosure">
+                    <summary>Publishing and media</summary>
+                    <div class="impact-disclosure-content">
+                        We spread the Gospel through print, digital teaching, devotional publishing, and ministry media that reaches people consistently beyond physical gatherings.
+                    </div>
+                </details>
+
+                <details class="impact-disclosure">
+                    <summary>Daily devotionals</summary>
+                    <div class="impact-disclosure-content">
+                        Our devotional ministry reaches readers across multiple nations each day, helping believers stay rooted in truth, prayer, and obedience to Christ.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section class="surface-section">
+        <div class="surface-frame">
+            <div class="public-card p-4 p-lg-5">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-8">
+                        <div class="public-kicker mb-3">Next step</div>
+                        <h2 class="mb-3">Move from interest to involvement.</h2>
+                        <p class="mb-0 text-muted">Explore events, join the mission, or begin ministry training through ASOM.</p>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="d-grid gap-2">
+                            <a href="{{ route('partners.create', ['type' => 'prayer']) }}" class="surface-button-primary justify-content-center">Become a partner</a>
+                            <a href="{{ route('lms.courses.index') }}" class="surface-button-secondary justify-content-center">Explore ASOM</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- What We Do End -->
-
-    <style>
-    .service-item {
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .service-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(208, 11, 11, 0.629);
-        padding: 5px
-    }
-
-    .card-body {
-        margin-top: 10px;
-        border-radius: 10px;
-        background: #f8f9fa;
-    }
-    </style>
-
-    <script>
-        $('.service-item').on('click', function() {
-            $(this).find('.fa-chevron-down').toggleClass('rotate-180');
-        });
-    </script>
-   
-    </x-layouts.app>
+    </section>
+</x-layouts.app>

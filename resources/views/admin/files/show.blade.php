@@ -157,12 +157,12 @@
                             <div class="row text-center">
                                 <div class="col-6">
                                     <div class="border-end">
-                                        <h5 class="mb-0">{{ $file->user->files()->count() }}</h5>
+                                        <h5 class="mb-0">{{ $ownerFileCount }}</h5>
                                         <small class="text-muted">Total Files</small>
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <h5 class="mb-0">{{ $file->user->files()->sum('size') ? number_format($file->user->files()->sum('size') / 1024 / 1024, 1) . ' MB' : '0 MB' }}</h5>
+                                    <h5 class="mb-0">{{ $ownerFileSize > 0 ? number_format($ownerFileSize / 1024 / 1024, 1) . ' MB' : '0 MB' }}</h5>
                                     <small class="text-muted">Total Size</small>
                                 </div>
                             </div>

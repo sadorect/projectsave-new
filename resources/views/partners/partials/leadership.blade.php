@@ -1,39 +1,51 @@
-<div class="section-header mt-4">
-    <h4>Leadership Experience</h4>
+<div class="public-divider mt-5 pt-5"></div>
+
+<div class="public-section-heading mb-4">
+    <div class="public-kicker">Step 3</div>
+    <h3 class="mb-0 text-2xl font-semibold">Leadership Experience</h3>
+    <p class="public-section-description mb-0">Share any leadership responsibility you have held in church or fellowship settings.</p>
 </div>
 
-<div class="form-group">
-    <label>Have you held any leadership position in the church/fellowship?</label>
-    <select class="form-control" name="leadership_experience" required>
-        <option value="">Select...</option>
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-    </select>
+<div class="row g-3">
+    <div class="col-12">
+        <label class="form-label fw-semibold">Have you held any leadership position in the church or fellowship?</label>
+        <select class="form-select" name="leadership_experience" required>
+            <option value="">Select...</option>
+            <option value="yes" @selected(old('leadership_experience') === 'yes')>Yes</option>
+            <option value="no" @selected(old('leadership_experience') === 'no')>No</option>
+        </select>
+    </div>
 </div>
-<div id="leadershipDetails" style="display: none;">
-    <div class="leadership-entry card mb-3">
-        <div class="card-body">
-            <div class="form-group">
-                <label>Name of Church/Fellowship</label>
+
+<div id="leadershipDetails" class="d-none mt-4" aria-hidden="true">
+    <div class="leadership-entry public-card p-4">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Name of Church or Fellowship</label>
                 <input type="text" class="form-control" name="church_name[]">
             </div>
-            <div class="form-group">
-                <label>Post Held</label>
+
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Post Held</label>
                 <input type="text" class="form-control" name="post_held[]">
             </div>
-            <div class="form-group">
-                <label>Year</label>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Year</label>
                 <input type="text" class="form-control" name="leadership_year[]">
             </div>
-            <div class="form-group">
-                <label>Name of Referee</label>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Name of Referee</label>
                 <input type="text" class="form-control" name="referee_name[]">
             </div>
-            <div class="form-group">
-                <label>Phone Number of Referee</label>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Phone Number of Referee</label>
                 <input type="tel" class="form-control" name="referee_phone[]">
             </div>
         </div>
     </div>
-    <button type="button" class="btn btn-secondary" id="addMoreLeadership">Add More Experience</button>
+
+    <button type="button" class="surface-button-secondary mt-3" id="addMoreLeadership">Add More Experience</button>
 </div>

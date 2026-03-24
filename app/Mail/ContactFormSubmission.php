@@ -4,55 +4,23 @@ namespace App\Mail;
 
 use App\Models\Contact;
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
 
-class ContactFormSubmission extends Mailable
+class ContactFormSubmission extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
-    
-    protected $contact;
 
-    public function __construct($contact)
+    public function __construct(public Contact $contact)
     {
-        $this->contact = $contact;
+        $this->afterCommit();
     }
 
     public function build()
     {
-        return $this->markdown('emails.contact-submission')
-                    ->with('contact', $this->contact);
-    }
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Contact Form Submission',
-        );
-    }
-
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.contact-submission',
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
+        return $this->subject('Contact Form Submission')
+            ->markdown('emails.contact-submission')
+            ->with('contact', $this->contact);
     }
 }

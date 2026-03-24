@@ -15,4 +15,9 @@ class Faq extends Model
         'details',
         'status'
     ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
 }

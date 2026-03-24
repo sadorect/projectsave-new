@@ -1,105 +1,111 @@
-<div class="sidebar bg-dark text-white" style="width: 250px; min-height: 100vh;">
-     <div class="p-3">
-         <div class="text-center mb-4">
-             <a href="{{ route('home') }}">
-                 <img src="{{ auth()->user()->avatar ?? asset('frontend/img/default-avatar.png') }}" 
-                      alt="Profile" 
-                      class="rounded-circle mb-3" 
-                      style="width: 80px; height: 80px;">
-             </a>
-             <h6 class="mb-0">{{ auth()->user()->name }}</h6>
-             <small class="text-muted">Member</small>
-         </div>
+@php
+    $user = auth()->user();
+    $initial = strtoupper(substr($user->name, 0, 1));
+    $learningRoute = $user->isAsomStudent() ? route('asom.welcome') : route('asom');
 
-        <nav class="nav flex-column">
-            <a class="nav-link text-white {{ request()->routeIs('user.dashboard') ? 'active' : '' }}" 
-               href="{{ route('user.dashboard') }}">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
-            </a>
-                    <a class="nav-link text-white {{ request()->routeIs('user.profile') ? 'active' : '' }}" 
-                                    href="{{ route('user.profile') }}">
-                        <i class="bi bi-person me-2"></i> My Profile
-                    </a>
+    $accountSections = [
+        [
+            'label' => 'Account',
+            'items' => [
+                ['label' => 'Account Home', 'route' => route('user.dashboard'), 'icon' => 'bi bi-house-door', 'active' => request()->routeIs('user.dashboard')],
+                ['label' => 'Profile', 'route' => route('user.profile'), 'icon' => 'bi bi-person', 'active' => request()->routeIs('user.profile*')],
+                ['label' => 'Settings', 'route' => route('user.settings'), 'icon' => 'bi bi-sliders', 'active' => request()->routeIs('user.settings*')],
+                ['label' => 'Notifications', 'route' => route('user.notifications'), 'icon' => 'bi bi-bell', 'active' => request()->routeIs('user.notifications*')],
+                ['label' => 'Partnerships', 'route' => route('user.partnerships'), 'icon' => 'bi bi-people', 'active' => request()->routeIs('user.partnerships*')],
+            ],
+        ],
+        [
+            'label' => 'Learning',
+            'items' => [
+                [
+                    'label' => $user->isAsomStudent() ? 'ASOM Workspace' : 'Explore ASOM',
+                    'route' => $learningRoute,
+                    'icon' => 'bi bi-mortarboard',
+                    'active' => request()->routeIs('asom') || request()->routeIs('asom.welcome') || request()->routeIs('lms.*'),
+                ],
+            ],
+        ],
+    ];
 
-            <a class="nav-link text-white {{ request()->routeIs('asom.welcome') ? 'active' : '' }}" 
-               href="{{route('asom.welcome')}}">
-                <i class="bi bi-people me-2"></i> ASOM
-            </a>
-                    <!-- Add to sidebar menu -->
-                    <!-- Add this where you want in the nav section -->
-@if(isset($showContentManagement) && $showContentManagement)
-<a class="nav-link text-white" data-bs-toggle="collapse" href="#contentManagement" role="button" aria-expanded="false">
-    <i class="bi bi-pencil-square me-2"></i> Manage Posts
-    <i class="bi bi-chevron-down float-end"></i>
-</a>
+    $workspaceItems = collect([
+        $user->hasBackofficeAccess() ? ['label' => 'Primary Workspace', 'route' => route($user->dashboardRoute()), 'icon' => 'bi bi-briefcase', 'active' => request()->routeIs('admin.*') || request()->routeIs('news.*') || request()->routeIs('videos.*')] : null,
+        ($user->isAdmin() || $user->hasPermission('manage-files')) ? ['label' => 'My Files', 'route' => route('user.files'), 'icon' => 'bi bi-folder2-open', 'active' => request()->routeIs('user.files') || request()->routeIs('files.*')] : null,
+    ])->filter()->values();
+@endphp
 
-<div class="collapse" id="contentManagement">
-    <nav class="nav flex-column ms-3">
-        <a class="nav-link text-white {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}" 
-           href="{{ route('admin.posts.index') }}">
-            <i class="bi bi-file-text me-2"></i> Posts
-        </a>
-        
-        <a class="nav-link text-white {{ request()->routeIs('admin.events.*') ? 'active' : '' }}" 
-           href="{{ route('admin.events.index') }}">
-            <i class="bi bi-calendar-event me-2"></i> Events
-        </a>
-        
-        <a class="nav-link text-white {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" 
-           href="{{ route('admin.categories.index') }}">
-            <i class="bi bi-folder me-2"></i> Categories
-        </a>
-        
-        <a class="nav-link text-white {{ request()->routeIs('admin.tags.*') ? 'active' : '' }}" 
-           href="{{ route('admin.tags.index') }}">
-            <i class="bi bi-tags me-2"></i> Tags
-        </a>
-    </nav>
-</div>
-@endif
+<aside
+    class="surface-sidebar surface-sidebar-shell offcanvas-lg offcanvas-start d-flex flex-column gap-4"
+    tabindex="-1"
+    id="userSidebar"
+    aria-labelledby="userSidebarLabel"
+>
+    <div class="offcanvas-header d-lg-none px-0 pt-0">
+        <div>
+            <div class="text-sm text-white-50 text-uppercase tracking-[0.2em]">Projectsave</div>
+            <div class="fs-5 fw-semibold text-white" id="userSidebarLabel">Account Area</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close navigation"></button>
+    </div>
 
-                
-            
-            <a class="nav-link text-white {{ request()->routeIs('user.partnerships.*') ? 'active' : '' }}" 
-               href="#partnerships">
-                <i class="bi bi-people me-2"></i> Partnerships
-            </a>
-            
-            <a class="nav-link text-white {{ request()->routeIs('user.notifications.*') ? 'active' : '' }}" 
-               href="#notifications">
-                <i class="bi bi-bell me-2"></i> Notifications
-            </a>
-            
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('files.*') ? 'active' : '' }}" href="{{ route('files.index') }}">
-                    <i class="fas fa-folder-open me-2"></i>
-                    <span>My Files</span>
-                    @if(auth()->user()->files()->count() > 0)
-                        <span class="badge bg-primary ms-auto">{{ auth()->user()->files()->count() }}</span>
-                    @endif
-                </a>
-            </li>
+    <div class="offcanvas-body d-flex flex-column gap-4 p-0">
+        <div class="surface-sidebar-brand">
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex h-12 w-12 align-items-center justify-content-center rounded-circle bg-white/10 fw-semibold text-white">
+                    {{ $initial }}
+                </div>
+                <div>
+                    <div class="fs-5 fw-semibold text-white">{{ $user->name }}</div>
+                    <small class="text-white-50">{{ $user->isAsomStudent() ? 'ASOM student account' : 'Member account' }}</small>
+                </div>
+            </div>
+        </div>
 
-            <a class="nav-link text-white {{ request()->routeIs('user.settings.*') ? 'active' : '' }}" 
-               href="#settings">
-                <i class="bi bi-gear me-2"></i> Settings
-            </a>
-            <li class="nav-item">
-                <a href="{{ route('user.account.deletion') }}" class="nav-link">
+        <nav class="d-flex flex-column gap-4 flex-grow-1">
+            @foreach($accountSections as $section)
+                <div class="d-flex flex-column gap-2">
+                    <div class="surface-sidebar-section">{{ $section['label'] }}</div>
+
+                    <div class="d-flex flex-column gap-1">
+                        @foreach($section['items'] as $item)
+                            <a class="surface-nav-link {{ $item['active'] ? 'active' : '' }}" href="{{ $item['route'] }}">
+                                <i class="{{ $item['icon'] }}"></i>
+                                <span>{{ $item['label'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+
+            @if($workspaceItems->isNotEmpty())
+                <div class="d-flex flex-column gap-2">
+                    <div class="surface-sidebar-section">Workspaces</div>
+
+                    <div class="d-flex flex-column gap-1">
+                        @foreach($workspaceItems as $item)
+                            <a class="surface-nav-link {{ $item['active'] ? 'active' : '' }}" href="{{ $item['route'] }}">
+                                <i class="{{ $item['icon'] }}"></i>
+                                <span>{{ $item['label'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            <div class="d-flex flex-column gap-2">
+                <div class="surface-sidebar-section">Sensitive</div>
+
+                <a class="surface-nav-link {{ request()->routeIs('user.account.deletion*') ? 'active' : '' }}" href="{{ route('user.account.deletion') }}">
                     <i class="bi bi-trash"></i>
                     <span>Delete Account</span>
                 </a>
-              </li>
+            </div>
         </nav>
 
-        <div class="mt-auto pt-3 border-top">
+        <div class="surface-sidebar-footer">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="btn btn-outline-light w-100">
-                    <i class="bi bi-box-arrow-right me-2"></i> Logout
-                </button>
+                <button type="submit" class="surface-button-secondary w-100 justify-content-center">Logout</button>
             </form>
         </div>
-
     </div>
-</div>
+</aside>

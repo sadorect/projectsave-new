@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\LMS;
 
 use App\Models\Exam;
 use App\Models\Course;
+use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Facades\Log;
@@ -13,6 +14,20 @@ use Illuminate\Support\Facades\Storage;
 
 class ExamController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . Exam::class)->only(['index', 'questions']);
+        $this->middleware('can:create,' . Exam::class)->only(['create', 'store']);
+        $this->middleware('can:view,exam')->only(['show', 'edit', 'preview']);
+        $this->middleware('can:update,exam')->only(['update', 'toggleActivation']);
+        $this->middleware('can:delete,exam')->only('destroy');
+        $this->middleware('can:manage,' . Exam::class)->only([
+            'showImportForm',
+            'importPreview',
+            'importConfirm',
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -24,8 +39,20 @@ class ExamController extends Controller
 
     public function index()
     {
-        $exams = Exam::with('course')->paginate(10);
-        return view('admin.lms.exams.index', compact('exams'));
+        $exams = Exam::query()
+            ->with('course:id,title')
+            ->withCount(['questions', 'attempts'])
+            ->latest()
+            ->paginate(10);
+
+        $summary = [
+            'total' => Exam::count(),
+            'active' => Exam::where('is_active', true)->count(),
+            'inactive' => Exam::where('is_active', false)->count(),
+            'questions' => \App\Models\Question::count(),
+        ];
+
+        return view('admin.lms.exams.index', compact('exams', 'summary'));
     }
 
     public function create()
@@ -168,15 +195,24 @@ public function importPreview(Request $request, Exam $exam)
 
     public function toggleActivation(Exam $exam)
     {
-    //dd($exam);
-    $exam->is_active = !$exam->is_active;
-    $exam->save();
-    
-    return response()->json([
-        'success' => true,
-        'is_active' => $exam->is_active,
-        'message' => $exam->is_active ? 'Exam activated successfully' : 'Exam deactivated successfully'
-    ]);
+        $exam->is_active = ! $exam->is_active;
+        $exam->save();
+
+        $message = $exam->is_active
+            ? 'Exam activated successfully.'
+            : 'Exam deactivated successfully.';
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'is_active' => $exam->is_active,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()
+            ->back()
+            ->with('success', $message);
     }
 
     private function extractQuestionsFromInlineOptions($filePath)
@@ -289,12 +325,18 @@ public function importPreview(Request $request, Exam $exam)
     ]);
 
     // Save the file locally
-    $path = $request->file('docx_file')->store('temp', 'public');
-$fullPath = storage_path('app/public/' . $path);
+    $path = FileUploadService::uploadDocument(
+        $request->file('docx_file'),
+        'temp',
+        'public',
+        ['docx'],
+        'docx_file'
+    );
+    $fullPath = storage_path('app/public/' . $path);
     if (!file_exists($fullPath)) {
-    Log::error("DOCX file not found at: {$fullPath}");
-    return back()->withErrors(['docx_file' => 'Error processing the uploaded file. Please try again.']);
-}
+        Log::error("DOCX file not found at: {$fullPath}");
+        return back()->withErrors(['docx_file' => 'Error processing the uploaded file. Please try again.']);
+    }
     
 
     $result = $this->extractQuestionsFromInlineOptions($fullPath);

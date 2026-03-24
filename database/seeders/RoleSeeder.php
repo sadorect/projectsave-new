@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleSeeder extends Seeder
 {
@@ -14,68 +14,234 @@ class RoleSeeder extends Seeder
      */
     private array $roles = [
         'Super Admin' => [
+            'slug' => 'super-admin',
             'description' => 'Full system access with all permissions',
             'permissions' => '*', // Special case: all permissions
         ],
         'Admin' => [
-            'description' => 'System administrator with most permissions',
+            'slug' => 'admin',
+            'description' => 'Platform administrator with broad operational coverage',
             'permissions' => [
-                'view users', 'create users', 'edit users', 'delete users',
-                'view roles', 'create roles', 'edit roles',
-                'view content', 'create content', 'edit content', 'delete content', 'publish content',
-                'view settings', 'edit settings',
-                'view reports', 'export reports',
-                'view audit log',
+                'access-admin-dashboard',
+                'access-content-admin',
+                'access-lms-admin',
+                'manage-users',
+                'view-users',
+                'create-users',
+                'edit-users',
+                'delete-users',
+                'verify-users',
+                'manage-user-roles',
+                'manage-user-sessions',
+                'view-roles',
+                'create-roles',
+                'edit-roles',
+                'delete-roles',
+                'manage-roles',
+                'view-posts',
+                'create-posts',
+                'edit-posts',
+                'delete-posts',
+                'publish-posts',
+                'manage-post-taxonomy',
+                'view-events',
+                'create-events',
+                'edit-events',
+                'delete-events',
+                'publish-events',
+                'view-faqs',
+                'create-faqs',
+                'edit-faqs',
+                'delete-faqs',
+                'publish-faqs',
+                'view-content',
+                'create-content',
+                'edit-content',
+                'delete-content',
+                'publish-content',
+                'view-courses',
+                'manage-courses',
+                'manage-lessons',
+                'manage-enrollments',
+                'manage-exams',
+                'manage-certificates',
+                'manage-partners',
+                'manage-prayer-force',
+                'manage-forms',
+                'manage-mail',
+                'manage-mail-templates',
+                'manage-notification-settings',
+                'manage-files',
+                'view-reports',
+                'export-reports',
+                'view-audit-log',
+                'manage-audit-log',
+                'manage-settings',
+                'api-access',
+                'manage-api-tokens',
+            ],
+        ],
+        'Content Admin' => [
+            'slug' => 'content-admin',
+            'description' => 'Content operations lead with full publishing control',
+            'permissions' => [
+                'access-content-admin',
+                'view-posts',
+                'create-posts',
+                'edit-posts',
+                'delete-posts',
+                'publish-posts',
+                'manage-post-taxonomy',
+                'view-events',
+                'create-events',
+                'edit-events',
+                'delete-events',
+                'publish-events',
+                'view-faqs',
+                'create-faqs',
+                'edit-faqs',
+                'delete-faqs',
+                'publish-faqs',
+                'view-content',
+                'create-content',
+                'edit-content',
+                'delete-content',
+                'publish-content',
             ],
         ],
         'Editor' => [
+            'slug' => 'editor',
             'description' => 'Content manager with publishing rights',
             'permissions' => [
-                'view content', 'create content', 'edit content', 'publish content',
-                'view reports',
+                'access-content-admin',
+                'view-posts',
+                'create-posts',
+                'edit-posts',
+                'publish-posts',
+                'manage-post-taxonomy',
+                'view-events',
+                'create-events',
+                'edit-events',
+                'publish-events',
+                'view-faqs',
+                'create-faqs',
+                'edit-faqs',
+                'publish-faqs',
+                'view-content',
+                'create-content',
+                'edit-content',
+                'publish-content',
             ],
         ],
         'Author' => [
+            'slug' => 'author',
             'description' => 'Content creator without publishing rights',
             'permissions' => [
-                'view content', 'create content', 'edit content',
+                'access-content-admin',
+                'view-posts',
+                'create-posts',
+                'edit-posts',
+                'view-events',
+                'create-events',
+                'edit-events',
+                'view-faqs',
+                'create-faqs',
+                'edit-faqs',
+                'view-content',
+                'create-content',
+                'edit-content',
             ],
         ],
         'Viewer' => [
+            'slug' => 'viewer',
             'description' => 'Read-only access to content',
             'permissions' => [
-                'view content',
-                'view reports',
+                'access-content-admin',
+                'view-posts',
+                'view-events',
+                'view-faqs',
+                'view-content',
+                'view-reports',
+            ],
+        ],
+        'LMS Admin' => [
+            'slug' => 'lms-admin',
+            'description' => 'LMS operator for courses, enrollments, exams, and certificates',
+            'permissions' => [
+                'access-admin-dashboard',
+                'access-lms-admin',
+                'view-courses',
+                'manage-courses',
+                'manage-lessons',
+                'manage-enrollments',
+                'manage-exams',
+                'manage-certificates',
+                'view-reports',
+            ],
+        ],
+        'Student Support' => [
+            'slug' => 'student-support',
+            'description' => 'Learner support role focused on account and enrollment issues',
+            'permissions' => [
+                'access-admin-dashboard',
+                'view-users',
+                'edit-users',
+                'verify-users',
+                'manage-user-sessions',
+                'view-courses',
+                'manage-enrollments',
+                'view-reports',
+            ],
+        ],
+        'Partner Operations' => [
+            'slug' => 'partner-operations',
+            'description' => 'Operations role for partner and prayer-force workflows',
+            'permissions' => [
+                'access-admin-dashboard',
+                'manage-partners',
+                'manage-prayer-force',
+                'view-reports',
             ],
         ],
         'API User' => [
+            'slug' => 'api-user',
             'description' => 'External system with API access',
             'permissions' => [
-                'api access',
+                'api-access',
+                'manage-api-tokens',
             ],
         ],
     ];
 
     public function run(): void
     {
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         $allPermissions = Permission::all();
 
         foreach ($this->roles as $name => $attributes) {
-            $role = Role::create([
-                'name' => $name,
-                'slug' => Str::slug($name),
-                'description' => $attributes['description'],
-            ]);
+            $role = Role::query()->updateOrCreate(
+                ['slug' => $attributes['slug']],
+                [
+                    'name' => $name,
+                    'description' => $attributes['description'],
+                    'guard_name' => 'web',
+                ]
+            );
 
             // Handle special case for Super Admin
             if ($attributes['permissions'] === '*') {
-                $role->permissions()->attach($allPermissions->pluck('id'));
+                $role->syncPermissions($allPermissions);
                 continue;
             }
 
             // Attach specific permissions
-            $permissions = Permission::whereIn('name', $attributes['permissions'])->get();
-            $role->permissions()->attach($permissions->pluck('id'));
+            $permissions = Permission::query()
+                ->whereIn('slug', $attributes['permissions'])
+                ->get();
+            $role->syncPermissions($permissions);
         }
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

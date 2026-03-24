@@ -15,14 +15,22 @@ class MathCaptcha extends Component
 {
     public string $question;
     public string $inputClass;
+    public string $formId;
+    public string $errorBag;
+    public string $captchaKey;
 
     /**
      * @param  string  $inputClass  Optional extra CSS classes for the input element.
      */
-    public function __construct(string $inputClass = '')
+    public function __construct(string $inputClass = '', string $formId = '', string $errorBag = 'default')
     {
-        $this->question   = MathCaptchaService::generate();
+        $captcha = MathCaptchaService::generate();
+
+        $this->question = $captcha['question'];
+        $this->captchaKey = $captcha['key'];
         $this->inputClass = $inputClass;
+        $this->formId = $formId;
+        $this->errorBag = $errorBag;
     }
 
     public function render()

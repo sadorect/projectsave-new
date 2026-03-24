@@ -10,10 +10,33 @@ use App\Http\Controllers\Controller;
 
 class ExamAttemptController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . ExamAttempt::class)->only('index');
+        $this->middleware('can:view,attempt')->only('show');
+        $this->middleware('can:delete,attempt')->only('destroy');
+        $this->middleware('can:manage,' . ExamAttempt::class)->only(['manualPass', 'storeManualPass', 'resetAttempts']);
+    }
+
     public function index()
     {
-        $attempts = ExamAttempt::with(['user', 'exam'])->latest()->paginate(20);
-        return view('admin.lms.exams.show-attempts', compact('attempts'));
+        $attempts = ExamAttempt::query()
+            ->with([
+                'user:id,name,email',
+                'exam:id,title,course_id,passing_score',
+                'exam.course:id,title',
+            ])
+            ->latest()
+            ->paginate(20);
+
+        $summary = [
+            'total' => ExamAttempt::count(),
+            'today' => ExamAttempt::whereDate('created_at', today())->count(),
+            'students' => ExamAttempt::distinct()->count('user_id'),
+            'exams' => ExamAttempt::distinct()->count('exam_id'),
+        ];
+
+        return view('admin.lms.exams.show-attempts', compact('attempts', 'summary'));
     }
 
 

@@ -35,7 +35,7 @@
                             <i class="fas fa-arrow-right me-2"></i>Continue to Next Lesson
                         </a>
                     @else
-                        <a href="{{ route('asom.welcome') }}" class="btn btn-success btn-lg px-4">
+                        <a href="{{ route('lms.dashboard') }}" class="btn btn-success btn-lg px-4">
                             <i class="fas fa-graduation-cap me-2"></i>Return to ASOM Dashboard
                         </a>
                     @endif
@@ -58,49 +58,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .completion-celebration {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .trophy-icon {
-        animation: bounce 1s ease-in-out infinite alternate;
-    }
-    
-    @keyframes bounce {
-        from { transform: translateY(0px); }
-        to { transform: translateY(-10px); }
-    }
-    
-    .modal-content {
-        border-radius: 20px;
-    }
-    
-    .progress-update {
-        border-radius: 15px;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    }
-    
-    .btn-lg {
-        border-radius: 25px;
-        padding: 12px 30px;
-        font-weight: 600;
-    }
-    
-    #achievement-notification {
-        animation: slideIn 0.5s ease-out;
-    }
-    
-    @keyframes slideIn {
-        from { 
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to { 
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>

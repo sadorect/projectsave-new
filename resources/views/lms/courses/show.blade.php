@@ -1,421 +1,256 @@
-<x-layouts.app>
-    <!-- Page Header -->
-    <div class="page-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('asom') }}">ASOM</a></li>
-                            <li class="breadcrumb-item active">{{ $course->title }}</li>
-                        </ol>
-                    </nav>
-                    <h1>{{ $course->title }}</h1>
-                    @if($course->instructor)
-                        <p class="text-muted">Instructor: {{ $course->instructor->name }}</p>
-                    @endif
-                </div>
-                <div class="col-md-4 text-md-end">
-                    @if($isEnrolled)
-                        <span class="badge bg-success fs-6 px-3 py-2">
-                            <i class="fas fa-check-circle me-2"></i>Enrolled
-                        </span>
-                    @else
-                        <span class="badge bg-primary fs-6 px-3 py-2">
-                            <i class="fas fa-graduation-cap me-2"></i>Available
-                        </span>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
+<x-layouts.lms
+    :title="$course->title . ' | ASOM'"
+    :show-sidebar="false"
+    :flush-top="true"
+>
+    <div class="d-grid gap-4">
+        <section class="lms-course-hero-section">
+            <div class="lms-course-hero-shell" style="--lms-course-hero-image: url('{{ $course->featured_image_url }}');">
+                <div class="lms-hero-frame">
+                    <div class="lms-course-hero">
+                        <div class="row g-4 align-items-end">
+                            <div class="col-xl-7">
+                                <div class="lms-course-hero-copy">
+                                    <span class="surface-eyebrow border-0 bg-white/10 text-white">Course Detail</span>
+                                    <h1>{{ $course->title }}</h1>
+                                    <p class="lead mb-0 text-white-50">{{ $courseLead }}</p>
 
-    @include('components.alerts')
+                                    <div class="lms-dashboard-actions mt-4">
+                                        @if($isEnrolled && $nextLesson)
+                                            <a href="{{ route('lms.lessons.show', [$course->slug, $nextLesson->slug]) }}" class="btn btn-light rounded-pill px-4">
+                                                {{ $progress > 0 ? 'Continue learning' : 'Start course' }}
+                                            </a>
+                                            <a href="{{ route('lms.lessons.index', $course->slug) }}" class="surface-button-ghost text-white">Open lesson outline</a>
+                                        @elseif(auth()->check())
+                                            <form action="{{ route('lms.courses.enroll', $course->slug) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-light rounded-pill px-4">Enroll now</button>
+                                            </form>
+                                            <a href="{{ route('lms.dashboard') }}" class="surface-button-ghost text-white">Open my workspace</a>
+                                        @else
+                                            <a href="{{ route('asom.register') }}" class="btn btn-light rounded-pill px-4">Register to enroll</a>
+                                            <a href="{{ route('login') }}" class="surface-button-ghost text-white">Sign in</a>
+                                        @endif
+                                    </div>
 
-    <div class="container my-5">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="course-detail-card">
-                    @if($course->featured_image)
-                        <div class="course-image-container">
-                            <img src="{{ Storage::disk('s3')->url($course->featured_image) }}" 
-                                 alt="{{ $course->title }}" 
-                                 class="img-fluid course-image"
-                                 onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
-                        </div>
-                    @else
-                        <div class="course-image-container">
-                            <img src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
-                                 alt="{{ $course->title }}" 
-                                 class="img-fluid course-image">
-                        </div>
-                    @endif
-
-                    <!-- Course Overview Tabs -->
-                    <div class="course-tabs mb-4">
-                        <ul class="nav nav-tabs nav-tabs-custom" id="courseTab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" data-bs-toggle="tab" href="#description">
-                                    <i class="fas fa-info-circle me-2"></i>Description
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#objectives">
-                                    <i class="fas fa-bullseye me-2"></i>Objectives
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#outcomes">
-                                    <i class="fas fa-trophy me-2"></i>Outcomes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" data-bs-toggle="tab" href="#evaluation">
-                                    <i class="fas fa-clipboard-check me-2"></i>Evaluation
-                                </a>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content course-tab-content">
-                            <div class="tab-pane fade show active" id="description">
-                                <div class="course-content">
-                                    {!! $course->description !!}
+                                    <div class="lms-course-hero-metrics mt-4">
+                                        @foreach($courseHeroStats as $stat)
+                                            <article class="lms-course-hero-metric">
+                                                <span class="label">{{ $stat['label'] }}</span>
+                                                <span class="value">{{ $stat['value'] }}</span>
+                                            </article>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="objectives">
-                                <div class="course-content">
-                                    {!! $course->objectives !!}
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="outcomes">
-                                <div class="course-content">
-                                    {!! $course->outcomes !!}
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="evaluation">
-                                <div class="course-content">
-                                    {!! $course->evaluation !!}
+
+                            <div class="col-xl-5">
+                                <div class="lms-course-hero-panel">
+                                    <span class="surface-eyebrow border-0 bg-white/10 text-white">Inside this learning track</span>
+                                    <div class="d-grid gap-3 mt-3">
+                                        @forelse($courseHeroHighlights as $highlight)
+                                            <div class="lms-course-hero-highlight">
+                                                <strong>{{ $highlight['title'] }}</strong>
+                                                <span>{{ $highlight['meta'] }}</span>
+                                            </div>
+                                        @empty
+                                            <div class="lms-course-hero-highlight">
+                                                <strong>Lesson outline coming soon</strong>
+                                                <span>The first teaching checkpoints will appear here as soon as lessons are published for this course.</span>
+                                            </div>
+                                        @endforelse
+                                    </div>
+
+                                    <div class="lms-course-hero-footnote">
+                                        @if($availableExams->isNotEmpty())
+                                            <strong>{{ $availableExams->count() }} assessment {{ $availableExams->count() === 1 ? 'path' : 'paths' }} available</strong>
+                                            <span>Students complete lessons first, then move into qualifying exams as they finish the course flow.</span>
+                                        @else
+                                            <strong>Lesson-led progression</strong>
+                                            <span>This course currently emphasizes guided lessons and course completion before any later assessment expansion.</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
 
-                    <!-- Course Resources Section -->
-                    @if($isEnrolled)
-                        <div class="course-resources">
-                            <h4 class="mb-4"><i class="fas fa-book-reader me-2"></i>Course Resources</h4>
-                            
-                            <!-- Recommended Books -->
-                            @if($course->recommended_books)
-                                <div class="resource-card mb-4">
-                                    <div class="resource-header">
-                                        <h5 class="mb-0"><i class="fas fa-book me-2"></i>Recommended Books</h5>
-                                    </div>
-                                    <div class="resource-content">
-                                        {!! $course->recommended_books !!}
-                                    </div>
-                                </div>
-                            @endif
+        <div class="row g-4">
+            <div class="col-xl-8">
+                <article class="course-detail-card">
+                    @if($courseSections->isNotEmpty())
+                        <div class="course-tabs">
+                            <ul class="nav nav-tabs nav-tabs-custom" role="tablist">
+                                @foreach($courseSections as $section)
+                                    <li class="nav-item" role="presentation">
+                                        <button
+                                            class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#course-section-{{ $loop->index }}"
+                                            type="button"
+                                            role="tab"
+                                        >
+                                            {{ $section['title'] }}
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
 
-                            <!-- Course Materials -->
-                            @if($course->documents)
-                                <div class="resource-card">
-                                    <div class="resource-header">
-                                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Course Materials</h5>
-                                    </div>
-                                    <div class="resource-content">
-                                        <div class="row">
-                                            @foreach(json_decode($course->documents) as $document)
-                                                <div class="col-md-6 mb-3">
-                                                    <div class="document-card">
-                                                        <i class="fas fa-file-pdf document-icon"></i>
-                                                        <div class="document-info">
-                                                            <h6>{!! $document->name !!}</h6>
-                                                            <small class="text-muted">{{ number_format($document->size / 1048576, 2) }} MB</small>
-                                                            <a href="{{ $document->path }}" class="btn btn-sm btn-primary mt-2" download>
-                                                                <i class="fas fa-download me-1"></i>Download
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
+                            <div class="tab-content course-tab-content">
+                                @foreach($courseSections as $section)
+                                    <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="course-section-{{ $loop->index }}" role="tabpanel">
+                                        <div class="course-content">
+                                            {!! $section['content'] !!}
                                         </div>
                                     </div>
-                                </div>
-                            @endif
+                                @endforeach
+                            </div>
                         </div>
                     @endif
-                </div>
-            </div>
-            
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <div class="course-sidebar">
-                    <!-- Course Stats -->
-                    <div class="sidebar-card mb-4">
-                        <h5 class="mb-3"><i class="fas fa-chart-bar me-2"></i>Course Info</h5>
-                        <div class="course-stats">
-                            <div class="stat-item mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Total Lessons:</span>
-                                    <strong>{{ $course->lessons->count() }}</strong>
+
+                    @if($isEnrolled && $courseMaterials->isNotEmpty())
+                        <div class="resource-content pt-0">
+                            <div class="resource-card">
+                                <div class="resource-header">
+                                    <h4 class="mb-0">Course materials</h4>
                                 </div>
-                            </div>
-                            @if($course->instructor)
-                                <div class="stat-item mb-3">
-                                    <div class="d-flex justify-content-between">
-                                        <span>Instructor:</span>
-                                        <strong>{{ $course->instructor->name }}</strong>
+                                <div class="resource-content">
+                                    <div class="row g-3">
+                                        @foreach($courseMaterials as $material)
+                                            <div class="col-md-6">
+                                                <div class="document-card">
+                                                    <i class="fas fa-file-alt document-icon"></i>
+                                                    <div>
+                                                        <h5 class="h6 mb-1">{{ $material['name'] }}</h5>
+                                                        @if(! empty($material['size']))
+                                                            <small class="text-muted d-block mb-2">{{ number_format($material['size'] / 1048576, 2) }} MB</small>
+                                                        @endif
+                                                        <a href="{{ $material['path'] }}" class="surface-button-secondary" download>Download</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                </div>
-                            @endif
-                            <div class="stat-item mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span>Status:</span>
-                                    <span class="badge bg-{{ $course->status === 'published' ? 'success' : 'warning' }}">
-                                        {{ ucfirst($course->status) }}
-                                    </span>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
+                </article>
+            </div>
 
-                    <!-- Enrollment Actions -->
-                    <div class="sidebar-card">
-                        <div class="d-grid gap-2">
-                            @if($isEnrolled)
-                                <a href="{{ route('lms.lessons.index', $course->slug) }}" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-play me-2"></i>Continue Learning
-                                </a>
-                                @auth
-                                    <a href="{{ route('asom.welcome') }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-tachometer-alt me-2"></i>ASOM Dashboard
+            <div class="col-xl-4">
+                <div class="d-grid gap-4">
+                    <aside class="sidebar-card">
+                        <h3 class="h5 mb-3">Course snapshot</h3>
+                        <div class="course-stats">
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <span>Total lessons</span>
+                                <strong>{{ $course->lessons->count() }}</strong>
+                            </div>
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <span>Available exams</span>
+                                <strong>{{ $availableExams->count() }}</strong>
+                            </div>
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <span>Instructor</span>
+                                <strong>{{ $course->instructor?->name ?? 'ASOM Team' }}</strong>
+                            </div>
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <span>Status</span>
+                                <strong>{{ $isEnrolled ? 'Enrolled' : 'Open for enrollment' }}</strong>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <aside class="sidebar-card">
+                        <h3 class="h5 mb-3">Student action</h3>
+
+                        @if($isEnrolled)
+                            <div class="d-grid gap-3">
+                                <div>
+                                    <div class="d-flex justify-content-between small text-muted mb-2">
+                                        <span>Progress</span>
+                                        <span>{{ $progress }}%</span>
+                                    </div>
+                                    <div class="lms-course-progress">
+                                        <div class="lms-course-progress-fill" style="width: {{ $progress }}%"></div>
+                                    </div>
+                                </div>
+
+                                @if($nextLesson)
+                                    <a href="{{ route('lms.lessons.show', [$course->slug, $nextLesson->slug]) }}" class="surface-button-primary justify-content-center">
+                                        {{ $progress > 0 ? 'Continue learning' : 'Start course' }}
                                     </a>
-                                @endauth
-                                <form action="{{ route('lms.courses.unenroll', $course->slug) }}" method="POST" class="mt-3">
+                                @endif
+
+                                <a href="{{ route('lms.lessons.index', $course->slug) }}" class="surface-button-secondary justify-content-center">Open lesson outline</a>
+
+                                @if($availableExams->isNotEmpty() && $progress >= 100)
+                                    <a href="{{ route('lms.exams.index') }}" class="surface-button-secondary justify-content-center">Go to exams</a>
+                                @endif
+
+                                @if($diplomaCertificate)
+                                    <a href="{{ route('lms.certificates.show', $diplomaCertificate) }}" class="surface-button-secondary justify-content-center">View program certificate</a>
+                                @elseif($diplomaStatus)
+                                    <div class="rounded-4 border p-3 bg-light-subtle">
+                                        <small class="text-muted d-block mb-1">Diploma in Ministry progress</small>
+                                        <strong>{{ $diplomaStatus['completed_requirements'] }} of {{ $diplomaStatus['required_count'] }} requirements complete</strong>
+                                    </div>
+                                @endif
+
+                                @if($manualCourseCertificate)
+                                    <a href="{{ route('lms.certificates.show', $manualCourseCertificate) }}" class="surface-button-ghost justify-content-center">View course recognition</a>
+                                @endif
+
+                                <form action="{{ route('lms.courses.unenroll', $course->slug) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Are you sure you want to unenroll from this course?')">
-                                        <i class="fas fa-sign-out-alt me-2"></i>Unenroll
+                                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill" onclick="return confirm('Are you sure you want to unenroll from this course?')">
+                                        Unenroll
                                     </button>
                                 </form>
-                            @else
+                            </div>
+                        @else
+                            <div class="d-grid gap-3">
                                 @auth
                                     <form action="{{ route('lms.courses.enroll', $course->slug) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="btn btn-success btn-lg w-100">
-                                            <i class="fas fa-graduation-cap me-2"></i>Enroll Now
-                                        </button>
+                                        <button type="submit" class="surface-button-primary w-100 justify-content-center">Enroll now</button>
                                     </form>
-                                    <a href="{{ route('asom.welcome') }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-tachometer-alt me-2"></i>ASOM Dashboard
-                                    </a>
+                                    <a href="{{ route('lms.dashboard') }}" class="surface-button-secondary justify-content-center">Open my workspace</a>
                                 @else
-                                    <a href="{{ route('register') }}" class="btn btn-success btn-lg">
-                                        <i class="fas fa-user-plus me-2"></i>Register to Enroll
-                                    </a>
-                                    <a href="{{ route('login') }}" class="btn btn-outline-primary">
-                                        <i class="fas fa-sign-in-alt me-2"></i>Login
-                                    </a>
+                                    <a href="{{ route('asom.register') }}" class="surface-button-primary justify-content-center">Register to enroll</a>
+                                    <a href="{{ route('login') }}" class="surface-button-secondary justify-content-center">Sign in</a>
                                 @endauth
-                            @endif
-                        </div>
-                    </div>
+                            </div>
+                        @endif
+                    </aside>
 
-                    <!-- Quick Links -->
-                    <div class="sidebar-card mt-4">
-                        <h6 class="mb-3">Quick Links</h6>
-                        <div class="list-group list-group-flush">
-                            <a href="{{ route('asom') }}" class="list-group-item list-group-item-action">
-                                <i class="fas fa-home me-2"></i>All ASOM Courses
-                            </a>
-                            @if($isEnrolled && $course->lessons->count() > 0)
-                                <a href="{{ route('lms.lessons.index', $course->slug) }}" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-list me-2"></i>Course Lessons
-                                </a>
-                            @endif
+                    <aside class="sidebar-card">
+                        <h3 class="h5 mb-3">What you will cover</h3>
+                        <div class="d-grid gap-3">
+                            @forelse($course->lessons as $lesson)
+                                <div class="rounded-4 border p-3 bg-light-subtle">
+                                    <div class="d-flex justify-content-between align-items-start gap-3">
+                                        <div>
+                                            <div class="fw-semibold">{{ $lesson->title }}</div>
+                                            <small class="text-muted">{{ $lesson->video_url ? 'Video lesson' : 'Reading lesson' }}</small>
+                                        </div>
+                                        @if($isEnrolled && $completedLessons->contains($lesson->id))
+                                            <i class="fas fa-check-circle text-success mt-1"></i>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <p class="text-muted mb-0">The lesson outline for this course will appear here when it is available.</p>
+                            @endforelse
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </div>
         </div>
     </div>
-
-    <style>
-        .page-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 0 2rem;
-            margin-bottom: 0;
-        }
-        
-        .page-header .breadcrumb {
-            background: rgba(255,255,255,0.1);
-            border-radius: 25px;
-            padding: 0.5rem 1rem;
-        }
-        
-        .page-header .breadcrumb-item a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-        }
-        
-        .page-header .breadcrumb-item.active {
-            color: white;
-        }
-        
-        .course-detail-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-        
-        .course-image-container {
-            position: relative;
-            height: 300px;
-            overflow: hidden;
-        }
-        
-        .course-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .nav-tabs-custom {
-            border-bottom: 2px solid #e9ecef;
-            margin-bottom: 0;
-        }
-        
-        .nav-tabs-custom .nav-link {
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: #6c757d;
-            font-weight: 500;
-            padding: 1rem 1.5rem;
-        }
-        
-        .nav-tabs-custom .nav-link.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-            background: none;
-        }
-        
-        .course-tab-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 0 0 15px 15px;
-        }
-        
-        .course-content {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            color: #4a5568;
-        }
-        
-        .resource-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-        
-        .resource-header {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 1.5rem;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .resource-content {
-            padding: 1.5rem;
-        }
-        
-        .document-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        
-        .document-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .document-icon {
-            font-size: 2.5rem;
-            color: #dc3545;
-            margin-bottom: 1rem;
-        }
-        
-        .sidebar-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            padding: 2rem;
-        }
-        
-        .course-stats .stat-item {
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f1f3f4;
-        }
-        
-        .course-stats .stat-item:last-child {
-            border-bottom: none;
-        }
-        
-        .list-group-item {
-            border: none;
-            border-radius: 10px !important;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .list-group-item:hover {
-            background: #f8f9fa;
-            transform: translateX(5px);
-        }
-        
-        .btn {
-            border-radius: 10px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .btn-lg {
-            padding: 0.75rem 2rem;
-        }
-        
-        @media (max-width: 768px) {
-            .page-header {
-                padding: 2rem 0 1rem;
-                text-align: center;
-            }
-            
-            .course-image-container {
-                height: 200px;
-            }
-            
-            .nav-tabs-custom .nav-link {
-                padding: 0.75rem 1rem;
-                font-size: 0.9rem;
-            }
-            
-            .course-tab-content {
-                padding: 1.5rem;
-            }
-            
-            .sidebar-card {
-                margin-top: 2rem;
-            }
-        }
-    </style>
-</x-layouts.app>
+</x-layouts.lms>

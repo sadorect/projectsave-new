@@ -60,7 +60,7 @@ class VerifyPermissionsStructure extends Command
         $this->info('Checking database structure...');
 
         // Check required tables
-        $requiredTables = ['users', 'roles', 'permissions', 'role_user', 'role_permission'];
+        $requiredTables = ['users', 'roles', 'permissions', 'model_has_roles', 'role_has_permissions'];
         foreach ($requiredTables as $table) {
             if (!Schema::hasTable($table)) {
                 $this->errors[] = "Missing table: {$table}";
@@ -70,7 +70,7 @@ class VerifyPermissionsStructure extends Command
 
         // Check required columns
         if (Schema::hasTable('permissions')) {
-            $requiredColumns = ['id', 'name', 'slug', 'description', 'category'];
+            $requiredColumns = ['id', 'name', 'slug', 'description', 'category', 'guard_name'];
             foreach ($requiredColumns as $column) {
                 if (!Schema::hasColumn('permissions', $column)) {
                     $this->errors[] = "Missing column in permissions table: {$column}";
@@ -92,9 +92,9 @@ class VerifyPermissionsStructure extends Command
         }
 
         // Check pivot table indexes
-        $pivotIndexes = DB::select("SHOW INDEX FROM role_permission WHERE Column_name IN ('role_id', 'permission_id')");
+        $pivotIndexes = DB::select("SHOW INDEX FROM role_has_permissions WHERE Column_name IN ('role_id', 'permission_id')");
         if (count($pivotIndexes) < 2) {
-            $this->warnings[] = "Missing indexes on role_permission pivot table";
+            $this->warnings[] = "Missing indexes on role_has_permissions pivot table";
         }
     }
 
@@ -211,7 +211,9 @@ class VerifyPermissionsStructure extends Command
         $this->info('Checking route permissions...');
 
         $routes = collect(\Route::getRoutes())->filter(function ($route) {
-            return collect($route->middleware())->contains('permission');
+            return collect($route->middleware())->contains(function ($middleware) {
+                return Str::startsWith($middleware, 'permission:');
+            });
         });
 
         foreach ($routes as $route) {
@@ -221,9 +223,13 @@ class VerifyPermissionsStructure extends Command
             });
 
             if ($permissionMiddleware) {
-                $permission = Str::after($permissionMiddleware, 'permission:');
-                if (!Permission::where('slug', $permission)->exists()) {
-                    $this->errors[] = "Route {$route->uri()} requires non-existent permission: {$permission}";
+                $permissions = collect(explode(',', Str::after($permissionMiddleware, 'permission:')))
+                    ->reject(fn ($permission) => $permission === 'admin');
+
+                foreach ($permissions as $permission) {
+                    if (!Permission::query()->where('slug', $permission)->exists()) {
+                        $this->errors[] = "Route {$route->uri()} requires non-existent permission: {$permission}";
+                    }
                 }
             }
         }
@@ -291,8 +297,7 @@ class VerifyPermissionsStructure extends Command
     {
         $superAdmin = Role::where('slug', 'super-admin')->first();
         if ($superAdmin) {
-            $allPermissions = Permission::pluck('id');
-            $superAdmin->permissions()->sync($allPermissions);
+            $superAdmin->syncPermissions(Permission::all());
             $this->info('✅ Assigned all permissions to Super Admin role');
         }
     }

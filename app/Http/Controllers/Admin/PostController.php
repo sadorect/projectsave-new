@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\FacebookService;
 use App\Services\FileUploadService;
+use App\Services\HtmlSanitizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -17,6 +18,16 @@ use App\Http\Controllers\Controller;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . Post::class)->only('index');
+        $this->middleware('can:create,' . Post::class)->only(['create', 'store']);
+        $this->middleware('can:update,post')->only(['edit', 'update']);
+        $this->middleware('can:delete,post')->only('destroy');
+        $this->middleware('can:bulkManage,' . Post::class)->only('bulkAction');
+        $this->middleware('can:manageTaxonomy,' . Post::class)->only('createCategory');
+    }
+
     public function index(Request $request)
     {
         $query = Post::with(['categories', 'tags']);
@@ -251,9 +262,22 @@ class PostController extends Controller
             $validated['slug'] = Str::slug($validated['title']);
             $validated['user_id'] = auth()->id();
             $validated['published_at'] = Carbon::parse($request->published_at);
+            $validated['details'] = HtmlSanitizer::clean($validated['details']);
+            if (isset($validated['bible_text'])) {
+                $validated['bible_text'] = HtmlSanitizer::clean($validated['bible_text']);
+            }
+            if (isset($validated['action_point'])) {
+                $validated['action_point'] = HtmlSanitizer::clean($validated['action_point']);
+            }
 
             if ($request->hasFile('image')) {
-                $validated['image'] = $request->file('image')->store('posts', 'public');
+                $validated['image'] = FileUploadService::uploadImage(
+                    $request->file('image'),
+                    'posts',
+                    'public',
+                    ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                    'image'
+                );
             }
 
             $post = Post::create($validated);
@@ -327,7 +351,21 @@ class PostController extends Controller
         //$validated['published_at'] = Carbon::parse($request->published_at);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('posts', 'public');
+            $validated['image'] = FileUploadService::uploadImage(
+                $request->file('image'),
+                'posts',
+                'public',
+                ['jpg', 'jpeg', 'png', 'gif'],
+                'image'
+            );
+        }
+
+        $validated['details'] = HtmlSanitizer::clean($validated['details']);
+        if (isset($validated['bible_text'])) {
+            $validated['bible_text'] = HtmlSanitizer::clean($validated['bible_text']);
+        }
+        if (isset($validated['action_point'])) {
+            $validated['action_point'] = HtmlSanitizer::clean($validated['action_point']);
         }
 
         $post->update($validated);

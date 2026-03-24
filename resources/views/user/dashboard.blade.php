@@ -62,19 +62,8 @@
                     </div>
                     <h5 class="card-title">ASOM Progress</h5>
                     @if(auth()->user()->user_type === 'asom_student')
-                        @php
-                        $user = auth()->user();
-                        $asomCourses = \App\Models\Course::whereIn('title', [
-                            'Bible Introduction', 'Hermeneutics', 'Ministry Vitals',
-                            'Spiritual Gifts & Ministry', 'Biblical Counseling', 'Homiletics'
-                        ])->get();
-                        $enrolledCourses = $user->courses()->get();
-                        $overallProgress = $enrolledCourses->isEmpty() ? 0 : round($enrolledCourses->sum(function($course) use($user) {
-                            return $user->getCourseProgress($course);
-                        }) / $enrolledCourses->count(), 1);
-                        @endphp
-                        <p class="card-text h4 text-primary mb-0">{{ $overallProgress }}%</p>
-                        <small class="text-muted">{{ $enrolledCourses->count() }}/{{ $asomCourses->count() }} courses</small>
+                        <p class="card-text h4 text-primary mb-0">{{ $asomSummary['overall_progress'] ?? 0 }}%</p>
+                        <small class="text-muted">{{ $asomSummary['enrolled_courses_count'] ?? 0 }}/{{ $asomSummary['program_courses_count'] ?? 0 }} courses</small>
                     @else
                         <p class="card-text h4 text-success mb-0">Available</p>
                         <small class="text-muted">Ready to enroll</small>
@@ -234,9 +223,11 @@
                             </button>
                         </form>
                         @endif
-                        <a href="{{ route('user.files') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-folder me-2"></i>My Files
-                        </a>
+                        @if(auth()->user()->isAdmin() || auth()->user()->hasPermission('manage-files'))
+                            <a href="{{ route('user.files') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-folder me-2"></i>My Files
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>

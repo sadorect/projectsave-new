@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Permissions Management</h3>
-                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#createPermissionModal">
+                    <button type="button" class="btn btn-primary float-right" data-bs-toggle="modal" data-bs-target="#createPermissionModal">
                         Create New Permission
                     </button>
                 </div>
@@ -22,18 +22,18 @@
                         </thead>
                         <tbody>
                             @foreach($permissions as $permission)
-                            <tr>
-                                <td>{{ $permission->name }}</td>
-                                <td>
-                                    @foreach($permission->roles as $role)
-                                        <span class="badge badge-info">{{ $role->name }}</span>
-                                    @endforeach
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary">Edit</button>
-                                    <button class="btn btn-sm btn-danger">Delete</button>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>{{ $permission->name }}</td>
+                                    <td>
+                                        @foreach($permission->roles as $role)
+                                            <span class="badge bg-info">{{ $role->name }}</span>
+                                        @endforeach
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary">Edit</button>
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -43,17 +43,14 @@
     </div>
 </div>
 
-<!-- Create Permission Modal -->
-<div class="modal fade" id="createPermissionModal" tabindex="-1">
+<div class="modal fade" id="createPermissionModal" tabindex="-1" aria-labelledby="createPermissionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ route('admin.permissions.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title">Create New Permission</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>×</span>
-                    </button>
+                    <h5 class="modal-title" id="createPermissionModalLabel">Create New Permission</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -63,10 +60,9 @@
                     <div class="form-group">
                         <label>Assign to Roles</label>
                         @foreach($roles as $role)
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" name="roles[]" value="{{ $role->id }}" 
-                                    class="custom-control-input" id="role{{ $role->id }}">
-                                <label class="custom-control-label" for="role{{ $role->id }}">
+                            <div class="form-check">
+                                <input type="checkbox" name="roles[]" value="{{ $role->id }}" class="form-check-input" id="role{{ $role->id }}">
+                                <label class="form-check-label" for="role{{ $role->id }}">
                                     {{ $role->name }}
                                 </label>
                             </div>
@@ -74,7 +70,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Create Permission</button>
                 </div>
             </form>

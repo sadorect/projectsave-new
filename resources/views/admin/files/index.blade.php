@@ -323,15 +323,17 @@
 @endsection
 
 @php
-function getFileIcon($mimeType) {
-    if (str_starts_with($mimeType, 'image/')) return 'fa-image';
-    if (str_starts_with($mimeType, 'video/')) return 'fa-video';
-    if (str_starts_with($mimeType, 'audio/')) return 'fa-music';
-    if ($mimeType === 'application/pdf') return 'fa-file-pdf';
-    if (str_contains($mimeType, 'word')) return 'fa-file-word';
-    if (str_contains($mimeType, 'excel') || str_contains($mimeType, 'spreadsheet')) return 'fa-file-excel';
-    if (str_contains($mimeType, 'powerpoint') || str_contains($mimeType, 'presentation')) return 'fa-file-powerpoint';
-    if (str_starts_with($mimeType, 'text/')) return 'fa-file-alt';
-    return 'fa-file';
+if (! function_exists('getFileIcon')) {
+    function getFileIcon($mimeType) {
+        if (str_starts_with($mimeType, 'image/')) return 'fa-image';
+        if (str_starts_with($mimeType, 'video/')) return 'fa-video';
+        if (str_starts_with($mimeType, 'audio/')) return 'fa-music';
+        if ($mimeType === 'application/pdf') return 'fa-file-pdf';
+        if (str_contains($mimeType, 'word')) return 'fa-file-word';
+        if (str_contains($mimeType, 'excel') || str_contains($mimeType, 'spreadsheet')) return 'fa-file-excel';
+        if (str_contains($mimeType, 'powerpoint') || str_contains($mimeType, 'presentation')) return 'fa-file-powerpoint';
+        if (str_starts_with($mimeType, 'text/')) return 'fa-file-alt';
+        return 'fa-file';
+    }
 }
 @endphp

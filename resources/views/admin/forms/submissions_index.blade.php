@@ -1,160 +1,114 @@
 @extends('admin.layouts.app')
 
+@section('title', 'Form Submissions')
+@section('page_kicker', 'Forms And Intake')
+@section('page_subtitle', 'Monitor every response arriving through ministry forms and jump into the related form context when needed.')
+
 @section('content')
-<div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="h3 mb-2 text-gray-800"><i class="fas fa-list me-2"></i>All Form Submissions</h1>
-      <p class="text-muted">View and manage all form submissions across all forms</p>
-    </div>
-    <a href="{{ route('admin.forms.index') }}" class="btn btn-secondary">
-      <i class="fas fa-arrow-left me-2"></i>Back to Forms
-    </a>
-  </div>
+<div class="admin-page-shell">
+    <section class="admin-stat-grid">
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">All submissions</span>
+            <strong class="admin-stat-value">{{ number_format($summary['total']) }}</strong>
+            <p class="admin-stat-note mb-0">Responses currently stored across every admin-managed form.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Received today</span>
+            <strong class="admin-stat-value">{{ number_format($summary['today']) }}</strong>
+            <p class="admin-stat-note mb-0">Fresh responses that landed in the last 24 hours.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Member responses</span>
+            <strong class="admin-stat-value">{{ number_format($summary['members']) }}</strong>
+            <p class="admin-stat-note mb-0">Submissions tied to signed-in users.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Guest responses</span>
+            <strong class="admin-stat-value">{{ number_format($summary['guests']) }}</strong>
+            <p class="admin-stat-note mb-0">Submissions received without a member account.</p>
+        </article>
+    </section>
 
-  @include('components.alerts')
+    <x-ui.panel title="Submission Feed" subtitle="Review incoming form traffic and open the owning form for deeper response management.">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <a href="{{ route('admin.forms.index') }}" class="surface-button-secondary">Back to forms</a>
+        </div>
 
-  @if($submissions && $submissions->count() > 0)
-    <div class="card shadow mb-4">
-      <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">All Submissions ({{ $submissions->total() }})</h6>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-bordered" width="100%" cellspacing="0">
-            <thead>
-              <tr>
-                <th width="5%">#</th>
-                <th width="25%">Form Title</th>
-                <th width="20%">Submitted By</th>
-                <th width="15%">Email</th>
-                <th width="15%">Submitted At</th>
-                <th width="20%">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @foreach($submissions as $submission)
-                <tr>
-                  <td>{{ $loop->iteration + ($submissions->currentPage() - 1) * $submissions->perPage() }}</td>
-                  <td>
-                    <strong>{{ $submission->form->title ?? 'Unknown Form' }}</strong>
-                    <br><small class="text-muted">ID: {{ $submission->form_id }}</small>
-                  </td>
-                  <td>
-                    @if($submission->user)
-                      {{ $submission->user->name }}
-                    @else
-                      <span class="text-muted">Guest User</span>
-                    @endif
-                  </td>
-                  <td>
-                    @if($submission->user)
-                      {{ $submission->user->email }}
-                    @else
-                      <span class="text-muted">N/A</span>
-                    @endif
-                  </td>
-                  <td>
-                    <small>{{ $submission->created_at->format('M d, Y H:i') }}</small>
-                    <br><small class="text-muted">{{ $submission->created_at->diffForHumans() }}</small>
-                  </td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" 
-                              data-bs-target="#submissionModal{{ $submission->id }}" title="View Details">
-                        <i class="fas fa-eye"></i>
-                      </button>
-                      <a href="{{ route('admin.forms.submissions', $submission->form) }}" 
-                         class="btn btn-primary btn-sm" title="View Form Submissions">
-                        <i class="fas fa-list"></i>
-                      </a>
-                      @if($submission->form)
-                        <a href="{{ route('admin.forms.download', $submission->form) }}" 
-                           class="btn btn-success btn-sm" title="Download CSV">
-                          <i class="fas fa-download"></i>
-                        </a>
-                      @endif
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Submission Details Modal -->
-                <div class="modal fade" id="submissionModal{{ $submission->id }}" tabindex="-1">
-                  <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title">Submission Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                      </div>
-                      <div class="modal-body">
-                        <div class="row">
-                          <div class="col-md-6">
-                            <strong>Form:</strong> {{ $submission->form->title ?? 'Unknown' }}
-                          </div>
-                          <div class="col-md-6">
-                            <strong>Submitted:</strong> {{ $submission->created_at->format('M d, Y H:i') }}
-                          </div>
-                        </div>
-                        <div class="row mt-2">
-                          <div class="col-md-6">
-                            <strong>User:</strong> {{ $submission->user->name ?? 'Guest' }}
-                          </div>
-                          <div class="col-md-6">
-                            <strong>Email:</strong> {{ $submission->user->email ?? 'N/A' }}
-                          </div>
-                        </div>
-                        
-                        <hr>
-                        
-                        <h6>Submitted Data:</h6>
-                        @if($submission->data && is_array($submission->data))
-                          <div class="table-responsive">
-                            <table class="table table-sm">
-                              @foreach($submission->data as $key => $value)
-                                <tr>
-                                  <td width="30%"><strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong></td>
-                                  <td>
-                                    @if(is_array($value))
-                                      {{ implode(', ', $value) }}
+        @if($submissions->isNotEmpty())
+            <div class="surface-table-shell">
+                <table class="table admin-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Form</th>
+                            <th>Submitted by</th>
+                            <th>Received</th>
+                            <th>Payload</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($submissions as $submission)
+                            <tr>
+                                <td>
+                                    <strong class="d-block">{{ $submission->form->title ?? 'Unknown form' }}</strong>
+                                    <small class="text-muted">Form ID {{ $submission->form_id }}</small>
+                                </td>
+                                <td>
+                                    @if($submission->user)
+                                        <strong class="d-block">{{ $submission->user->name }}</strong>
+                                        <small class="text-muted">{{ $submission->user->email }}</small>
                                     @else
-                                      {{ $value }}
+                                        <span class="admin-status-chip is-muted">Guest user</span>
                                     @endif
-                                  </td>
-                                </tr>
-                              @endforeach
-                            </table>
-                          </div>
-                        @else
-                          <p class="text-muted">No data available</p>
-                        @endif
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-        
-        <div class="d-flex justify-content-center">
-          {{ $submissions->links() }}
-        </div>
-      </div>
-    </div>
-  @else
-    <div class="card shadow">
-      <div class="card-body text-center py-5">
-        <i class="fas fa-inbox text-muted mb-4" style="font-size: 4rem;"></i>
-        <h4 class="text-muted mb-3">No Submissions Found</h4>
-        <p class="text-muted mb-4">No one has submitted any forms yet. Create forms and share them to start collecting data.</p>
-        <a href="{{ route('admin.forms.index') }}" class="btn btn-primary">
-          <i class="fas fa-clipboard-list me-2"></i>View Forms
-        </a>
-      </div>
-    </div>
-  @endif
+                                </td>
+                                <td>
+                                    <strong class="d-block">{{ $submission->created_at->format('M j, Y H:i') }}</strong>
+                                    <small class="text-muted">{{ $submission->created_at->diffForHumans() }}</small>
+                                </td>
+                                <td>
+                                    @if(is_array($submission->data) && count($submission->data) > 0)
+                                        <details class="admin-inline-details">
+                                            <summary>{{ count($submission->data) }} field(s)</summary>
+                                            <div class="admin-data-preview mt-2">
+                                                @foreach($submission->data as $key => $value)
+                                                    <div class="admin-data-preview-item">
+                                                        <strong>{{ ucfirst(str_replace('_', ' ', $key)) }}</strong>
+                                                        <span>{{ is_array($value) ? implode(', ', $value) : ($value ?: 'No response') }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </details>
+                                    @else
+                                        <span class="text-muted">No stored payload</span>
+                                    @endif
+                                </td>
+                                <td class="text-end">
+                                    @if($submission->form)
+                                        <a href="{{ route('admin.forms.submissions', $submission->form) }}" class="btn btn-sm btn-outline-primary">Open form responses</a>
+                                    @else
+                                        <span class="text-muted">No form link</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $submissions->links() }}
+            </div>
+        @else
+            <x-ui.empty-state
+                title="No submissions found"
+                message="Responses will appear here as soon as visitors or members begin using your forms."
+                icon="bi bi-inbox"
+            >
+                <x-slot:actions>
+                    <a href="{{ route('admin.forms.index') }}" class="surface-button-secondary">Open forms</a>
+                </x-slot:actions>
+            </x-ui.empty-state>
+        @endif
+    </x-ui.panel>
 </div>
 @endsection

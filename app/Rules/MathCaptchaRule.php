@@ -16,7 +16,9 @@ class MathCaptchaRule implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!MathCaptcha::validate($value)) {
+        $captchaKey = request()->input('math_captcha_key');
+
+        if (! MathCaptcha::validate($value, is_string($captchaKey) ? $captchaKey : null)) {
             $fail('The answer to the math question is incorrect. Please try again.');
         }
     }

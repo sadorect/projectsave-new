@@ -36,6 +36,8 @@
                             <input type="password" name="password_confirmation" class="form-control">
                         </div>
 
+                        <x-math-captcha error-bag="updatePassword" />
+
                         <button type="submit" class="btn btn-primary">Update Password</button>
                     </form>
                 </div>
@@ -45,25 +47,42 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Communication Preferences</h5>
-                    <form method="POST" action="{{ route('notification-preferences.update') }}">
+                    <form method="POST" action="{{ route('user.preferences.update') }}">
                         @csrf
                         @method('patch')
 
                         <div class="mb-3">
                             <label class="form-label">Preferred Language</label>
                             <select name="language" class="form-select">
-                                <option value="en">English</option>
-                                <option value="fr">French</option>
+                                <option value="en" {{ auth()->user()->language === 'en' ? 'selected' : '' }}>English</option>
+                                <option value="fr" {{ auth()->user()->language === 'fr' ? 'selected' : '' }}>French</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Time Zone</label>
                             <select name="timezone" class="form-select">
-                                <option value="UTC">UTC</option>
-                                <option value="America/New_York">Eastern Time</option>
-                                <option value="Europe/London">London</option>
+                                <option value="UTC" {{ auth()->user()->timezone === 'UTC' ? 'selected' : '' }}>UTC</option>
+                                <option value="America/New_York" {{ auth()->user()->timezone === 'America/New_York' ? 'selected' : '' }}>Eastern Time</option>
+                                <option value="Europe/London" {{ auth()->user()->timezone === 'Europe/London' ? 'selected' : '' }}>London</option>
                             </select>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <input type="hidden" name="preferences[email]" value="0">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="settingsEmailNotifications" name="preferences[email]" value="1" {{ !empty($accountPreferences['email']) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="settingsEmailNotifications">Email notifications</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="hidden" name="preferences[event_reminders]" value="0">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="settingsEventReminders" name="preferences[event_reminders]" value="1" {{ !empty($accountPreferences['event_reminders']) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="settingsEventReminders">Event reminders</label>
+                                </div>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Save Preferences</button>

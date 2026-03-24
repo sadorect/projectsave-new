@@ -5,30 +5,30 @@ namespace App\Http\Controllers\LMS;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Models\Certificate;
-use App\Models\ExamAttempt;
-use Illuminate\Http\Request;
+use App\Support\Lms\DiplomaProgramService;
 
 class LessonProgressController extends Controller
 {
+    public function __construct(private DiplomaProgramService $diplomaProgram)
+    {
+    }
+
     public function markComplete(Course $course, Lesson $lesson)
     {
-        // Ensure the lesson belongs to the course
         if ($lesson->course_id !== $course->id) {
             return response()->json(['success' => false, 'message' => 'Lesson does not belong to this course.'], 400);
         }
 
         $user = auth()->user();
 
-        // Mark lesson as complete for the user
-         $user->lessonProgress()->updateOrCreate(
+        $user->lessonProgress()->updateOrCreate(
             [
                 'lesson_id' => $lesson->id,
-                'user_id' => $user->id
+                'user_id' => $user->id,
             ],
             [
                 'completed' => true,
-                'completed_at' => now()
+                'completed_at' => now(),
             ]
         );
 
@@ -44,47 +44,33 @@ class LessonProgressController extends Controller
         if ($progressPercentage === 100.0) {
             $user->courses()->updateExistingPivot($course->id, [
                 'status' => 'completed',
-                'completed_at' => now()
+                'completed_at' => now(),
             ]);
-            
-            // Auto-generate certificate if course is completed and no certificate exists
-            $existingCertificate = Certificate::where('user_id', $user->id)
-                ->where('course_id', $course->id)
-                ->first();
-                
-            if (!$existingCertificate) {
-                // Get final grade from exams if available
-                $finalGrade = null;
-                $examAttempts = ExamAttempt::where('user_id', $user->id)
-                    ->whereHas('exam', function($query) use ($course) {
-                        $query->where('course_id', $course->id);
-                    })
-                    ->whereNotNull('completed_at')
-                    ->get();
 
-                if ($examAttempts->isNotEmpty()) {
-                    $finalGrade = $examAttempts->avg('score');
-                }
+            $this->diplomaProgram->ensurePendingCertificate(
+                $user,
+                'Program certificate generated after the learner completed all ASOM diploma lesson requirements.'
+            );
+        }
 
-                Certificate::create([
-                    'user_id' => $user->id,
-                    'course_id' => $course->id,
-                    'final_grade' => $finalGrade,
-                    'issued_at' => now(),
-                    'completed_at' => now(),
-                    'is_approved' => false, // Requires admin approval
-                ]);
-            }
+        $nextLesson = $course->lessons()
+            ->where('order', '>', $lesson->order)
+            ->orderBy('order')
+            ->first();
+
+        if (request()->expectsJson() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Lesson marked as complete.',
+                'newProgress' => round($progressPercentage),
+                'nextLessonUrl' => $nextLesson
+                    ? route('lms.lessons.show', [$course->slug, $nextLesson->slug])
+                    : route('lms.dashboard'),
+            ]);
         }
 
         return redirect()->back()
             ->with('success', 'Lesson marked as complete!')
             ->with('progressPercentage', $progressPercentage);
-        // Alternatively, you can return a JSON response
-       /* return response()->json([
-            'success' => true,
-            'progress' => $progressPercentage
-        ]);
-        */
     }
 }

@@ -8,39 +8,127 @@ use App\Models\Course;
 use App\Services\VideoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Support\Lms\DiplomaProgramService;
 
 class LessonController extends Controller
 {
     protected $videoService;
+    protected $diplomaProgram;
 
-    public function __construct(VideoService $videoService)
+    public function __construct(VideoService $videoService, DiplomaProgramService $diplomaProgram)
     {
         $this->videoService = $videoService;
+        $this->diplomaProgram = $diplomaProgram;
     }
 
     public function index(Course $course)
     {
-        $lessons = $course->lessons()->orderBy('order')->get();
-        return view('lms.lessons.index', compact('course', 'lessons'));
+        if (! $this->studentIsEnrolled($course)) {
+            return redirect()->route('lms.courses.show', $course->slug)
+                ->with('error', 'Enroll in the course to access the lesson outline.');
+        }
+
+        $course->load([
+            'instructor',
+            'lessons' => fn ($query) => $query->orderBy('order'),
+            'exams' => fn ($query) => $query->where('is_active', true)->withCount('questions'),
+        ]);
+
+        $completedLessonIds = auth()->user()->lessonProgress()
+            ->whereIn('lesson_id', $course->lessons->pluck('id'))
+            ->where('completed', true)
+            ->pluck('lesson_id');
+
+        $courseProgress = round(auth()->user()->getCourseProgress($course));
+        $nextLesson = $course->lessons->first(fn ($lesson) => ! $completedLessonIds->contains($lesson->id)) ?? $course->lessons->first();
+        $availableExams = $course->exams->filter(fn ($exam) => $exam->questions_count >= 5)->values();
+        $diplomaStatus = $this->diplomaProgram->eligibility(auth()->user());
+        $diplomaCertificate = $diplomaStatus['certificate'];
+        $manualCourseCertificate = $this->diplomaProgram->manualCourseCertificatesFor(auth()->user())->get($course->id);
+
+        $lessonCards = $course->lessons->map(function (Lesson $lesson) use ($completedLessonIds, $course) {
+            $isCompleted = $completedLessonIds->contains($lesson->id);
+
+            return [
+                'model' => $lesson,
+                'title' => $lesson->title,
+                'excerpt' => Str::limit(trim(strip_tags((string) $lesson->content)), 140),
+                'is_completed' => $isCompleted,
+                'type_label' => $lesson->video_url ? 'Video lesson' : 'Reading lesson',
+                'url' => route('lms.lessons.show', [$course->slug, $lesson->slug]),
+            ];
+        })->values();
+
+        return view('lms.lessons.index', compact(
+            'course',
+            'courseProgress',
+            'completedLessonIds',
+            'nextLesson',
+            'availableExams',
+            'diplomaStatus',
+            'diplomaCertificate',
+            'manualCourseCertificate',
+            'lessonCards'
+        ));
     }
 
     public function show(Course $course, Lesson $lesson)
-{
-    $totalLessons = $course->lessons()->count();
-    $completedLessons = auth()->user()->lessonProgress()
-        ->whereIn('lesson_id', $course->lessons()->pluck('id'))
-        ->where('completed', true)
-        ->count();
-        
-    $courseProgress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
+    {
+        if (! $this->studentIsEnrolled($course)) {
+            return redirect()->route('lms.courses.show', $course->slug)
+                ->with('error', 'Enroll in the course to access the lesson player.');
+        }
 
-    $nextLesson = $course->lessons()
-        ->where('order', '>', $lesson->order)
-        ->orderBy('order')
-        ->first();
-            
-    return view('lms.lessons.show', compact('course', 'lesson', 'nextLesson', 'courseProgress'));
-}
+        $course->load([
+            'instructor',
+            'lessons' => fn ($query) => $query->orderBy('order'),
+            'exams' => fn ($query) => $query->where('is_active', true)->withCount('questions'),
+        ]);
+
+        abort_unless($lesson->course_id === $course->id, 404);
+
+        $completedLessonIds = auth()->user()->lessonProgress()
+            ->whereIn('lesson_id', $course->lessons->pluck('id'))
+            ->where('completed', true)
+            ->pluck('lesson_id');
+
+        $courseProgress = round(auth()->user()->getCourseProgress($course));
+        $currentIndex = $course->lessons->search(fn (Lesson $courseLesson) => $courseLesson->id === $lesson->id);
+        $previousLesson = $currentIndex !== false && $currentIndex > 0 ? $course->lessons[$currentIndex - 1] : null;
+        $nextLesson = $currentIndex !== false && $currentIndex < ($course->lessons->count() - 1)
+            ? $course->lessons[$currentIndex + 1]
+            : null;
+        $availableExams = $course->exams->filter(fn ($exam) => $exam->questions_count >= 5)->values();
+        $diplomaStatus = $this->diplomaProgram->eligibility(auth()->user());
+        $diplomaCertificate = $diplomaStatus['certificate'];
+        $manualCourseCertificate = $this->diplomaProgram->manualCourseCertificatesFor(auth()->user())->get($course->id);
+        $lessonCompleted = $completedLessonIds->contains($lesson->id);
+
+        $courseOutline = $course->lessons->map(function (Lesson $courseLesson) use ($completedLessonIds, $course, $lesson) {
+            return [
+                'model' => $courseLesson,
+                'is_current' => $courseLesson->id === $lesson->id,
+                'is_completed' => $completedLessonIds->contains($courseLesson->id),
+                'url' => route('lms.lessons.show', [$course->slug, $courseLesson->slug]),
+                'type_label' => $courseLesson->video_url ? 'Video lesson' : 'Reading lesson',
+            ];
+        })->values();
+
+        return view('lms.lessons.show', compact(
+            'course',
+            'lesson',
+            'nextLesson',
+            'previousLesson',
+            'courseProgress',
+            'completedLessonIds',
+            'availableExams',
+            'diplomaStatus',
+            'diplomaCertificate',
+            'manualCourseCertificate',
+            'lessonCompleted',
+            'courseOutline'
+        ));
+    }
 
 
     public function create(Course $course)
@@ -127,5 +215,13 @@ class LessonController extends Controller
         $lesson->delete();
         return redirect()->route('lessons.index', $course)
                         ->with('success', 'Lesson deleted successfully');
+    }
+
+    private function studentIsEnrolled(Course $course): bool
+    {
+        return auth()->user()
+            ->courses()
+            ->where('course_id', $course->id)
+            ->exists();
     }
 }

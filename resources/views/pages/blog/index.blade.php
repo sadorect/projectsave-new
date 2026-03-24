@@ -1,121 +1,161 @@
-<x-layouts.app>
-    
+<x-layouts.app
+    title="Projectsave Devotionals"
+    meta-description="Read devotionals and ministry articles designed to strengthen believers and equip them for kingdom service."
+>
+    @php
+        $featuredPost = $posts->count() ? $posts->getCollection()->first() : null;
+        $remainingPosts = $posts->count() > 1 ? $posts->getCollection()->slice(1) : collect();
+    @endphp
 
-        <!-- Page Header Start -->
-        <div class="page-header">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <h2>Our Devotional</h2>
-                    </div>
-                    <div class="col-12">
-                        <a href="">Home</a>
-                        <a href="">Devotional</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Page Header End -->
-        <div class="container">
-            <div class="row justify-content-center mb-5">
-                <div class="col-lg-8 text-center">
-                    <h2 class="display-4 mb-3">Daily Bread for Spiritual Growth</h2>
-                    <p class="lead">
-                        Transformative devotional insights drawn from God's Word to equip believers for effective kingdom service. These Spirit-inspired writings will strengthen your faith, deepen your walk with God, and empower you to fulfill the Great Commission.
-                    </p>
-                    <div class="mt-4">
-                        <span class="badge bg-primary me-2">Daily Devotional</span>
-                        <span class="badge bg-primary me-2">Spiritual Growth</span>
-                        <span class="badge bg-primary me-2">Kingdom Service</span>
-                        <span class="badge bg-primary">Divine Empowerment</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        
-        <!-- Blog Start -->
-        <div class="blog">
-            <div class="container">
-               
-                <div class="row">
-                    @foreach($posts as $post)
-                        <div class="col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm hover-lift">
-                                @if($post->image)
-                                    <div class="card-img-top position-relative">
-                                        <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="img-fluid rounded-top">
-                                        <div class="overlay-gradient"></div>
+    <x-ui.public-page-hero
+        eyebrow="Devotionals"
+        title="Daily bread for spiritual growth"
+        :subtitle="$selectedDate ? 'Archive for ' . $selectedDate . '. Read the devotionals published on that day and explore the wider archive from the sidebar.' : 'Read Scripture-rooted teaching and devotional encouragement that strengthens faith, clarifies calling, and supports kingdom service.'"
+    >
+        <x-slot:actions>
+            @if($selectedDate)
+                <a href="{{ route('blog.index') }}" class="surface-button-secondary">Clear date filter</a>
+            @else
+                <a href="{{ route('faqs.list') }}" class="surface-button-secondary">Browse FAQs</a>
+            @endif
+            <a href="{{ route('search') }}?q=faith" class="surface-button-primary">Search the archive</a>
+        </x-slot:actions>
+    </x-ui.public-page-hero>
+
+    <section class="surface-section pt-2">
+        <div class="surface-frame">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-8">
+                    @if($featuredPost)
+                        <div class="public-card overflow-hidden mb-5">
+                            <div class="row g-0 align-items-stretch">
+                                @if($featuredPost->image)
+                                    <div class="col-xl-5">
+                                        <div class="public-image-frame rounded-0 h-100">
+                                            <img src="{{ asset('storage/' . $featuredPost->image) }}" alt="{{ $featuredPost->title }}" loading="lazy">
+                                        </div>
                                     </div>
                                 @endif
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <i class="fas fa-bible text-primary me-2"></i>
-                                        <h5 class="card-title mb-0">
-                                            <a href="{{ route('posts.show', $post->slug) }}" class="text-dark text-decoration-none hover-text-primary">
-                                                {{ $post->title }}
-                                            </a>
-                                        </h5>
-                                    </div>
-                                    <p class="card-text text-muted">
-                                        {!! Str::limit(strip_tags($post->details), 150) !!}
-                                    </p>
-                                    
-                                    <div class="d-flex align-items-center mt-3">
-                                        <img src="{{ asset('frontend/img/psave_logo.png') }}" alt="Author" class="rounded-circle me-2" width="30">
-                                        <small class="text-muted">{{ $post->author }}</small>
-                                        <span class="mx-2">•</span>
-                                        <small class="text-muted">{{ $post->published_at ? $post->published_at->format('M d, Y') : '' }}</small>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-transparent border-top-0">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            @foreach($post->categories as $category)
-                                                <span class="badge bg-light text-primary me-1">{{ $category->name }}</span>
-                                            @endforeach
+                                <div class="{{ $featuredPost->image ? 'col-xl-7' : 'col-12' }}">
+                                    <div class="p-4 p-lg-5">
+                                        <div class="public-chip mb-3">{{ $selectedDate ? 'Featured from this day' : 'Featured devotional' }}</div>
+                                        <h2 class="mb-3">{{ $featuredPost->title }}</h2>
+                                        <p class="mb-3 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($featuredPost->details), 220) }}</p>
+                                        <div class="public-meta-list mb-4">
+                                            <span><i class="bi bi-person me-2 text-brand-700"></i>{{ $featuredPost->author }}</span>
+                                            <span><i class="bi bi-calendar-event me-2 text-brand-700"></i>{{ optional($featuredPost->published_at)->format('M d, Y') }}</span>
                                         </div>
-                                        <a href="{{ route('posts.show', $post->slug) }}" class="btn btn-outline-primary btn-sm">
-                                            Read More <i class="fas fa-arrow-right ms-1"></i>
-                                        </a>
+                                        <a href="{{ route('posts.show', $featuredPost->slug) }}" class="surface-button-primary">Read the devotional</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-                
+                    @endif
 
-                <div class="row">
-                    <div class="col-12">
-                        <div class="pagination-wrapper">
-                            {{ $posts->links() }}
+                    <x-ui.public-section-heading
+                        eyebrow="Archive"
+                        :title="$selectedDate ? 'Devotionals published on ' . $selectedDate : 'Recent devotionals'"
+                        :description="$selectedDate ? 'Browse every devotional published on the selected day or clear the filter to return to the full archive.' : 'Explore recent articles published by the ministry.'"
+                    />
+
+                    <div class="row g-4 mt-1">
+                        @forelse($remainingPosts as $post)
+                            <div class="col-xl-6">
+                                <article class="public-card overflow-hidden">
+                                    @if($post->image)
+                                        <div class="public-image-frame rounded-bottom-0">
+                                            <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" loading="lazy">
+                                        </div>
+                                    @endif
+                                    <div class="p-4">
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+                                            <span class="public-chip">{{ optional($post->published_at)->format('M d, Y') }}</span>
+                                            @foreach($post->categories as $category)
+                                                <span class="public-chip">{{ $category->name }}</span>
+                                            @endforeach
+                                        </div>
+                                        <h3 class="h5 mb-3">
+                                            <a href="{{ route('posts.show', $post->slug) }}" class="text-decoration-none">{{ $post->title }}</a>
+                                        </h3>
+                                        <p class="mb-0 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($post->details), 150) }}</p>
+                                    </div>
+                                </article>
+                            </div>
+                        @empty
+                            <div class="col-12">
+                                <x-ui.empty-state
+                                    title="No devotionals available"
+                                    message="Published devotionals will appear here as soon as they are available."
+                                    icon="bi bi-journal-richtext"
+                                />
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <div class="mt-5">
+                        {{ $posts->links() }}
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="d-flex flex-column gap-4">
+                        <div class="public-sidebar-card">
+                            <x-ui.public-section-heading
+                                eyebrow="Search"
+                                title="Find a devotional"
+                                description="Search the archive by topic, Scripture emphasis, or ministry theme."
+                            />
+
+                            <form method="GET" action="{{ route('search') }}" class="mt-4">
+                                <label for="devotional-archive-search" class="form-label fw-semibold">Search keyword</label>
+                                <div class="d-flex gap-2">
+                                    <input id="devotional-archive-search" class="form-control" type="text" name="q" placeholder="Faith, prayer, mission...">
+                                    <button class="surface-button-primary" type="submit">Go</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <x-blog.calendar
+                            :calendar="$calendar"
+                            :current-month="$currentMonth"
+                            :calendar-month="$calendarMonth"
+                            :calendar-year="$calendarYear"
+                            :post-calendar-days="$postCalendarDays"
+                        />
+
+                        <div class="public-sidebar-card">
+                            <x-ui.public-section-heading
+                                eyebrow="Recent"
+                                title="Recent devotionals"
+                            />
+
+                            <div class="d-flex flex-column gap-3 mt-4">
+                                @foreach($recentPosts as $recentPost)
+                                    <a href="{{ route('posts.show', $recentPost->slug) }}" class="text-decoration-none">
+                                        <div class="border rounded-4 p-3">
+                                            <h3 class="h6 mb-1">{{ $recentPost->title }}</h3>
+                                            <small class="text-muted">{{ optional($recentPost->published_at)->format('M d, Y') }}</small>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <div class="public-sidebar-card">
+                            <x-ui.public-section-heading
+                                eyebrow="Topics"
+                                title="Browse categories"
+                            />
+
+                            <div class="d-flex flex-wrap gap-2 mt-4">
+                                @foreach($categories as $category)
+                                    <span class="public-chip">{{ $category->name }} ({{ $category->posts_count }})</span>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>        <!-- Blog End -->
-
-<style>
-        .hover-lift {
-            transition: transform 0.2s ease;
-        }
-        
-        .hover-lift:hover {
-            transform: translateY(-5px);
-        }
-        
-        .overlay-gradient {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.1));
-        }
-        
-        .hover-text-primary:hover {
-            color: var(--bs-primary) !important;
-        }
-    </style>      
+        </div>
+    </section>
 </x-layouts.app>

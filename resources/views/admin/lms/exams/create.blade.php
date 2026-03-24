@@ -11,7 +11,7 @@
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Course</label>
-                    <select name="course_id" class="form-select" required>
+                    <select name="course_id" class="form-select" required data-exam-course-autofill="input[name='title']">
                         <option value="">Select a course</option>
                         @foreach($courses as $course)
                             <option value="{{ $course->id }}">{{ $course->title }}</option>
@@ -75,19 +75,4 @@
         </div>
     </div>
 </div>
-@push('scripts')
-<script>
-    document.querySelector('select[name="course_id"]').addEventListener('change', function() {
-        const courseSelect = this;
-        const selectedOption = courseSelect.options[courseSelect.selectedIndex];
-        const titleInput = document.querySelector('input[name="title"]');
-        
-        if (selectedOption.value) {
-            titleInput.value = selectedOption.text + ' - Final Exam';
-        }
-    });
-</script>
-@endpush
-
 @endsection
-

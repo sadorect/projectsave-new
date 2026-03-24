@@ -4,9 +4,14 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Course Management</h2>
-        <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Add New Course
-        </a>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ route('admin.asom-page.edit') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-stars"></i> ASOM Page
+            </a>
+            <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add New Course
+            </a>
+        </div>
     </div>
 
     <div class="card">

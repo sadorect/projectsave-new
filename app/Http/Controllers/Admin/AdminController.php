@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Event;
@@ -13,7 +14,7 @@ class AdminController extends Controller
 {
     protected function getAppropriateLayout()
     {
-        if (auth()->user()->hasPermission('edit-content') && !auth()->user()->is_admin) {
+        if (auth()->user()->canAccessContentAdmin() && !auth()->user()->isAdmin()) {
             return 'layouts.content.app';
         }
         return 'admin.layouts.app';
@@ -33,9 +34,7 @@ class AdminController extends Controller
             ->take(5)
             ->get();
 
-        //$layout = $this->getAppropriateLayout();
-
-        return view('admin.dashboard', compact('stats', 'recent_activity', 'layout'));
+        return view('admin.dashboard', compact('stats', 'recent_activity'));
     }
 
    

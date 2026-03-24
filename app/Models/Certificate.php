@@ -73,7 +73,7 @@ class Certificate extends Model
      */
     public function getCertificateTypeAttribute(): string
     {
-        return $this->isDiplomaCertificate() ? 'Diploma in Ministry' : $this->course->title;
+        return $this->isDiplomaCertificate() ? 'Diploma in Ministry' : ($this->course?->title ?? 'Course Certificate');
     }
 
     /**

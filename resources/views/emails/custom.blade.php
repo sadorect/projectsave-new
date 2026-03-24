@@ -5,5 +5,10 @@
 </head>
 <body>
     {!! $content !!}
+
+    @if(! empty($customMessage))
+        <hr>
+        {!! $customMessage !!}
+    @endif
 </body>
 </html>

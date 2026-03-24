@@ -1,100 +1,80 @@
-<x-layouts.app>
-    <!-- Page Header Start -->
-    <div class="page-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2>Login</h2>
-                </div>
-                <div class="col-12">
-                    <a href="{{ route('home') }}">Home</a>
-                    <a href="">Login</a>
-                </div>
-            </div>
-        </div>
+<x-guest-layout>
+    <div class="auth-form-intro">
+        <span class="auth-kicker">Login</span>
+        <h2 class="auth-form-title">Welcome back</h2>
+        <p class="auth-form-copy">
+            Sign in to continue into your ministry account, student workspace, and personalized public experience.
+        </p>
     </div>
-    <!-- Page Header End -->
 
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="login-form">
-                    <!-- Session Status -->
-                    @if (session('status'))
-                        <div class="alert alert-success mb-4" role="alert">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    <!-- General Error Messages -->
-                    @if ($errors->any())
-                        <div class="alert alert-danger mb-4" role="alert">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-                        
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" 
-                                   class="form-control @error('email') is-invalid @enderror" 
-                                   id="email" 
-                                   name="email" 
-                                   value="{{ old('email') }}" 
-                                   required 
-                                   autofocus>
-                            @error('email')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" 
-                                   class="form-control @error('password') is-invalid @enderror" 
-                                   id="password" 
-                                   name="password" 
-                                   required>
-                            @error('password')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="remember_me" name="remember">
-                                <label class="custom-control-label" for="remember_me">Remember me</label>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-custom">Login</button>
-
-                        <div class="d-flex justify-content-between mt-3">
-                            @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" class="forgot-password">
-                                    Forgot your password?
-                                </a>
-                            @endif
-                            
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="register-link">
-                                    Don't have an account? Register here
-                                </a>
-                            @endif
-                        </div>
-                    </form>
-                </div>
-            </div>
+    @if (session('status'))
+        <div class="auth-alert auth-alert-success mb-4">
+            {{ session('status') }}
         </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="auth-alert auth-alert-danger mb-4">
+            Please review the highlighted fields and try again.
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('login') }}" class="auth-form-grid">
+        @csrf
+
+        <div class="auth-field">
+            <label for="email" class="surface-form-label">Email address</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                value="{{ old('email') }}"
+                class="surface-form-input @error('email') is-invalid @enderror"
+                autocomplete="email"
+                required
+                autofocus
+            >
+            @error('email')
+                <div class="auth-error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="auth-field">
+            <label for="password" class="surface-form-label">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                class="surface-form-input @error('password') is-invalid @enderror"
+                autocomplete="current-password"
+                required
+            >
+            @error('password')
+                <div class="auth-error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="auth-inline">
+            <div class="form-check mb-0">
+                <input type="checkbox" class="form-check-input" id="remember_me" name="remember">
+                <label class="form-check-label text-muted" for="remember_me">Keep me signed in</label>
+            </div>
+
+            @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}">Forgot your password?</a>
+            @endif
+        </div>
+
+        <x-math-captcha />
+
+        <button type="submit" class="surface-button-primary w-100 justify-content-center">Sign in</button>
+    </form>
+
+    <div class="auth-link-row">
+        Need an account? <a href="{{ route('register') }}">Create a ministry account</a>
     </div>
-</x-layouts.app>
+
+    <div class="auth-action-stack">
+        <a href="{{ route('asom.register') }}" class="surface-button-secondary">Join ASOM directly</a>
+    </div>
+</x-guest-layout>

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,11 +33,7 @@ class AuthenticatedSessionController extends Controller
 
     protected function authenticated(Request $request, $user)
     {
-        if ($user->is_admin) {
-            return redirect()->intended(RouteServiceProvider::ADMIN_HOME);
-        }
-
-        return redirect()->intended(RouteServiceProvider::HOME);
+        return redirect()->intended(route($user->dashboardRoute()));
     }
 
     /**

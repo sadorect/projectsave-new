@@ -3,10 +3,6 @@
 @section('content')
 <div class="container">
     <h3>Import Questions for: {{ $exam->title }}</h3>
-
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
     @if(session('skipped'))
         <div class="alert alert-danger">
             @if(is_array(session('skipped')))

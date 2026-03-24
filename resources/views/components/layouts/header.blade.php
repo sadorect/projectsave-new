@@ -1,140 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>@yield('title', 'Projectsave International')</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-        <meta name="format-detection" content="telephone=no">
-        <meta property="og:title" content="@yield('og_title', config('app.name'))">
-        <meta property="og:description" content="@yield('og_description', 'ProjectSave International Ministry - Winning the lost, building the saints.')">
-        <meta property="og:image" content="@yield('og_image', asset('frontend/img/logo.png'))">
-        <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:type" content="website">
-        <meta name="description" content="@yield('meta_description', 'ProjectSave International Ministry - Winning the lost, building the saints through evangelism and discipleship across nations.')">
-        <meta name="author" content="ProjectSave International Ministry">
-        <meta name="robots" content="@yield('meta_robots', 'index, follow')">
-        <link rel="canonical" href="{{ url()->current() }}" />
-        <link rel="alternate" type="application/rss+xml" title="ProjectSave International Blog Feed" href="{{ route('feed') }}">
+@php
+    $navigationItems = collect($publicNavigation ?? [])->flatMap(fn (array $section) => $section['items'] ?? []);
+    $fallbackNavigationItems = collect([
+        ['label' => 'Home', 'route' => 'home', 'patterns' => ['home']],
+        ['label' => 'About', 'route' => 'about', 'patterns' => ['about']],
+        ['label' => 'Events', 'route' => 'events.index', 'patterns' => ['events.*']],
+        ['label' => 'Devotionals', 'route' => 'blog.index', 'patterns' => ['blog.*', 'posts.show']],
+        ['label' => 'FAQs', 'route' => 'faqs.list', 'patterns' => ['faqs.*']],
+        ['label' => 'Contact', 'route' => 'contact.show', 'patterns' => ['contact.*']],
+        ['label' => 'ASOM', 'route' => 'lms.courses.index', 'patterns' => ['lms.*', 'asom', 'asom.welcome']],
+    ])
+        ->filter(fn (array $item) => \Illuminate\Support\Facades\Route::has($item['route']))
+        ->map(fn (array $item) => [
+            'label' => $item['label'],
+            'url' => route($item['route']),
+            'active' => collect($item['patterns'])->contains(fn (string $pattern) => request()->routeIs($pattern)),
+        ]);
 
-        <!-- Favicon -->
-        <link href="{{ asset('frontend/img/psave_logo.png') }}" rel="icon">
+    if ($navigationItems->isEmpty()) {
+        $navigationItems = $fallbackNavigationItems;
+    }
 
-        <!-- Critical font preload -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    $dashboardRoute = auth()->check() ? route(auth()->user()->dashboardRoute()) : null;
+@endphp
 
-        <!-- CSS Libraries (SRI hashes ensure CDN supply-chain integrity) -->
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
-              integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-              crossorigin="anonymous">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet"
-              integrity="sha384-slN8GvtUJGnv6ca26v8EiFRo8pJ/5QGYccwBPYR1RtnATAIDsDEb8tlsD7HxW8I2"
-              crossorigin="anonymous">
-        <link href="{{ asset('frontend/lib/flaticon/font/flaticon.css') }}" rel="stylesheet">
-        <link href="{{ asset('frontend/lib/animate/animate.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('frontend/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+<header class="site-header">
+    <div class="site-topbar">
+        <div class="surface-frame">
+            <div class="site-topbar-content">
+                <div class="site-topbar-copy d-none d-lg-flex">
+                    <span class="site-topbar-copy-pill">Global ministry</span>
+                    <span>Evangelism, discipleship, and ministry training with a Christ-centered witness.</span>
+                </div>
 
-        <!-- Template Stylesheet -->
-        <link href="{{ asset('frontend/css/style.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
-    </head>
+                <div class="site-topbar-links">
+                    <a href="tel:+2347080100893" class="site-topbar-link">
+                        <i class="fas fa-phone-alt text-brand-400"></i>
+                        <span>(+234) 07080100893</span>
+                    </a>
+                    <a href="mailto:info@projectsaveng.org" class="site-topbar-link">
+                        <i class="fas fa-envelope text-brand-400"></i>
+                        <span>info@projectsaveng.org</span>
+                    </a>
 
-    <body>
-        {{-- Facebook SDK (only loaded when FACEBOOK_APP_ID is set in .env) --}}
-        @if(config('services.facebook.client_id'))
-        <div id="fb-root"></div>
-        <script async defer crossorigin="anonymous"
-                src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v18.0&appId={{ config('services.facebook.client_id') }}">
-        </script>
-        @endif
-        <!-- Top Bar Start -->
-        <div class="top-bar d-none d-md-block">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="top-bar-left">
-                            <div class="text">
-                                <i class="fa fa-phone-alt"></i>
-                                <p>(+234) 07080100893</p>
-                            </div>
-                            <div class="text">
-                                <i class="fa fa-envelope"></i>
-                                <p>info@projectsaveng.org</p>
-                            </div>
-                            <form class="form-inline my-2 my-lg-0" action="{{ route('search') }}" method="GET">
-                                <div class="input-group">
-                                    <input class="form-control" type="search" name="q" placeholder="Search..." aria-label="Search" value="{{ request('q') }}" style="height: 38px;">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-custom py-0" type="submit" style="height: 38px;">
-                                            <i class="fa fa-search"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="top-bar-right">
-                            <div class="social">
-                                
-                                <a href="https://facebook.com/projectsave02"><i class="fab fa-facebook-f"></i></a>
-                                
-                                <a href="https://instagram.com/projectsave_ministries"><i class="fab fa-instagram"></i></a>
-                            </div>
-                        </div>
+                    <div class="site-social-links" aria-label="Social media links">
+                        <a href="https://facebook.com/projectsave02" class="site-social-link" aria-label="Projectsave on Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://instagram.com/projectsave_ministries" class="site-social-link" aria-label="Projectsave on Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Top Bar End -->
+    </div>
 
-        <!-- Nav Bar Start -->
-        <div class="navbar navbar-expand-lg bg-dark navbar-dark">
-            <div class="container-fluid">
-                <a href="{{ route('home') }}" class="navbar-brand"><img src="{{ asset('frontend/img/psave_logo.png') }}" alt="P'Save Logo" style="height: 40px;"></a>
-                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                    <div class="navbar-nav ml-auto">
-                        <a href="{{ route('home') }}" class="nav-item nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
-                        <a href="{{ route('about') }}" class="nav-item nav-link {{ request()->routeIs('about') ? 'active' : '' }}">About</a>
-                        <a href="{{ route('asom') }}" class="nav-item nav-link {{ request()->routeIs('learn.*') ? 'active' : '' }}">ASOM</a>
-                        <a href="{{ route('events.index') }}" class="nav-item nav-link {{ request()->routeIs('events.*') ? 'active' : '' }}">Events</a>
-                        <a href="{{ route('blog.index') }}" class="nav-item nav-link {{ request()->routeIs('blog.*')|| request()->routeIs('posts.show') ? 'active' : '' }}">Devotional</a>
-                        <a href="{{ route('faqs.list') }}" class="nav-item nav-link {{ request()->routeIs('faqs.*') ? 'active' : '' }}">Blog</a>
+    <div class="site-navbar-shell sticky-top">
+        <div class="surface-frame py-2 py-lg-3">
+            <nav class="navbar navbar-expand-lg p-0" aria-label="Primary">
+                <a href="{{ route('home') }}" class="site-brand-mark">
+                    <span class="site-brand-badge">
+                        <img src="{{ asset('frontend/img/psave_logo.png') }}" alt="Projectsave International" class="h-8 w-8 rounded-xl object-cover">
+                    </span>
+                    <span class="site-brand-copy">
+                        <strong>Projectsave International</strong>
+                        <span>Winning the lost. Building the saints.</span>
+                    </span>
+                </a>
 
+                <div class="d-flex align-items-center gap-2 ms-auto d-lg-none">
+                    @guest
+                        <a href="{{ route('login') }}" class="site-account-link site-mobile-cta">Login</a>
+                    @else
+                        <a href="{{ $dashboardRoute }}" class="site-account-link site-mobile-cta">Dashboard</a>
+                    @endguest
 
+                    <button
+                        class="site-navbar-toggle"
+                        type="button"
+                        data-site-nav-toggle
+                        aria-controls="publicNavigation"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation"
+                    >
+                        <span class="site-navbar-toggle-box" aria-hidden="true">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
+                </div>
 
+                <div class="site-navigation-panel mt-3 mt-lg-0" id="publicNavigation">
+                    <div class="site-mobile-menu">
+                        <form action="{{ route('search') }}" method="GET" class="site-mobile-search d-lg-none">
+                            <label class="visually-hidden" for="site-search-mobile">Search the site</label>
+                            <input
+                                id="site-search-mobile"
+                                class="site-search-input site-search-input-light"
+                                type="search"
+                                name="q"
+                                value="{{ request('q') }}"
+                                placeholder="Search devotionals, FAQs, and events"
+                            >
+                            <button class="site-search-button" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
 
+                        <div class="navbar-nav site-nav-links ms-lg-5 flex-wrap gap-1">
+                            @foreach($navigationItems as $item)
+                                @if(! empty($item['url']))
+                                    <a href="{{ $item['url'] }}" class="site-nav-link nav-link {{ $item['active'] ? 'active' : '' }}">
+                                        {{ $item['label'] }}
+                                    </a>
+                                @endif
+                            @endforeach
+                        </div>
 
-
-
-
-
-
-
-
-                        <a href="{{ route('contact.show') }}" class="nav-item nav-link {{ request()->routeIs('contact.*') ? 'active' : '' }}">Contact</a>                        @if(!auth()->check())
-                            <a href="{{ route('login') }}" class="nav-item nav-link">Login</a> |
-                            <a href="{{ route('register') }}" class="nav-item nav-link">Register</a>
-                        @else
-                            <div class="d-flex align-items-center">
-                                <a href="{{ route('user.dashboard') }}" class="nav-item nav-link">Dashboard</a>
-                                <a class="nav-link" href="{{ route('asom.welcome') }}#courses-tab">My Learning</a>
-                                <form class="form-inline m-0" action="{{ route('logout') }}" method="POST">
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 site-nav-actions">
+                            @guest
+                                <a href="{{ route('login') }}" class="site-account-link">Login</a>
+                                <a href="{{ route('register') }}" class="surface-button-secondary">Create account</a>
+                            @else
+                                <a href="{{ $dashboardRoute }}" class="site-account-link">Dashboard</a>
+                                <a href="{{ route('asom.welcome') }}" class="site-account-link">My learning</a>
+                                <form method="POST" action="{{ route('logout') }}" class="m-0">
                                     @csrf
-                                    <button type="submit" class="nav-link btn btn-link">Logout</button>
+                                    <button type="submit" class="surface-button-ghost">Logout</button>
                                 </form>
-                            </div>
-                        @endif
+                            @endguest
+                        </div>
                     </div>
                 </div>
-            </div>
+            </nav>
         </div>
-        <!-- Nav Bar End -->
-
-
-
-
+    </div>
+</header>

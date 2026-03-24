@@ -20,16 +20,11 @@
                         <small class="text-muted">Created {{ $course->created_at->format('M d, Y') }}</small>
                     </div>
 
-                    @if($course->featured_image)
-                    <img src="{{ Storage::disk('s3')->temporaryUrl($course->featured_image, now()->addMinutes(10)) }}" 
-                             alt="{{ $course->title }}" 
+                    <img src="{{ $featuredImageUrl }}"
+                         alt="{{ $course->title }}"
                          class="img-fluid mb-4 rounded"
+                         loading="lazy"
                          onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
-                @else
-                    <img src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
-                         alt="{{ $course->title }}" 
-                         class="img-fluid mb-4 rounded">
-                @endif
 
                     <div class="course-description mb-4">
                         {!! $course->description !!}
@@ -54,7 +49,7 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        @forelse($course->lessons()->orderBy('order')->get() as $lesson)
+                        @forelse($course->lessons as $lesson)
                             <div class="list-group-item">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span>{{ $lesson->order }}. {{ $lesson->title }}</span>

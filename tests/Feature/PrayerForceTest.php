@@ -67,9 +67,9 @@ class PrayerForceTest extends TestCase
             $this->validData(),
             ['name' => '<script>alert("xss")</script>John']
         ));
-        
-        $partner = PrayerForcePartner::where('email', 'john@example.com')->first();
-        $this->assertStringNotContainsString('<script>', $partner->name);
+
+        $response->assertSessionHasErrors(['name']);
+        $this->assertDatabaseMissing('prayer_force_partners', ['email' => 'john@example.com']);
     }
 
     public function test_conditional_field_clearing()

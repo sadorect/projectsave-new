@@ -8,7 +8,7 @@
                 </div>
                 <div class="col-12">
                     <a href="{{ route('home') }}">Home</a>
-                    <a href="{{ route('profile') }}">Profile</a>
+                    <a href="{{ route('profile.edit') }}">Profile</a>
                     <a href="">Notifications</a>
                 </div>
             </div>
@@ -22,18 +22,20 @@
                     <div class="card-body">
                         <h4 class="card-title mb-4">Email Notifications</h4>
                         
-                        <form method="POST" action="{{ route('notification-preferences.update') }}">
+                        <form method="POST" action="{{ route('user.preferences.update') }}">
                             @csrf
                             @method('patch')
 
                             <div class="notification-group mb-4">
                                 <h5>Updates & News</h5>
                                 <div class="custom-control custom-switch mb-3">
-                                    <input type="checkbox" class="custom-control-input" id="newsletter" name="preferences[newsletter]">
+                                    <input type="hidden" name="preferences[newsletter]" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="newsletter" name="preferences[newsletter]" value="1">
                                     <label class="custom-control-label" for="newsletter">Newsletter & Ministry Updates</label>
                                 </div>
                                 <div class="custom-control custom-switch mb-3">
-                                    <input type="checkbox" class="custom-control-input" id="blog_posts" name="preferences[blog_posts]">
+                                    <input type="hidden" name="preferences[blog_posts]" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="blog_posts" name="preferences[blog_posts]" value="1">
                                     <label class="custom-control-label" for="blog_posts">New Blog Posts</label>
                                 </div>
                             </div>
@@ -41,11 +43,13 @@
                             <div class="notification-group mb-4">
                                 <h5>Events & Activities</h5>
                                 <div class="custom-control custom-switch mb-3">
-                                    <input type="checkbox" class="custom-control-input" id="events" name="preferences[events]">
+                                    <input type="hidden" name="preferences[events]" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="events" name="preferences[events]" value="1">
                                     <label class="custom-control-label" for="events">Upcoming Events</label>
                                 </div>
                                 <div class="custom-control custom-switch mb-3">
-                                    <input type="checkbox" class="custom-control-input" id="prayer_requests" name="preferences[prayer_requests]">
+                                    <input type="hidden" name="preferences[prayer_requests]" value="0">
+                                    <input type="checkbox" class="custom-control-input" id="prayer_requests" name="preferences[prayer_requests]" value="1">
                                     <label class="custom-control-label" for="prayer_requests">Prayer Requests</label>
                                 </div>
                             </div>

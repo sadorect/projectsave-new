@@ -42,7 +42,7 @@ class Handler extends ExceptionHandler
         parent::report($exception);
 
         // Only proceed when audit logging is enabled via env or in production
-        if (!app()->environment('production') && !env('ERROR_AUDIT', false)) {
+        if (!app()->environment('production') && !$this->errorAuditEnabled()) {
             return;
         }
 
@@ -126,5 +126,12 @@ class Handler extends ExceptionHandler
             // If writing the audit log fails, write to the normal log but do not rethrow.
             Log::error('Failed to write admin audit log for exception: ' . $e->getMessage());
         }
+    }
+
+    private function errorAuditEnabled(): bool
+    {
+        $value = $_ENV['ERROR_AUDIT'] ?? $_SERVER['ERROR_AUDIT'] ?? getenv('ERROR_AUDIT') ?? env('ERROR_AUDIT', false);
+
+        return filter_var($value, FILTER_VALIDATE_BOOL);
     }
 }

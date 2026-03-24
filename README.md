@@ -102,3 +102,11 @@ For inquiries, please contact [ministry contact information]
 
 ## Documentation
 Detailed documentation for administrators and contributors available in the `/docs` directory.
+
+Operational setup for queue workers and upload malware scanning is documented in [docs/Queue_And_Malware_Operations.md](docs/Queue_And_Malware_Operations.md).
+
+UI/UX, performance, and access-control overhaul recommendations are documented in [docs/UI_UX_Performance_Overhaul_Plan.md](docs/UI_UX_Performance_Overhaul_Plan.md).
+
+Phase-by-phase overhaul progress is tracked in [docs/UI_UX_Overhaul_Progress.md](docs/UI_UX_Overhaul_Progress.md).
+
+The active shared shell, token, and component rules are documented in [docs/Design_System_Component_Guide.md](docs/Design_System_Component_Guide.md).

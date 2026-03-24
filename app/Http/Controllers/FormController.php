@@ -11,18 +11,38 @@ use App\Mail\FormSubmissionNotification;
 
 class FormController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . Form::class)->only(['index', 'adminIndex', 'submissionsIndex']);
+        $this->middleware('can:create,' . Form::class)->only(['create', 'store']);
+        $this->middleware('can:update,form')->only(['edit', 'update']);
+        $this->middleware('can:delete,form')->only('destroy');
+        $this->middleware('can:viewSubmissions,form')->only('submissions');
+        $this->middleware('can:export,form')->only('downloadSubmissions');
+    }
+
     // Admin: List forms
     public function index()
     {
-        $forms = Form::latest()->paginate(10);
-        return view('admin.forms.index', compact('forms'));
+        return $this->adminIndex();
     }
 
     // Admin method for admin routes
     public function adminIndex()
     {
-        $forms = Form::latest()->paginate(10);
-        return view('admin.forms.index', compact('forms'));
+        $forms = Form::query()
+            ->withCount('submissions')
+            ->latest()
+            ->paginate(10);
+
+        $summary = [
+            'forms' => Form::count(),
+            'public_forms' => Form::where('require_login', false)->count(),
+            'gated_forms' => Form::where('require_login', true)->count(),
+            'submissions' => FormSubmission::count(),
+        ];
+
+        return view('admin.forms.index', compact('forms', 'summary'));
     }
 
     // Admin: Create form
@@ -71,6 +91,8 @@ class FormController extends Controller
     // Admin: Edit form
     public function edit(Form $form)
     {
+        $form->loadCount('submissions');
+
         return view('admin.forms.edit', compact('form'));
     }       
 
@@ -191,10 +213,10 @@ class FormController extends Controller
                 foreach ($form->notify_emails as $email) {
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                         try {
-                            Mail::to($email)->send(new FormSubmissionNotification($form, $submission));
+                            Mail::to($email)->queue(new FormSubmissionNotification($form, $submission));
                         } catch (\Exception $e) {
                             // Log email error but don't fail the submission
-                            Log::error('Failed to send form notification email to ' . $email . ': ' . $e->getMessage());
+                            Log::error('Failed to queue form notification email to ' . $email . ': ' . $e->getMessage());
                         }
                     }
                 }
@@ -209,8 +231,22 @@ class FormController extends Controller
     // Admin: List all submissions (index view)
     public function submissionsIndex()
     {
-        $submissions = FormSubmission::with('form')->latest()->paginate(20);
-        return view('admin.forms.submissions_index', compact('submissions'));
+        $submissions = FormSubmission::query()
+            ->with([
+                'form:id,title',
+                'user:id,name,email',
+            ])
+            ->latest()
+            ->paginate(20);
+
+        $summary = [
+            'total' => FormSubmission::count(),
+            'today' => FormSubmission::whereDate('created_at', today())->count(),
+            'members' => FormSubmission::whereNotNull('user_id')->count(),
+            'guests' => FormSubmission::whereNull('user_id')->count(),
+        ];
+
+        return view('admin.forms.submissions_index', compact('submissions', 'summary'));
     }
 
     // Admin: View submissions for a specific form
@@ -219,8 +255,22 @@ class FormController extends Controller
         if (!$form) {
             abort(404, 'Form not found.');
         }
-        $submissions = $form->submissions()->latest()->paginate(20);
-        return view('admin.forms.submissions', compact('form', 'submissions'));
+
+        $form->loadCount('submissions');
+
+        $submissions = $form->submissions()
+            ->with('user:id,name,email')
+            ->latest()
+            ->paginate(20);
+
+        $summary = [
+            'total' => $form->submissions_count,
+            'today' => $form->submissions()->whereDate('created_at', today())->count(),
+            'members' => $form->submissions()->whereNotNull('user_id')->count(),
+            'guests' => $form->submissions()->whereNull('user_id')->count(),
+        ];
+
+        return view('admin.forms.submissions', compact('form', 'submissions', 'summary'));
     }
 
 

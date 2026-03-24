@@ -20,7 +20,7 @@
           <h6 class="m-0 font-weight-bold text-primary">Form Details</h6>
         </div>
         <div class="card-body">
-          <form method="POST" action="{{ route('admin.forms.store') }}" id="form-create">
+          <form method="POST" action="{{ route('admin.forms.store') }}" id="form-create" data-admin-form-builder data-form-field-index="1">
             @csrf
             
             <div class="row">
@@ -56,12 +56,12 @@
             <div class="mb-4">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0"><i class="fas fa-list me-2"></i>Form Fields</h5>
-                <button type="button" class="btn btn-success btn-sm" id="add-field">
+                <button type="button" class="btn btn-success btn-sm" id="add-field" data-form-add-field>
                   <i class="fas fa-plus me-1"></i>Add Field
                 </button>
               </div>
               
-              <div id="fields">
+              <div id="fields" data-form-fields>
                 <div class="field-group card mb-3" data-index="0">
                   <div class="card-body">
                     <div class="row">
@@ -93,12 +93,11 @@
                         @enderror
                       </div>
                       
-                      <div class="col-md-3 mb-3">
+                      <div class="col-md-3 mb-3 {{ in_array(old('fields.0.type', 'text'), ['select', 'radio']) ? '' : 'd-none' }}" data-form-options-wrap>
                         <label class="form-label">Options</label>
                         <input name="fields[0][options]" value="{{ old('fields.0.options') }}" 
                                placeholder="Comma separated (for select/radio)" 
-                               class="form-control options-input @error('fields.0.options') is-invalid @enderror"
-                               style="display: none;">
+                               class="form-control options-input @error('fields.0.options') is-invalid @enderror">
                         @error('fields.0.options')
                           <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -115,7 +114,7 @@
                             Required
                           </label>
                         </div>
-                        <button type="button" class="btn btn-danger btn-sm remove-field mt-2" style="display:none;">
+                        <button type="button" class="btn btn-danger btn-sm remove-field mt-2 d-none">
                           <i class="fas fa-trash"></i>
                         </button>
                       </div>
@@ -183,132 +182,5 @@
     </div>
   </div>
 </div>
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  let fieldIndex = 1;
-  const fieldsContainer = document.getElementById('fields');
-  const addFieldBtn = document.getElementById('add-field');
-
-  // Show/hide options input based on field type
-  function toggleOptionsInput(selectElement) {
-    const fieldGroup = selectElement.closest('.field-group');
-    const optionsInput = fieldGroup.querySelector('.options-input');
-    const fieldType = selectElement.value;
-    
-    if (fieldType === 'select' || fieldType === 'radio') {
-      optionsInput.style.display = 'block';
-      optionsInput.required = true;
-    } else {
-      optionsInput.style.display = 'none';
-      optionsInput.required = false;
-      optionsInput.value = '';
-    }
-  }
-
-  // Initialize options visibility for existing fields
-  document.querySelectorAll('.field-type-select').forEach(function(select) {
-    toggleOptionsInput(select);
-    select.addEventListener('change', function() {
-      toggleOptionsInput(this);
-    });
-  });
-
-  addFieldBtn.addEventListener('click', function() {
-    const template = document.querySelector('.field-group');
-    const newField = template.cloneNode(true);
-    newField.setAttribute('data-index', fieldIndex);
-
-    // Update all field names and IDs
-    newField.querySelectorAll('input, select').forEach(function(input) {
-      if (input.name) {
-        input.name = input.name.replace(/\[0\]/, `[${fieldIndex}]`);
-      }
-      if (input.id) {
-        input.id = input.id.replace(/_0$/, `_${fieldIndex}`);
-      }
-      // Reset values
-      if (input.type === 'checkbox') {
-        input.checked = false;
-      } else {
-        input.value = '';
-      }
-    });
-
-    // Update label for attributes
-    newField.querySelectorAll('label[for]').forEach(function(label) {
-      label.setAttribute('for', label.getAttribute('for').replace(/_0$/, `_${fieldIndex}`));
-    });
-
-    // Show remove button and hide options input
-    const removeBtn = newField.querySelector('.remove-field');
-    removeBtn.style.display = 'block';
-    
-    const optionsInput = newField.querySelector('.options-input');
-    optionsInput.style.display = 'none';
-    optionsInput.required = false;
-
-    // Add event listener for the new field type select
-    const newSelect = newField.querySelector('.field-type-select');
-    newSelect.addEventListener('change', function() {
-      toggleOptionsInput(this);
-    });
-
-    fieldsContainer.appendChild(newField);
-    fieldIndex++;
-  });
-
-  // Handle remove field
-  fieldsContainer.addEventListener('click', function(e) {
-    if (e.target.classList.contains('remove-field') || e.target.closest('.remove-field')) {
-      const fieldGroup = e.target.closest('.field-group');
-      if (document.querySelectorAll('.field-group').length > 1) {
-        fieldGroup.remove();
-      } else {
-        alert('You must have at least one field in your form.');
-      }
-    }
-  });
-
-  // Convert comma-separated values to arrays before submit
-  document.getElementById('form-create').addEventListener('submit', function(e) {
-    // Convert notify_emails
-    const notifyInput = document.getElementById('notify_emails');
-    if (notifyInput && notifyInput.value.trim() !== '') {
-      const emails = notifyInput.value.split(',').map(e => e.trim()).filter(e => e.length > 0);
-      notifyInput.remove();
-      emails.forEach((email, idx) => {
-        const hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = `notify_emails[${idx}]`;
-        hidden.value = email;
-        this.appendChild(hidden);
-      });
-    }
-
-    // Convert field options to arrays
-    document.querySelectorAll('.field-group').forEach(function(group) {
-      const optionsInput = group.querySelector('.options-input');
-      if (optionsInput && optionsInput.value.trim() !== '') {
-        const indexMatch = optionsInput.name.match(/fields\[(\d+)\]\[options\]/);
-        if (indexMatch) {
-          const idx = indexMatch[1];
-          const options = optionsInput.value.split(',').map(o => o.trim()).filter(o => o.length > 0);
-          optionsInput.remove();
-          options.forEach((option, oidx) => {
-            const hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = `fields[${idx}][options][${oidx}]`;
-            hidden.value = option;
-            group.appendChild(hidden);
-          });
-        }
-      }
-    });
-  });
-});
-</script>
-@endpush
 
 @endsection

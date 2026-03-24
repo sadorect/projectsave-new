@@ -1,51 +1,36 @@
-<x-layouts.app>
-    <!-- Page Header Start -->
-    <div class="page-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2>Verify Email</h2>
-                </div>
-                <div class="col-12">
-                    <a href="{{ route('home') }}">Home</a>
-                    <a href="">Verify Email</a>
-                </div>
-            </div>
-        </div>
+<x-guest-layout>
+    <div class="auth-form-intro">
+        <span class="auth-kicker">Verify Email</span>
+        <h2 class="auth-form-title">Confirm your email address</h2>
+        <p class="auth-form-copy">
+            Before continuing, click the verification link we sent to your inbox. This keeps your account and student access secure.
+        </p>
     </div>
-    <!-- Page Header End -->
 
-    <div class="container my-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <div class="verify-email-form text-center">
-                    <div class="mb-4">
-                        Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you?
-                    </div>
-
-                    @if (session('status') == 'verification-link-sent')
-                        <div class="alert alert-success" role="alert">
-                            A new verification link has been sent to your email address.
-                        </div>
-                    @endif
-
-                    <div class="mt-4 d-flex justify-content-between">
-                        <form method="POST" action="{{ route('verification.send') }}">
-                            @csrf
-                            <button type="submit" class="btn btn-custom">
-                                Resend Verification Email
-                            </button>
-                        </form>
-
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-danger">
-                                Log Out
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    @if (session('status') === 'verification-link-sent')
+        <div class="auth-alert auth-alert-success mb-4">
+            A fresh verification link has been sent to your email address.
         </div>
+    @endif
+
+    <div class="auth-form-grid">
+        <form method="POST" action="{{ route('verification.send') }}" class="auth-form-grid">
+            @csrf
+            <x-math-captcha />
+            <button type="submit" class="surface-button-primary w-100 justify-content-center">
+                Resend verification email
+            </button>
+        </form>
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="surface-button-secondary w-100 justify-content-center">
+                Log out
+            </button>
+        </form>
     </div>
-</x-layouts.app>
+
+    <div class="auth-help-text mt-4">
+        If you registered for ASOM, email verification is required before entering the student workspace.
+    </div>
+</x-guest-layout>

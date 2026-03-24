@@ -21,7 +21,7 @@
                     <div class="info-item">
                         <label class="text-muted">Application Status</label>
                         <div class="mt-2">
-                            <span class="badge badge-{{ $partner->status === 'pending' ? 'warning' : ($partner->status === 'approved' ? 'success' : 'danger') }} badge-lg">
+                            <span class="badge bg-{{ $partner->status === 'pending' ? 'warning' : ($partner->status === 'approved' ? 'success' : 'danger') }}">
                                 {{ ucfirst($partner->status) }}
                             </span>
                         </div>
@@ -33,7 +33,7 @@
     
     @if($partner->status === 'approved')
         <div class="alert alert-success mt-3">
-            <h6><i class="fas fa-check-circle mr-2"></i>Next Steps</h6>
+            <h6><i class="fas fa-check-circle me-2"></i>Next Steps</h6>
             <ul class="mb-0 mt-2">
                 <li>Join our WhatsApp group</li>
                 <li>Complete orientation</li>

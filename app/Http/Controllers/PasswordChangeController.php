@@ -30,7 +30,7 @@ class PasswordChangeController extends Controller
             'first_login' => false
         ]);
 
-        return redirect()->route('dashboard')
+        return redirect()->route($user->dashboardRoute())
             ->with('success', 'Password changed successfully.');
     }
 }

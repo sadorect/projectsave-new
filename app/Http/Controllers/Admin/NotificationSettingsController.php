@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Event;
 use App\Models\User;
 use App\Models\ReminderLog;
 use Illuminate\Http\Request;
@@ -11,6 +12,11 @@ use App\Notifications\EventReminderNotification;
 
 class NotificationSettingsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:manage-notification-settings,admin');
+    }
+
     public function edit()
     {
       $settings = [

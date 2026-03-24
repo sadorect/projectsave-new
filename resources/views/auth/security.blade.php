@@ -8,7 +8,7 @@
                 </div>
                 <div class="col-12">
                     <a href="{{ route('home') }}">Home</a>
-                    <a href="{{ route('profile') }}">Profile</a>
+                    <a href="{{ route('profile.edit') }}">Profile</a>
                     <a href="">Security</a>
                 </div>
             </div>
@@ -41,6 +41,8 @@
                                 <label>Confirm New Password</label>
                                 <input type="password" class="form-control" name="password_confirmation" required>
                             </div>
+
+                            <x-math-captcha error-bag="updatePassword" />
 
                             <button type="submit" class="btn btn-custom">Update Password</button>
                         </form>

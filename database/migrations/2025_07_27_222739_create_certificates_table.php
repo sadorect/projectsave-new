@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained()->onDelete('cascade');
             $table->decimal('final_grade', 5, 2)->nullable();
             $table->timestamp('issued_at');
-            $table->timestamp('completed_at');
+            $table->timestamp('completed_at')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('approved_at')->nullable();

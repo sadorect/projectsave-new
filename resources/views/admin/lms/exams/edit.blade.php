@@ -114,7 +114,7 @@
                 <div class="card-body">
                     {{-- Search box --}}
                         <div class="mb-3">
-                            <input type="text" id="question-search" class="form-control" placeholder="Search questions...">
+                            <input type="text" id="question-search" class="form-control" placeholder="Search questions..." data-exam-question-search="#question-list .list-group-item">
                         </div>
                     @if($exam->questions->count() > 0)
                            <ul class="list-group" id="question-list">
@@ -128,10 +128,10 @@
                         <a href="{{ route('admin.questions.edit', [$exam, $question]) }}" class="btn btn-sm btn-primary ms-2">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form action="{{ route('admin.questions.destroy', [$exam, $question]) }}" method="POST" class="d-inline">
+                        <form action="{{ route('admin.questions.destroy', [$exam, $question]) }}" method="POST" class="d-inline" data-admin-confirm="Delete this question?">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger ms-1" onclick="return confirm('Are you sure you want to delete this question?')">
+                            <button type="submit" class="btn btn-sm btn-danger ms-1">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -149,42 +149,5 @@
         </div>
     </div>
 </div>
-@push('scripts')
-<script>
-    $(document).ready(function() {
-        $('.toggle-activation').click(function(e) {
-            e.preventDefault();
-            const button = $(this);
-            const form = button.closest('form');
-            
-            $.ajax({
-            url: form.attr('action'),
-            type: 'POST',
-            data: form.serialize() + '&is_active=' + (button.hasClass('btn-success') ? '0' : '1'),
-            success: function(response) {
-                const isActive = !button.hasClass('btn-success');
-                button.toggleClass('btn-success btn-secondary');
-                button.find('i').toggleClass('bi-toggle-on bi-toggle-off');
-                button.find('span').text(isActive ? 'Active' : 'Inactive');
-                
-                toastr.success(response.message);
-            }
-        });
-
-        });
-        // Question search functionality
-        $('#question-search').on('keyup', function() {
-            var value = $(this).val().toLowerCase();
-            $('#question-list .list-group-item').filter(function() {
-                $(this).toggle(
-                    $(this).find('.question-text').text().toLowerCase().indexOf(value) > -1
-                );
-            });
-        });
-    });
-    </script>
-    
-    @endpush
 @endsection
-
 

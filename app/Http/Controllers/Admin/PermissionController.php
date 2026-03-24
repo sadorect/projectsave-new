@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\Permission;
+use App\Models\Role;
 use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PermissionController extends Controller
 {
@@ -32,14 +33,26 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|unique:permissions,name']);
-        $permission = Permission::create(['name' => $request->name]);
-        
-        if($request->roles) {
-            $permission->syncRoles($request->roles);
+        $validated = $request->validate([
+            'name' => 'required|unique:permissions,name',
+            'roles' => 'array|nullable',
+            'roles.*' => 'integer|exists:roles,id',
+        ]);
+
+        $permission = Permission::create([
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+        ]);
+
+        if (! empty($validated['roles'])) {
+            $roles = Role::query()
+                ->whereIn('id', $validated['roles'])
+                ->get();
+
+            $permission->syncRoles($roles);
         }
-        
-        return redirect()->route('permissions.index')->with('success', 'Permission created successfully');
+
+        return redirect()->route('admin.permissions.index')->with('success', 'Permission created successfully');
     }
 
     /**

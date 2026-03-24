@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 
-                <form action="{{ route('admin.exams.manual-pass.store', $exam) }}" method="POST">
+                <form action="{{ route('admin.exams.manual-pass.store', $exam) }}" method="POST" data-admin-confirm="Are you sure you want to manually pass this student? This action will create a permanent exam attempt record.">
                     @csrf
                     <div class="card-body">
                         <div class="alert alert-info">
@@ -34,7 +34,7 @@
                                     <label for="user_id" class="form-label">
                                         <i class="fas fa-user me-1"></i>Select Student *
                                     </label>
-                                    <select name="user_id" id="user_id" class="form-control @error('user_id') is-invalid @enderror" required>
+                                    <select name="user_id" id="user_id" class="form-control @error('user_id') is-invalid @enderror" required autofocus>
                                         <option value="">Choose a student...</option>
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
@@ -104,7 +104,7 @@
                             <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-times me-1"></i>Cancel
                             </a>
-                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to manually pass this student? This action will create a permanent exam attempt record.')">
+                            <button type="submit" class="btn btn-success">
                                 <i class="fas fa-check me-1"></i>Mark as Passed
                             </button>
                         </div>
@@ -115,12 +115,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    // Auto-focus the student selection
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('user_id').focus();
-    });
-</script>
-@endpush

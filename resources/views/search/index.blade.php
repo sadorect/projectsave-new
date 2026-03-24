@@ -1,217 +1,106 @@
-<x-layouts.app>
-    <!-- Page Header Start -->
-    <div class="page-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <h2>Search Results</h2>
-                </div>
-                <div class="col-12">
-                    <a href="{{ route('home') }}">Home</a>
-                    <a href="">Search</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Page Header End -->
+<x-layouts.app
+    :title="$query !== '' ? 'Search results for ' . $query : 'Search Projectsave'"
+    :meta-description="$query !== '' ? 'Search Projectsave devotionals, events, and FAQs for ' . $query : 'Search Projectsave devotionals, events, and FAQs.'"
+>
+    @php($totalResults = $posts->count() + $events->count() + $faqs->count())
 
-    <div class="container my-5">
-        <div class="search-header text-center mb-5">
-            <h3>Search Results for "<span class="text-primary">{{ $query }}</span>"</h3>
-            <p class="text-muted">Found {{ $posts->count() + $events->count() + $faqs->count() }} results</p>
+    <x-ui.public-page-hero
+        eyebrow="Search"
+        :title="$query !== '' ? 'Results for \"' . $query . '\"' : 'Search the ministry site'"
+        :subtitle="$query !== '' ? $totalResults . ' result' . ($totalResults === 1 ? '' : 's') . ' across devotionals, events, and FAQs.' : 'Use a keyword to search devotionals, events, and FAQs from one place.'"
+    />
 
-        </div>
-        
-        @if($posts->count() > 0 || $events->count() > 0 || $faqs->count() > 0)
-            @if($posts->count() > 0)
-                <div class="section-header mt-5">
-                    <p>Blog Posts</p>
-                    <h2>Related Articles</h2>
-                </div>
-                <div class="row">
-                    @foreach($posts as $post)
-                        <div class="col-lg-6 mb-4">
-                            <div class="search-result-card">
-                                <div class="row no-gutters">
-                                    <div class="col-md-4">
-                                        @if($post->image)
-                                            <div class="result-img">
-                                                <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}">
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="result-content">
-                                            <span class="result-type"><i class="far fa-newspaper mr-2"></i>Blog Post</span>
-                                            <h4><a href="{{ route('posts.show', $post->slug) }}">{{ $post->title }}</a></h4>
-                                            <p>{{ Str::limit($post->excerpt, 100) }}</p>
-                                            <div class="result-meta">
-                                                <span><i class="far fa-calendar mr-1"></i>{{ $post->created_at->format('M d, Y') }}</span>
-                                                <span><i class="far fa-user mr-1"></i>{{ $post->author }}</span>
-                                            </div>
+    <section class="surface-section pt-2">
+        <div class="surface-frame">
+            @if($totalResults > 0)
+                @if($posts->isNotEmpty())
+                    <div class="mb-5">
+                        <x-ui.public-section-heading
+                            eyebrow="Devotionals"
+                            title="Related articles"
+                        />
+
+                        <div class="row g-3 mt-1">
+                            @foreach($posts as $post)
+                                <div class="col-lg-6">
+                                    <article class="public-results-card">
+                                        <div class="public-chip mb-3">Devotional</div>
+                                        <h3 class="h5 mb-2">
+                                            <a href="{{ route('posts.show', $post->slug) }}" class="text-decoration-none">{{ $post->title }}</a>
+                                        </h3>
+                                        <p class="mb-3 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($post->details), 140) }}</p>
+                                        <div class="public-meta-list">
+                                            <span><i class="bi bi-calendar-event me-2 text-brand-700"></i>{{ $post->created_at->format('M d, Y') }}</span>
+                                            <span><i class="bi bi-person me-2 text-brand-700"></i>{{ $post->author }}</span>
                                         </div>
-                                    </div>
+                                    </article>
                                 </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-
-            @if($faqs->count() > 0)
-            <div class="section-header mt-5">
-                <p>FAQs</p>
-                <h2>Frequently Asked Questions</h2>
-            </div>
-            <div class="row">
-                @foreach($faqs as $faq)
-                    <div class="col-lg-6 mb-4">
-                        <div class="search-result-card faq-card">
-                            <div class="result-content">
-                                <span class="result-type faq-type">
-                                    <i class="far fa-question-circle mr-2"></i>FAQ
-                                </span>
-                                <h4>{{ $faq->title }}</h4>
-                                <p>{!! Str::limit($faq->details, 150) !!}</p>
-                                <a href="{{ route('faqs.show', $faq->slug) }}" class="btn btn-custom btn-sm">Read More</a>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
-                @endforeach
-            </div>
-        @endif
-        
+                @endif
 
-            @if($events->count() > 0)
-                <div class="section-header mt-5">
-                    <p>Events</p>
-                    <h2>Upcoming Activities</h2>
-                </div>
-                <div class="row">
-                    @foreach($events as $event)
-                        <div class="col-lg-6 mb-4">
-                            <div class="search-result-card event-card">
-                                <div class="row no-gutters">
-                                    <div class="col-md-4">
-                                        @if($event->image)
-                                            <div class="result-img">
-                                                <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}">
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="result-content">
-                                            <span class="result-type event-type"><i class="far fa-calendar-alt mr-2"></i>Event</span>
-                                            <h4>{{ $event->title }}</h4>
-                                            <div class="event-details">
-                                                <p><i class="fa fa-map-marker-alt mr-2"></i>{{ $event->location }}</p>
-                                                <p><i class="far fa-clock mr-2"></i>{{ date('d M Y', strtotime($event->start_date)) }}</p>
-                                            </div>
-                                            <a class="btn btn-custom btn-sm" href="{{ route('events.show', $event) }}">View Details</a>
-                                        </div>
-                                    </div>
+                @if($faqs->isNotEmpty())
+                    <div class="mb-5">
+                        <x-ui.public-section-heading
+                            eyebrow="FAQs"
+                            title="Frequently asked questions"
+                        />
+
+                        <div class="row g-3 mt-1">
+                            @foreach($faqs as $faq)
+                                <div class="col-lg-6">
+                                    <article class="public-results-card">
+                                        <div class="public-chip mb-3">FAQ</div>
+                                        <h3 class="h5 mb-2">
+                                            <a href="{{ route('faqs.show', $faq->slug) }}" class="text-decoration-none">{{ $faq->title }}</a>
+                                        </h3>
+                                        <p class="mb-0 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($faq->details), 150) }}</p>
+                                    </article>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
-                    @endforeach
-                </div>
+                    </div>
+                @endif
+
+                @if($events->isNotEmpty())
+                    <div>
+                        <x-ui.public-section-heading
+                            eyebrow="Events"
+                            title="Upcoming activities"
+                        />
+
+                        <div class="row g-3 mt-1">
+                            @foreach($events as $event)
+                                <div class="col-lg-6">
+                                    <article class="public-results-card">
+                                        <div class="public-chip mb-3">Event</div>
+                                        <h3 class="h5 mb-2">
+                                            <a href="{{ route('events.show', $event) }}" class="text-decoration-none">{{ $event->title }}</a>
+                                        </h3>
+                                        <div class="public-meta-list mb-3">
+                                            <span><i class="bi bi-geo-alt me-2 text-brand-700"></i>{{ $event->location }}</span>
+                                            <span><i class="bi bi-calendar-event me-2 text-brand-700"></i>{{ \Carbon\Carbon::parse($event->start_date)->format('M d, Y') }}</span>
+                                        </div>
+                                        <p class="mb-0 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($event->description), 140) }}</p>
+                                    </article>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @else
+                <x-ui.empty-state
+                    title="No results found"
+                    message="Try a different keyword or browse our public sections directly."
+                    icon="bi bi-search"
+                >
+                    <x-slot:actions>
+                        <a href="{{ route('blog.index') }}" class="surface-button-secondary">Browse devotionals</a>
+                        <a href="{{ route('events.index') }}" class="surface-button-secondary">Browse events</a>
+                    </x-slot:actions>
+                </x-ui.empty-state>
             @endif
-        @else
-            <div class="no-results text-center">
-                <i class="fa fa-search fa-3x text-muted mb-3"></i>
-                <h4>No results found</h4>
-                <p class="text-muted">Try different keywords or browse our sections</p>
-                <div class="mt-4">
-                    <a href="{{ route('blog.index') }}" class="btn btn-custom mr-2">Browse Blog</a>
-                    <a href="{{ route('events.index') }}" class="btn btn-custom">See Events</a>
-                </div>
-            </div>
-        @endif
-    </div>
-
-    <style>
-        .search-result-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .search-result-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .result-img {
-            height: 100%;
-            min-height: 200px;
-            overflow: hidden;
-        }
-        
-        .result-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .result-content {
-            padding: 20px;
-        }
-        
-        .result-type {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            background: #f8f9fa;
-            color: #666;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
-        }
-        
-        .event-type {
-            background: #FF4C4C;
-            color: #fff;
-        }
-        
-        .result-content h4 {
-            margin-bottom: 10px;
-            color: #343a40;
-        }
-        
-        .result-content h4 a {
-            color: inherit;
-            text-decoration: none;
-        }
-        
-        .result-meta span {
-            margin-right: 15px;
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        .event-details p {
-            margin-bottom: 5px;
-            color: #6c757d;
-        }
-        
-        .no-results {
-            padding: 50px 0;
-        }
-
-        .faq-type {
-    background: #17a2b8;
-    color: #fff;
-}
-
-.faq-card .result-content {
-    padding: 25px;
-}
-
-.faq-card h4 {
-    color: #2d3436;
-    font-size: 1.1rem;
-    margin: 15px 0;
-}
-
-    </style>
+        </div>
+    </section>
 </x-layouts.app>

@@ -22,8 +22,13 @@
 
                 <div class="mb-3">
                     <label for="details" class="form-label">Details</label>
-                    <textarea style="display:none" class="form-control @error('details') is-invalid @enderror" 
-                              id="details" name="details">{{ old('details') }}</textarea>
+                    <textarea
+                        class="form-control @error('details') is-invalid @enderror"
+                        id="details"
+                        name="details"
+                        rows="8"
+                        data-admin-rich-text
+                    >{{ old('details') }}</textarea>
                     @error('details')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -44,17 +49,5 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-<script>
-    ClassicEditor
-        .create(document.querySelector('#details'))
-        .catch(error => {
-            console.error(error);
-        });
-</script>
-@endpush
-
-
 
 @endsection

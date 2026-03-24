@@ -18,7 +18,10 @@ class Event extends Model
     protected $dates = ['date'];
 
     protected $casts = [
-        'date' => 'datetime'
+        'date' => 'datetime',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'published_at' => 'datetime',
     ];
 
     protected static function boot()
@@ -35,11 +38,10 @@ class Event extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeUpcoming($query)
-    {
+public function scopeUpcoming($query)
+{
         return $query->where('start_date', '>=', now())
-                    ->where('status', 'published')
-                    ->orderBy('start_date');
+            ->orderBy('start_date');
     }
 
 

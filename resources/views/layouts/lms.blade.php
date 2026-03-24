@@ -15,9 +15,10 @@
     @stack('styles')
 </head>
 <body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     @include('layouts.navigation')
 
-    <main class="py-4">
+    <main class="py-4" id="main-content">
         <div class="container">
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">

@@ -5,16 +5,33 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use App\Models\Course;
-use App\Models\ExamAttempt;
 use App\Models\User;
+use App\Support\Lms\DiplomaProgramService;
 use Illuminate\Http\Request;
+use App\Services\HtmlSanitizer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use App\Notifications\CertificateApprovedNotification;
 
 class AdminCertificateController extends Controller
 {
+    public function __construct(private DiplomaProgramService $diplomaProgram)
+    {
+        $this->middleware('can:viewAny,' . Certificate::class)->only(['index', 'pending', 'export']);
+        $this->middleware('can:view,certificate')->only(['show', 'preview']);
+        $this->middleware('can:approve,certificate')->only('approve');
+        $this->middleware('can:reject,certificate')->only('reject');
+        $this->middleware('can:regenerate,certificate')->only('regenerate');
+        $this->middleware('can:delete,certificate')->only('destroy');
+        $this->middleware('can:manage,' . Certificate::class)->only([
+            'bulkApprove',
+            'scanMissing',
+            'generateSample',
+            'generateSampleCourse',
+            'cleanupSamples',
+        ]);
+    }
+
     /**
      * Display all certificates with filtering options
      */
@@ -81,16 +98,7 @@ class AdminCertificateController extends Controller
         
         // Get user's course completion details for diploma certificates
         if (!$certificate->course_id) {
-            $asomCourseTitles = [
-                'Bible Introduction',
-                'Hermeneutics',
-                'Ministry Vitals',
-                'Spiritual Gifts & Ministry',
-                'Biblical Counseling',
-                'Homiletics'
-            ];
-
-            $userCourseDetails = $this->getUserAsomCourseDetails($certificate->user, $asomCourseTitles);
+            $userCourseDetails = $this->diplomaProgram->userCourseDetails($certificate->user);
             return view('admin.certificates.show', compact('certificate', 'userCourseDetails'));
         }
 
@@ -113,7 +121,9 @@ class AdminCertificateController extends Controller
             'approved_by' => $admin->id,
             'approved_at' => now(),
             'issued_at' => now(),
-            'notes' => $request->input('notes', $certificate->notes)
+            'notes' => $request->filled('notes')
+                ? $this->sanitizePlainText($request->input('notes'))
+                : $certificate->notes
         ]);
 
         Log::info('Certificate approved by admin', [
@@ -151,9 +161,10 @@ class AdminCertificateController extends Controller
         ]);
 
         $admin = Auth::user();
+        $rejectionReason = $this->sanitizePlainText($request->rejection_reason);
         
         $certificate->update([
-            'notes' => 'REJECTED: ' . $request->rejection_reason . ' (Rejected by: ' . $admin->name . ')',
+            'notes' => 'REJECTED: ' . $rejectionReason . ' (Rejected by: ' . $admin->name . ')',
         ]);
 
         // Soft delete the certificate
@@ -163,7 +174,7 @@ class AdminCertificateController extends Controller
             'certificate_id' => $certificate->id,
             'user_id' => $certificate->user_id,
             'admin_id' => $admin->id,
-            'reason' => $request->rejection_reason
+            'reason' => $rejectionReason
         ]);
 
         // TODO: Send notification to student about certificate rejection
@@ -263,63 +274,6 @@ class AdminCertificateController extends Controller
     }
 
     /**
-     * Get detailed course completion info for a user's ASOM diploma
-     */
-    private function getUserAsomCourseDetails($user, $asomCourseTitles)
-    {
-        $courseDetails = [];
-        
-        foreach ($asomCourseTitles as $courseTitle) {
-            $course = \App\Models\Course::where('title', $courseTitle)
-                ->whereHas('users', function($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                })
-                ->with(['exams'])
-                ->first();
-
-            if ($course) {
-                $isCompleted = $course->isCompletedByStudent($user);
-                $examResults = [];
-
-                foreach ($course->exams as $exam) {
-                    $attempts = \App\Models\ExamAttempt::where('user_id', $user->id)
-                        ->where('exam_id', $exam->id)
-                        ->whereNotNull('completed_at')
-                        ->orderBy('score', 'desc')
-                        ->get();
-
-                    $bestScore = $attempts->max('score');
-                    $passed = $bestScore >= $exam->passing_score;
-
-                    $examResults[] = [
-                        'exam_title' => $exam->title,
-                        'best_score' => $bestScore,
-                        'passing_score' => $exam->passing_score,
-                        'passed' => $passed,
-                        'attempts_count' => $attempts->count()
-                    ];
-                }
-
-                $courseDetails[] = [
-                    'course_title' => $courseTitle,
-                    'completed' => $isCompleted,
-                    'exam_results' => $examResults,
-                    'enrolled_at' => $course->pivot->created_at ?? null
-                ];
-            } else {
-                $courseDetails[] = [
-                    'course_title' => $courseTitle,
-                    'completed' => false,
-                    'exam_results' => [],
-                    'enrolled_at' => null
-                ];
-            }
-        }
-
-        return $courseDetails;
-    }
-
-    /**
      * Export certificates data
      */
     public function export(Request $request)
@@ -337,79 +291,20 @@ class AdminCertificateController extends Controller
         $admin = Auth::user();
         $createdDiplomaCerts = 0;
 
-        // Determine program courses dynamically: published courses that have at least one valid active exam (>= 5 questions)
-        $allCourses = Course::where('status', 'published')
-            ->with(['exams' => function($q){
-                $q->where('is_active', true)->withCount('questions');
-            }])->get();
-
-        $programCourses = $allCourses->filter(function($course){
-            return $course->exams->where('questions_count', '>=', 5)->count() > 0;
-        });
-
-        if ($programCourses->isEmpty()) {
-            Log::warning('Scan missing certificates: No program courses found (no published courses with valid exams).');
-            return redirect()->route('admin.certificates.index')
-                ->with('info', 'No program courses found (need published courses with active exams of at least 5 questions).');
-        }
-
-        // Find all users enrolled in any of the ASOM courses
-        $userIds = DB::table('course_user')
-            ->whereIn('course_id', $programCourses->pluck('id'))
-            ->pluck('user_id')
-            ->unique();
-
-        $users = User::whereIn('id', $userIds)->get();
+        $programCourseTitles = $this->diplomaProgram->requiredCourseTitles();
+        $users = User::query()
+            ->whereHas('courses', fn ($query) => $query->whereIn('courses.title', $programCourseTitles))
+            ->get();
 
         foreach ($users as $user) {
-            // Skip if diploma certificate already exists
-            $existingDiploma = Certificate::where('user_id', $user->id)
-                ->whereNull('course_id')
-                ->first();
-            if ($existingDiploma) continue;
+            $certificate = $this->diplomaProgram->ensurePendingCertificate(
+                $user,
+                'Auto-generated diploma certificate by admin scan (pending approval).'
+            );
 
-            // Ensure PASSED exams across all program courses (active with enough questions)
-            $totalScore = 0; $examCount = 0; $allPassed = true; $completedDates = [];
-            foreach ($programCourses as $course) {
-                $courseExams = $course->exams()
-                    ->where('is_active', true)
-                    ->withCount('questions')
-                    ->get()
-                    ->filter(fn($exam) => $exam->questions_count >= 5);
-
-                if ($courseExams->isEmpty()) { $allPassed = false; break; }
-
-                foreach ($courseExams as $exam) {
-                    $bestAttempt = ExamAttempt::where('user_id', $user->id)
-                        ->where('exam_id', $exam->id)
-                        ->where('score', '>=', $exam->passing_score)
-                        ->whereNotNull('completed_at')
-                        ->orderBy('score', 'desc')
-                        ->first();
-                    if ($bestAttempt) {
-                        $totalScore += $bestAttempt->score; $examCount++;
-                        $completedDates[] = $bestAttempt->completed_at;
-                    } else {
-                        $allPassed = false; break 2;
-                    }
-                }
+            if ($certificate && $certificate->wasRecentlyCreated) {
+                $createdDiplomaCerts++;
             }
-
-            if (!$allPassed || $examCount === 0) continue;
-
-            $finalGrade = round($totalScore / $examCount, 2);
-            $completedAt = collect($completedDates)->filter()->max() ?? now();
-
-            Certificate::create([
-                'user_id' => $user->id,
-                'course_id' => null,
-                'final_grade' => $finalGrade,
-                'completed_at' => $completedAt,
-                'issued_at' => null,
-                'is_approved' => false,
-                'notes' => 'Auto-generated diploma certificate by admin scan (pending approval)'
-            ]);
-            $createdDiplomaCerts++;
         }
 
         Log::info('Admin scan for missing certificates completed', [
@@ -545,5 +440,10 @@ class AdminCertificateController extends Controller
         return view('lms.certificates.certificate', compact(
             'student', 'course', 'completionDate', 'certificateId', 'finalGrade', 'certificate', 'isPdf'
         ));
+    }
+
+    private function sanitizePlainText(?string $value): string
+    {
+        return trim(strip_tags(HtmlSanitizer::clean($value)));
     }
 }

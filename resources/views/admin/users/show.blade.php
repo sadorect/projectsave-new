@@ -15,21 +15,16 @@
             </nav>
         </div>
         <div class="btn-group">
-            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary">
-                <i class="bi bi-pencil"></i> Edit User
-            </a>
+            @can('update', $user)
+                <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Edit User
+                </a>
+            @endcan
             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Back to Users
             </a>
         </div>
     </div>
-
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="row">
         <!-- User Information Card -->
         <div class="col-lg-8">
@@ -174,9 +169,12 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-outline-primary">
-                            <i class="bi bi-pencil"></i> Edit User
-                        </a>
+                        @can('update', $user)
+                            <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-outline-primary">
+                                <i class="bi bi-pencil"></i> Edit User
+                            </a>
+                        @endcan
+                        @can('verify', $user)
                         @if(!$user->email_verified_at)
                             <form id="admin-verify-form" action="{{ route('admin.users.verify', $user) }}" method="POST" class="mb-2">
                                 @csrf
@@ -189,6 +187,8 @@
                                 <i class="bi bi-envelope"></i> Resend Verification
                             </button>
                         @endif
+                        @endcan
+                        @can('toggleActive', $user)
                         @if(\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active'))
                         <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST" class="mb-2">
                             @csrf
@@ -199,15 +199,20 @@
                             </button>
                         </form>
                         @endif
+                        @endcan
+                        @can('update', $user)
                         @if(!$user->is_admin)
                             <button class="btn btn-outline-success" onclick="toggleAdminStatus({{ $user->id }})">
                                 <i class="bi bi-shield-plus"></i> Make Admin
                             </button>
                         @endif
+                        @endcan
+                        @can('delete', $user)
                         <hr>
                         <button class="btn btn-outline-danger" onclick="confirmDelete({{ $user->id }})">
                             <i class="bi bi-trash"></i> Delete User
                         </button>
+                        @endcan
                     </div>
                 </div>
             </div>

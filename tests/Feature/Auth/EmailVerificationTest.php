@@ -62,4 +62,19 @@ class EmailVerificationTest extends TestCase
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
+
+    public function test_verification_notification_can_be_resent_with_math_captcha(): void
+    {
+        $user = User::factory()->create([
+            'email_verified_at' => null,
+        ]);
+
+        $this->actingAs($user)
+            ->withSession(['math_captcha_answer' => 8])
+            ->post(route('verification.send'), [
+                'math_captcha' => 8,
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect();
+    }
 }

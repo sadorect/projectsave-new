@@ -8,7 +8,7 @@
             <a href="{{ route('admin.exams.edit', $exam) }}" class="btn btn-secondary">Back to Exam</a>
         </div>
         <div class="card-body">
-            <form action="{{ route('admin.questions.store', $exam) }}" method="POST" id="questionForm">
+            <form action="{{ route('admin.questions.store', $exam) }}" method="POST" id="questionForm" data-admin-question-builder>
                 @csrf
                 <div class="mb-3">
                     <label class="form-label">Question Text</label>
@@ -17,7 +17,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Options</label>
-                    <div id="optionsContainer">
+                    <div id="optionsContainer" data-question-options>
                         <div class="option-row mb-2">
                             <div class="input-group">
                                 <span class="input-group-text">A</span>
@@ -37,14 +37,14 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-secondary mt-2" id="addOption">
+                    <button type="button" class="btn btn-secondary mt-2" id="addOption" data-question-add-option>
                         <i class="bi bi-plus"></i> Add Option
                     </button>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Correct Answer</label>
-                    <select name="correct_answer" class="form-select" required>
+                    <select name="correct_answer" class="form-select" required data-question-correct-answer>
                         <option value="">Select correct answer</option>
                     </select>
                 </div>
@@ -65,67 +65,3 @@
     </div>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const optionsContainer = document.getElementById('optionsContainer');
-        const addOptionBtn = document.getElementById('addOption');
-        const correctAnswerSelect = document.querySelector('select[name="correct_answer"]');
-        let optionCount = 2;
-
-        function updateCorrectAnswerOptions() {
-            const options = document.querySelectorAll('input[name="options[]"]');
-            correctAnswerSelect.innerHTML = '<option value="">Select correct answer</option>';
-            
-            options.forEach((option, index) => {
-                if (option.value.trim()) {
-                    const letter = String.fromCharCode(65 + index);
-                    const optionElement = document.createElement('option');
-                    optionElement.value = option.value;
-                    optionElement.textContent = `${letter}: ${option.value}`;
-                    correctAnswerSelect.appendChild(optionElement);
-                }
-            });
-        }
-
-        function addOption() {
-            optionCount++;
-            const letter = String.fromCharCode(64 + optionCount);
-            
-            const optionRow = document.createElement('div');
-            optionRow.className = 'option-row mb-2';
-            optionRow.innerHTML = `
-                <div class="input-group">
-                    <span class="input-group-text">${letter}</span>
-                    <input type="text" name="options[]" class="form-control" required>
-                    <button type="button" class="btn btn-danger remove-option">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            `;
-
-            optionsContainer.appendChild(optionRow);
-            updateCorrectAnswerOptions();
-        }
-
-        addOptionBtn.addEventListener('click', addOption);
-
-        optionsContainer.addEventListener('click', function(e) {
-            if (e.target.closest('.remove-option')) {
-                const optionRow = e.target.closest('.option-row');
-                optionRow.remove();
-                updateCorrectAnswerOptions();
-            }
-        });
-
-        optionsContainer.addEventListener('input', function(e) {
-            if (e.target.matches('input[name="options[]"]')) {
-                updateCorrectAnswerOptions();
-            }
-        });
-
-        updateCorrectAnswerOptions();
-    });
-</script>
-@endpush

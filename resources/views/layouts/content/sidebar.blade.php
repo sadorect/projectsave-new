@@ -1,33 +1,45 @@
-<div class="sidebar bg-dark text-white" style="width: 250px; min-height: 100vh;">
-    <div class="p-3">
-        <div class="text-center mb-4">
-            <img src="{{ auth()->user()->avatar ?? asset('frontend/img/default-avatar.png') }}" 
-                 alt="Profile" 
-                 class="rounded-circle mb-3" 
-                 style="width: 80px; height: 80px;">
-            <h6 class="mb-0">{{ auth()->user()->name }}</h6>
-            <small class="text-muted">Content Editor</small>
-        </div>
+@php($initial = strtoupper(substr(auth()->user()->name, 0, 1)))
 
-        <nav class="nav flex-column">
-            <a class="nav-link text-white" href="{{ route('user.dashboard') }}">
-                <i class="bi bi-house me-2"></i> User Dashboard
-            </a>
-            
-            <a class="nav-link text-white" data-bs-toggle="collapse" href="#contentManagement">
-                <i class="bi bi-pencil-square me-2"></i> Content Management
-                <i class="bi bi-chevron-down float-end"></i>
-            </a>
-            
-            <div class="collapse show" id="contentManagement">
-                <nav class="nav flex-column ms-3">
-                    <a class="nav-link text-white {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}" 
-                       href="{{ route('admin.posts.index') }}">
-                        <i class="bi bi-file-text me-2"></i> Posts
-                    </a>
-                    <!-- Other content management links -->
-                </nav>
+<aside class="surface-sidebar surface-sidebar-shell d-flex flex-column gap-4">
+    <div class="surface-sidebar-brand">
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex h-12 w-12 align-items-center justify-content-center rounded-circle bg-white/10 fw-semibold text-white">
+                {{ $initial }}
             </div>
-        </nav>
+            <div>
+                <div class="fs-5 fw-semibold text-white">{{ auth()->user()->name }}</div>
+                <small class="text-white-50">Content workspace</small>
+            </div>
+        </div>
     </div>
-</div>
+
+    <nav class="d-flex flex-column gap-4 flex-grow-1">
+        @foreach($contentNavigation ?? [] as $section)
+            <div class="d-flex flex-column gap-2">
+                @if(! empty($section['label']))
+                    <div class="surface-sidebar-section">{{ $section['label'] }}</div>
+                @endif
+
+                <div class="d-flex flex-column gap-1">
+                    @foreach($section['items'] as $item)
+                        @if($item['url'])
+                            <a class="surface-nav-link {{ $item['active'] ? 'active' : '' }}" href="{{ $item['url'] }}">
+                                @if($item['icon'])
+                                    <i class="{{ $item['icon'] }}"></i>
+                                @endif
+                                <span>{{ $item['label'] }}</span>
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        @endforeach
+    </nav>
+
+    <div class="surface-sidebar-footer">
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="surface-button-secondary w-100 justify-content-center">Logout</button>
+        </form>
+    </div>
+</aside>

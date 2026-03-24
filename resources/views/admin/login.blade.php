@@ -3,7 +3,9 @@
 <head>
     <title>Admin Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    @if (! app()->runningUnitTests())
+        @vite('resources/css/admin.css')
+    @endif
 </head>
 <body class="bg-light">
     <div class="container">
@@ -25,13 +27,15 @@
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control" required>
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
                             </div>
                             
                             <div class="mb-4">
                                 <label class="form-label">Password</label>
                                 <input type="password" name="password" class="form-control" required>
                             </div>
+
+                            <x-math-captcha />
                             
                             <button type="submit" class="btn btn-primary w-100">
                                 Login
@@ -42,6 +46,8 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @if (! app()->runningUnitTests())
+        @vite('resources/js/admin.js')
+    @endif
 </body>
 </html>

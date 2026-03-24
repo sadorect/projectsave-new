@@ -18,10 +18,12 @@ class PasswordUpdateTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->from('/profile')
+            ->withSession(['math_captcha_answer' => 8])
             ->put('/password', [
                 'current_password' => 'password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
+                'math_captcha' => 8,
             ]);
 
         $response
@@ -38,10 +40,12 @@ class PasswordUpdateTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->from('/profile')
+            ->withSession(['math_captcha_answer' => 8])
             ->put('/password', [
                 'current_password' => 'wrong-password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
+                'math_captcha' => 8,
             ]);
 
         $response

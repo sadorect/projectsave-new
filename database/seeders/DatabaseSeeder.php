@@ -8,8 +8,6 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\PostSeeder;
 use Database\Seeders\EventSeeder;
 use Database\Seeders\CategorySeeder;
-use Database\Seeders\RolesAndPermissionsSeeder;
-
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -18,13 +16,20 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
             AdminSeeder::class,
             CategorySeeder::class,
             TagSeeder::class,
             PostSeeder::class,
             EventSeeder::class,
-            RolesAndPermissionsSeeder::class,
             ASOMDiplomaSeeder::class,
         ]);
+
+        if (app()->environment('local')) {
+            $this->call([
+                LmsPreviewContentSeeder::class,
+            ]);
+        }
     }
 }

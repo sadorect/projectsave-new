@@ -21,7 +21,13 @@
                             <p class="mb-3">{{ $question->question_text }}</p>
                             
                             <div class="options-list">
-                                @foreach(json_decode($question->options) as $optionIndex => $option)
+                                @php
+                                    $options = is_array($question->options)
+                                        ? $question->options
+                                        : (json_decode($question->options ?? '[]', true) ?: []);
+                                @endphp
+
+                                @foreach($options as $optionIndex => $option)
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="radio" 
                                                name="question_{{ $question->id }}" 

@@ -4,47 +4,86 @@ namespace App\Http\Controllers\LMS;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exam;
-use App\Models\Course;
 use App\Models\ExamAttempt;
-use App\Models\Certificate;
+use App\Models\Course;
 use App\Models\User;
 use App\Notifications\ExamResultsNotification;
+use App\Support\Lms\DiplomaProgramService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class StudentExamController extends Controller
 {
+    public function __construct(private DiplomaProgramService $diplomaProgram)
+    {
+    }
+
     /**
      * Display available exams for the authenticated student
      */
     public function index()
     {
         $user = Auth::user();
-        
-        // Get completed courses with their exams
-        $completedCoursesWithExams = Course::whereHas('users', function($query) use ($user) {
-        $query->where('user_id', $user->id);
-    })
-    ->with(['exams' => function($query) {
-        $query->where('is_active', true)
-              ->withCount('questions');
-    }])
-    ->get()
-    ->filter(function($course) use ($user) {
-        return $course->isCompletedByStudent($user) &&
-               $course->exams->where('questions_count', '>=', 5)->count() > 0;
-    });
 
-        // Get exam attempts for this user
-        $examAttempts = ExamAttempt::where('user_id', $user->id)
+        $completedCoursesWithExams = Course::query()
+            ->whereHas('users', fn ($query) => $query->where('user_id', $user->id))
+            ->with([
+                'instructor',
+                'exams' => fn ($query) => $query
+                    ->where('is_active', true)
+                    ->withCount('questions'),
+            ])
+            ->get()
+            ->filter(fn ($course) => $course->isCompletedByStudent($user))
+            ->values();
+
+        $examAttempts = ExamAttempt::query()
+            ->where('user_id', $user->id)
             ->with('exam')
+            ->orderByDesc('created_at')
             ->get()
             ->groupBy('exam_id');
 
-        return view('lms.exams.index', compact('completedCoursesWithExams', 'examAttempts'));
+        $examCatalog = $completedCoursesWithExams
+            ->flatMap(function ($course) use ($examAttempts) {
+                return $course->exams
+                    ->filter(fn ($exam) => $exam->questions_count >= 5)
+                    ->map(function ($exam) use ($course, $examAttempts) {
+                        $userAttempts = ($examAttempts[$exam->id] ?? collect())
+                            ->sortByDesc('created_at')
+                            ->values();
+                        $lastAttempt = $userAttempts->first();
+                        $attemptCount = $userAttempts->count();
+                        $remainingAttempts = max($exam->max_attempts - $attemptCount, 0);
+                        $bestScore = $userAttempts->max('score');
+                        $hasPassed = $bestScore !== null && $bestScore >= $exam->passing_score;
+                        $canTakeExam = $remainingAttempts > 0
+                            && (! $hasPassed || $exam->allow_retakes)
+                            && ! $userAttempts->contains(fn ($attempt) => $attempt->completed_at === null);
+
+                        return [
+                            'model' => $exam,
+                            'course' => $course,
+                            'attempts' => $userAttempts,
+                            'lastAttempt' => $lastAttempt,
+                            'attemptCount' => $attemptCount,
+                            'remainingAttempts' => $remainingAttempts,
+                            'bestScore' => $bestScore,
+                            'hasPassed' => $hasPassed,
+                            'canTakeExam' => $canTakeExam,
+                        ];
+                    });
+            })
+            ->values();
+
+        $examStats = [
+            'available' => $examCatalog->count(),
+            'passed' => $examCatalog->where('hasPassed', true)->count(),
+            'pending' => $examCatalog->where('hasPassed', false)->count(),
+        ];
+
+        return view('lms.exams.index', compact('examCatalog', 'examStats'));
     }
 
     /**
@@ -60,7 +99,8 @@ class StudentExamController extends Controller
                 ->with('error', 'You must complete the course before taking this exam.');
         }
 
-        // Get user's attempts for this exam
+        $exam->load(['course.instructor', 'course.lessons', 'questions']);
+
         $attempts = ExamAttempt::where('user_id', $user->id)
             ->where('exam_id', $exam->id)
             ->orderBy('created_at', 'desc')
@@ -92,7 +132,27 @@ class StudentExamController extends Controller
             }
         }
 
-        return view('lms.exams.show', compact('exam', 'attempts', 'remainingAttempts', 'lastAttempt', 'canRetake'));
+        $attemptHistory = $attempts->map(function (ExamAttempt $attempt, int $index) use ($exam) {
+            return [
+                'model' => $attempt,
+                'label' => 'Attempt #' . ($index + 1),
+                'status' => $attempt->completed_at === null
+                    ? 'In progress'
+                    : ($attempt->score >= $exam->passing_score ? 'Passed' : 'Failed'),
+            ];
+        });
+
+        $questionCount = $exam->questions->count();
+
+        return view('lms.exams.show', compact(
+            'exam',
+            'attempts',
+            'remainingAttempts',
+            'lastAttempt',
+            'canRetake',
+            'attemptHistory',
+            'questionCount'
+        ));
     }
 
     /**
@@ -155,6 +215,7 @@ class StudentExamController extends Controller
             return $this->submit($exam, $attempt, new Request());
         }
 
+        $exam->loadMissing('questions');
         $questions = $exam->questions()->inRandomOrder()->get();
         $remainingTime = max(0, $timeLimit - $elapsedTime);
 
@@ -202,6 +263,10 @@ class StudentExamController extends Controller
 
         // If submitting via form, save final answers
         if ($request && $request->has('answers')) {
+            $request->validate([
+                'answers' => 'nullable|array|max:200',
+                'answers.*' => 'nullable|string|max:5000',
+            ]);
             $formAnswers = $request->input('answers', []);
             $existingAnswers = $attempt->answers ?? [];
             
@@ -249,14 +314,28 @@ class StudentExamController extends Controller
             return redirect()->route('lms.exams.take', [$exam, $attempt]);
         }
 
+        $exam->load(['course.instructor', 'questions']);
         $questions = $exam->questions;
         $answers = $attempt->answers ?? [];
         $passed = $attempt->score >= $exam->passing_score;
+        $attemptCount = ExamAttempt::where('user_id', $user->id)
+            ->where('exam_id', $exam->id)
+            ->count();
+        $remainingAttempts = max($exam->max_attempts - $attemptCount, 0);
+        $canRetake = $remainingAttempts > 0 && $exam->allow_retakes && ! $passed;
         
-        // Calculate detailed analytics
         $analytics = $this->calculateDetailedAnalytics($exam, $attempt, $questions, $answers);
 
-        return view('lms.exams.results', compact('exam', 'attempt', 'questions', 'answers', 'passed', 'analytics'));
+        return view('lms.exams.results', compact(
+            'exam',
+            'attempt',
+            'questions',
+            'answers',
+            'passed',
+            'analytics',
+            'remainingAttempts',
+            'canRetake'
+        ));
     }
 
     /**
@@ -353,105 +432,17 @@ class StudentExamController extends Controller
             return;
         }
 
-        // Check if user already has a diploma certificate (pending or approved)
-        $existingCertificate = Certificate::where('user_id', $user->id)
-            ->whereNull('course_id') // Diploma certificates don't have course_id
-            ->first();
+        $certificate = $this->diplomaProgram->ensurePendingCertificate(
+            $user,
+            'Program certificate generated after the learner completed all ASOM diploma exams.'
+        );
 
-        if ($existingCertificate) {
-            return; // Already has diploma certificate
+        if ($certificate) {
+            Log::info('Diploma in Ministry certificate generated or confirmed from exam completion.', [
+                'user_id' => $user->id,
+                'certificate_id' => $certificate->certificate_id,
+            ]);
         }
-
-        // Define the ASOM course titles that make up the Diploma in Ministry program
-        $asomCourseTitles = [
-            'Bible Introduction',
-            'Hermeneutics',
-            'Ministry Vitals',
-            'Spiritual Gifts & Ministry',
-            'Biblical Counseling',
-            'Homiletics'
-        ];
-
-        // Check if user has completed all ASOM courses with passing exam scores
-        $completedAsomCourses = Course::whereIn('title', $asomCourseTitles)
-            ->whereHas('users', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->with(['exams' => function($query) {
-                $query->where('is_active', true);
-            }])
-            ->get()
-            ->filter(function($course) use ($user) {
-                // Check if course is completed by student
-                if (!$course->isCompletedByStudent($user)) {
-                    return false;
-                }
-
-                // Require that the course has exams and that ALL exams have been passed by the user
-                if ($course->exams->count() === 0) {
-                    return false; // No exams means the course can't qualify for diploma's exam requirement
-                }
-
-                $allExamsPassed = $course->exams->every(function($courseExam) use ($user) {
-                    return ExamAttempt::where('user_id', $user->id)
-                        ->where('exam_id', $courseExam->id)
-                        ->where('score', '>=', $courseExam->passing_score)
-                        ->whereNotNull('completed_at')
-                        ->exists();
-                });
-
-                return $allExamsPassed;
-            });
-
-        // If user has completed all required ASOM courses with passing exams
-        if ($completedAsomCourses->count() === count($asomCourseTitles)) {
-            $this->generateDiplomaCertificate($user, $completedAsomCourses);
-        }
-    }
-
-    /**
-     * Generate Diploma in Ministry certificate (pending admin approval)
-     */
-    private function generateDiplomaCertificate($user, $completedCourses)
-    {
-        // Calculate overall grade based on all exam attempts
-        $totalScore = 0;
-        $examCount = 0;
-
-        foreach ($completedCourses as $course) {
-            foreach ($course->exams as $exam) {
-                $bestAttempt = ExamAttempt::where('user_id', $user->id)
-                    ->where('exam_id', $exam->id)
-                    ->where('score', '>=', $exam->passing_score)
-                    ->whereNotNull('completed_at')
-                    ->orderBy('score', 'desc')
-                    ->first();
-
-                if ($bestAttempt) {
-                    $totalScore += $bestAttempt->score;
-                    $examCount++;
-                }
-            }
-        }
-
-        $finalGrade = $examCount > 0 ? round($totalScore / $examCount, 2) : 0;
-
-        // Create certificate pending admin approval
-        Certificate::create([
-            'user_id' => $user->id,
-            'course_id' => null, // Diploma certificates don't belong to a single course
-            'final_grade' => $finalGrade,
-            'completed_at' => now(),
-            'issued_at' => null, // Will be set when admin approves
-            'is_approved' => false, // Requires admin approval
-            'notes' => 'Certificate of Diploma in Ministry - Completed all ASOM courses with passing grades'
-        ]);
-
-        Log::info('Diploma in Ministry certificate generated (pending approval)', [
-            'user_id' => $user->id,
-            'final_grade' => $finalGrade,
-            'completed_courses' => $completedCourses->count()
-        ]);
     }
 
     /**
@@ -465,52 +456,17 @@ class StudentExamController extends Controller
             return ['eligible' => false, 'message' => 'User not found'];
         }
 
-        // Define the ASOM course titles
-        $asomCourseTitles = [
-            'Bible Introduction',
-            'Hermeneutics',
-            'Ministry Vitals',
-            'Spiritual Gifts & Ministry',
-            'Biblical Counseling',
-            'Homiletics'
-        ];
+        $eligibility = $this->diplomaProgram->eligibility($user);
 
-        $completedCourses = Course::whereIn('title', $asomCourseTitles)
-            ->whereHas('users', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->with(['exams'])
-            ->get()
-            ->filter(function($course) use ($user) {
-                return $course->isCompletedByStudent($user);
-            });
-
-        $passedExams = [];
-        $totalRequired = count($asomCourseTitles);
-        
-        foreach ($completedCourses as $course) {
-            foreach ($course->exams as $exam) {
-                $passingAttempt = ExamAttempt::where('user_id', $user->id)
-                    ->where('exam_id', $exam->id)
-                    ->where('score', '>=', $exam->passing_score)
-                    ->whereNotNull('completed_at')
-                    ->first();
-                
-                if ($passingAttempt) {
-                    $passedExams[] = $course->title;
-                    break; // Only need one passing exam per course
-                }
-            }
-        }
-
-        $completedRequirements = count(array_unique($passedExams));
-        
         return [
-            'eligible' => $completedRequirements === $totalRequired,
-            'completed' => $completedRequirements,
-            'total_required' => $totalRequired,
-            'completed_courses' => array_unique($passedExams),
-            'remaining_courses' => array_diff($asomCourseTitles, array_unique($passedExams))
+            'eligible' => $eligibility['eligible'],
+            'completed' => $eligibility['completed_requirements'],
+            'total_required' => $eligibility['required_count'],
+            'completed_courses' => collect($eligibility['requirements'])
+                ->where('is_satisfied', true)
+                ->pluck('title')
+                ->all(),
+            'remaining_courses' => $eligibility['remaining_course_titles'],
         ];
     }
 }

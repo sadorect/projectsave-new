@@ -12,6 +12,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminSessionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:manage-user-sessions,admin');
+    }
+
     public function index(Request $request)
     {
         $driver = config('session.driver');

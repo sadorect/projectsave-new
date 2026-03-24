@@ -1,259 +1,144 @@
 @extends('admin.layouts.app')
+
+@section('title', 'Form Responses')
+@section('page_kicker', 'Forms And Intake')
+@section('page_subtitle', 'Review the responses, copy the public form link, and export the dataset for this specific form.')
+
 @section('content')
-<div class="container-fluid">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h1 class="h3 mb-2 text-gray-800"><i class="fas fa-paper-plane me-2"></i>Form Submissions</h1>
-      <p class="text-muted">Submissions for: <strong>{{ $form->title ?? 'Unknown Form' }}</strong></p>
-    </div>
-    <div>
-      @if($submissions && $submissions->count() > 0)
-        <a href="{{ route('admin.forms.download', $form) }}" class="btn btn-success me-2">
-          <i class="fas fa-download me-1"></i>Export CSV
-        </a>
-      @endif
-      <a href="{{ route('admin.forms.index') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left me-2"></i>Back to Forms
-      </a>
-    </div>
-  </div>
+@php($fieldLabels = collect($form->fields ?? [])->mapWithKeys(fn ($field) => [($field['name'] ?? '') => ($field['label'] ?? $field['name'] ?? 'Field')]))
 
-  @include('components.alerts')
+<div class="admin-page-shell">
+    <section class="admin-stat-grid">
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Responses</span>
+            <strong class="admin-stat-value">{{ number_format($summary['total']) }}</strong>
+            <p class="admin-stat-note mb-0">Total responses recorded for this form.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Received today</span>
+            <strong class="admin-stat-value">{{ number_format($summary['today']) }}</strong>
+            <p class="admin-stat-note mb-0">Fresh responses received since midnight.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Member responses</span>
+            <strong class="admin-stat-value">{{ number_format($summary['members']) }}</strong>
+            <p class="admin-stat-note mb-0">Responses from signed-in users.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Guest responses</span>
+            <strong class="admin-stat-value">{{ number_format($summary['guests']) }}</strong>
+            <p class="admin-stat-note mb-0">Responses received from non-members.</p>
+        </article>
+    </section>
 
-  <!-- Form Info Card -->
-  <div class="row mb-4">
-    <div class="col-lg-8">
-      <div class="card shadow mb-4">
-        <div class="card-header py-3">
-          <h6 class="m-0 font-weight-bold text-primary">Form Information</h6>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <p><strong>Title:</strong> {{ $form->title ?? 'N/A' }}</p>
-              <p><strong>Description:</strong> {{ $form->description ?? 'No description' }}</p>
-            </div>
-            <div class="col-md-6">
-              <p><strong>Total Fields:</strong> {{ count($form->fields ?? []) }}</p>
-              <p><strong>Access:</strong> 
-                @if($form->require_login)
-                  <span class="badge bg-warning">Login Required</span>
-                @else
-                  <span class="badge bg-success">Public Access</span>
-                @endif
-              </p>
-              <p><strong>Created:</strong> {{ $form->created_at->format('M d, Y') }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4">
-      <div class="card shadow mb-4">
-        <div class="card-header py-3">
-          <h6 class="m-0 font-weight-bold text-primary">Statistics</h6>
-        </div>
-        <div class="card-body text-center">
-          <div class="row">
-            <div class="col">
-              <h3 class="text-primary">{{ $submissions->total() ?? 0 }}</h3>
-              <p class="text-muted mb-0">Total Submissions</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  @if($submissions && $submissions->count() > 0)
-    <div class="card shadow mb-4">
-      <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Submissions ({{ $submissions->total() }})</h6>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          @foreach($submissions as $submission)
-            <div class="card mb-3">
-              <div class="card-header">
-                <div class="row align-items-center">
-                  <div class="col-md-3">
-                    <strong>Submission #{{ $submission->id }}</strong>
-                    <br><small class="text-muted">{{ $submission->created_at->format('M d, Y H:i') }}</small>
-                  </div>
-                  <div class="col-md-4">
-                    @if($submission->user)
-                      <i class="fas fa-user text-primary me-1"></i>{{ $submission->user->name }}
-                      <br><small class="text-muted"><i class="fas fa-envelope me-1"></i>{{ $submission->user->email }}</small>
-                    @else
-                      <i class="fas fa-user-circle text-muted me-1"></i>Guest User
-                    @endif
-                  </div>
-                  <div class="col-md-3">
-                    <span class="badge bg-success">
-                      <i class="fas fa-check me-1"></i>Submitted {{ $submission->created_at->diffForHumans() }}
-                    </span>
-                  </div>
-                  <div class="col-md-2 text-end">
-                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" 
-                            data-bs-target="#submission{{ $submission->id }}" aria-expanded="false">
-                      <i class="fas fa-eye me-1"></i>View Details
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="collapse" id="submission{{ $submission->id }}">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <h6 class="text-primary mb-3"><i class="fas fa-clipboard-list me-2"></i>Submitted Data</h6>
-                      @if($submission->data && is_array($submission->data))
-                        @foreach($submission->data as $key => $value)
-                          @php
-                            // Try to find the field label from form fields
-                            $fieldLabel = $key;
-                            if ($form->fields) {
-                              foreach ($form->fields as $field) {
-                                if (isset($field['name']) && $field['name'] === $key) {
-                                  $fieldLabel = $field['label'] ?? $key;
-                                  break;
-                                }
-                              }
-                            }
-                            $fieldLabel = ucfirst(str_replace('_', ' ', $fieldLabel));
-                          @endphp
-                          <div class="mb-2 p-2 bg-light rounded">
-                            <strong class="text-dark">{{ $fieldLabel }}:</strong>
-                            <div class="mt-1">
-                              @if(is_array($value))
-                                <span class="badge bg-info">{{ implode(', ', $value) }}</span>
-                              @elseif(filter_var($value, FILTER_VALIDATE_EMAIL))
-                                <a href="mailto:{{ $value }}" class="text-decoration-none">
-                                  <i class="fas fa-envelope me-1"></i>{{ $value }}
-                                </a>
-                              @elseif(filter_var($value, FILTER_VALIDATE_URL))
-                                <a href="{{ $value }}" target="_blank" class="text-decoration-none">
-                                  <i class="fas fa-external-link-alt me-1"></i>{{ $value }}
-                                </a>
-                              @else
-                                <span class="text-muted">{{ $value ?: '(No response)' }}</span>
-                              @endif
-                            </div>
-                          </div>
-                        @endforeach
-                      @else
-                        <div class="alert alert-warning">
-                          <i class="fas fa-exclamation-triangle me-2"></i>No form data available for this submission.
+    <div class="row g-4">
+        <div class="col-xl-4">
+            <div class="d-grid gap-4">
+                <x-ui.panel title="Form Profile" subtitle="The current setup and response access level for this form.">
+                    <div class="admin-definition-grid admin-definition-grid-single">
+                        <div class="admin-definition-item">
+                            <span class="admin-definition-label">Title</span>
+                            <strong>{{ $form->title ?: 'Untitled form' }}</strong>
                         </div>
-                      @endif
+                        <div class="admin-definition-item">
+                            <span class="admin-definition-label">Description</span>
+                            <strong>{{ $form->description ?: 'No description provided' }}</strong>
+                        </div>
+                        <div class="admin-definition-item">
+                            <span class="admin-definition-label">Access</span>
+                            <strong>
+                                <span class="admin-status-chip {{ $form->require_login ? 'is-warning' : 'is-success' }}">
+                                    {{ $form->require_login ? 'Login required' : 'Public access' }}
+                                </span>
+                            </strong>
+                        </div>
+                        <div class="admin-definition-item">
+                            <span class="admin-definition-label">Field count</span>
+                            <strong>{{ count($form->fields ?? []) }}</strong>
+                        </div>
                     </div>
-                    
-                    <div class="col-md-6">
-                      <h6 class="text-primary mb-3"><i class="fas fa-info-circle me-2"></i>Submission Info</h6>
-                      <div class="mb-2 p-2 bg-light rounded">
-                        <strong>Submission ID:</strong> #{{ $submission->id }}
-                      </div>
-                      <div class="mb-2 p-2 bg-light rounded">
-                        <strong>Submitted At:</strong> {{ $submission->created_at->format('l, F j, Y \a\t g:i A') }}
-                      </div>
-                      <div class="mb-2 p-2 bg-light rounded">
-                        <strong>Time Ago:</strong> {{ $submission->created_at->diffForHumans() }}
-                      </div>
-                      @if($submission->user)
-                        <div class="mb-2 p-2 bg-light rounded">
-                          <strong>User Account:</strong> Registered User
-                        </div>
-                      @else
-                        <div class="mb-2 p-2 bg-light rounded">
-                          <strong>User Account:</strong> <span class="text-muted">Guest (No account)</span>
-                        </div>
-                      @endif
-                      
-                      <div class="mt-3">
-                        <button type="button" class="btn btn-outline-danger btn-sm" 
-                                onclick="deleteSubmission({{ $submission->id }})" title="Delete Submission">
-                          <i class="fas fa-trash me-1"></i>Delete
+                </x-ui.panel>
+
+                <x-ui.panel title="Actions" subtitle="Jump to the form editor, export responses, or copy the public intake link.">
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('admin.forms.edit', $form) }}" class="surface-button-primary">Edit form</a>
+                        <a href="{{ route('admin.forms.download', $form) }}" class="surface-button-secondary">Export CSV</a>
+                        <a href="{{ route('forms.show', $form) }}" target="_blank" class="surface-button-secondary">Preview public form</a>
+                        <button
+                            type="button"
+                            class="surface-button-ghost"
+                            data-admin-copy-text="{{ route('forms.show', $form) }}"
+                            data-copy-success="Form link copied."
+                        >
+                            Copy public link
                         </button>
-                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
+                </x-ui.panel>
             </div>
-          @endforeach
         </div>
-        
-        <div class="d-flex justify-content-center">
-          {{ $submissions->links() }}
+
+        <div class="col-xl-8">
+            <x-ui.panel title="Response Timeline" subtitle="Open individual responses to inspect the submitted payload and user context.">
+                @if($submissions->isNotEmpty())
+                    <div class="admin-record-list">
+                        @foreach($submissions as $submission)
+                            <details class="admin-record-card">
+                                <summary class="admin-record-summary">
+                                    <span>
+                                        <strong class="d-block">Submission #{{ $submission->id }}</strong>
+                                        <small class="text-muted">
+                                            {{ $submission->user?->name ?? 'Guest user' }}
+                                            @if($submission->user?->email)
+                                                - {{ $submission->user->email }}
+                                            @endif
+                                        </small>
+                                    </span>
+                                    <span class="text-end">
+                                        <strong class="d-block">{{ $submission->created_at->format('M j, Y H:i') }}</strong>
+                                        <small class="text-muted">{{ $submission->created_at->diffForHumans() }}</small>
+                                    </span>
+                                </summary>
+
+                                <div class="admin-record-body">
+                                    <div class="admin-data-preview">
+                                        @forelse($submission->data ?? [] as $key => $value)
+                                            <div class="admin-data-preview-item">
+                                                <strong>{{ ucfirst(str_replace('_', ' ', $fieldLabels[$key] ?? $key)) }}</strong>
+                                                <span>
+                                                    @if(is_array($value))
+                                                        {{ implode(', ', $value) }}
+                                                    @elseif(blank($value))
+                                                        No response
+                                                    @else
+                                                        {{ $value }}
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        @empty
+                                            <span class="text-muted">No submission data is available for this record.</span>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            </details>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-4">
+                        {{ $submissions->links() }}
+                    </div>
+                @else
+                    <x-ui.empty-state
+                        title="No responses yet"
+                        message="Share the form and new responses will appear here as they arrive."
+                        icon="bi bi-inbox"
+                    >
+                        <x-slot:actions>
+                            <a href="{{ route('forms.show', $form) }}" target="_blank" class="surface-button-secondary">Open public form</a>
+                        </x-slot:actions>
+                    </x-ui.empty-state>
+                @endif
+            </x-ui.panel>
         </div>
-      </div>
     </div>
-  @else
-    <div class="card shadow">
-      <div class="card-body text-center py-5">
-        <i class="fas fa-inbox text-muted mb-4" style="font-size: 4rem;"></i>
-        <h4 class="text-muted mb-3">No Submissions Yet</h4>
-        <p class="text-muted mb-4">This form hasn't received any submissions yet. Share the form link to start collecting responses.</p>
-        <div class="input-group mb-3" style="max-width: 500px; margin: 0 auto;">
-          <input type="text" class="form-control" id="formUrl" value="{{ route('forms.show', $form) }}" readonly>
-          <button class="btn btn-outline-secondary" type="button" onclick="copyFormUrl()">
-            <i class="fas fa-copy"></i> Copy Link
-          </button>
-        </div>
-        <a href="{{ route('forms.show', $form) }}" class="btn btn-primary" target="_blank">
-          <i class="fas fa-external-link-alt me-2"></i>Preview Form
-        </a>
-      </div>
-    </div>
-  @endif
 </div>
-
-@push('scripts')
-<script>
-function copyFormUrl() {
-  const urlInput = document.getElementById('formUrl');
-  urlInput.select();
-  document.execCommand('copy');
-  
-  // Show feedback
-  const button = event.target.closest('button');
-  const originalText = button.innerHTML;
-  button.innerHTML = '<i class="fas fa-check"></i> Copied!';
-  button.classList.remove('btn-outline-secondary');
-  button.classList.add('btn-success');
-  
-  setTimeout(() => {
-    button.innerHTML = originalText;
-    button.classList.remove('btn-success');
-    button.classList.add('btn-outline-secondary');
-  }, 2000);
-}
-
-function deleteSubmission(submissionId) {
-  if (confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
-    // Create a form to submit the delete request
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/admin/submissions/${submissionId}`;
-    
-    // Add CSRF token
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = '_token';
-    csrfInput.value = '{{ csrf_token() }}';
-    form.appendChild(csrfInput);
-    
-    // Add method spoofing for DELETE
-    const methodInput = document.createElement('input');
-    methodInput.type = 'hidden';
-    methodInput.name = '_method';
-    methodInput.value = 'DELETE';
-    form.appendChild(methodInput);
-    
-    document.body.appendChild(form);
-    form.submit();
-  }
-}
-</script>
-@endpush
 @endsection

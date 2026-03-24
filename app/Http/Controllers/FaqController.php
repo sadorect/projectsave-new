@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\Validator;
 
 class FaqController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . Faq::class)->only('index');
+        $this->middleware('can:create,' . Faq::class)->only(['create', 'store']);
+        $this->middleware('can:update,faq')->only(['edit', 'update']);
+        $this->middleware('can:delete,faq')->only('destroy');
+        $this->middleware('can:bulkManage,' . Faq::class)->only('bulkAction');
+    }
+
     public function index(Request $request)
     {
         $query = Faq::query();
@@ -165,27 +174,33 @@ class FaqController extends Controller
 
     public function show($slug)
     {
-    $faq = Faq::where('slug', $slug)
-              ->where('status', 'published')
+    $faq = Faq::published()
+              ->where('slug', $slug)
               ->firstOrFail();
               
-    $previous = Faq::where('status', 'published')
+    $previous = Faq::published()
                    ->where('created_at', '<', $faq->created_at)
                    ->orderBy('created_at', 'desc')
                    ->first();
                    
-    $next = Faq::where('status', 'published')
+    $next = Faq::published()
                ->where('created_at', '>', $faq->created_at)
                ->orderBy('created_at', 'asc')
                ->first();
+
+    $recentFaqs = Faq::published()
+        ->whereKeyNot($faq->getKey())
+        ->latest()
+        ->take(5)
+        ->get();
     
-    return view('pages.faqs.show', compact('faq', 'previous', 'next'));
+    return view('pages.faqs.show', compact('faq', 'previous', 'next', 'recentFaqs'));
     }
 
 
     public function list()
     {
-        $faqs = Faq::where('status', 'published')
+        $faqs = Faq::published()
             ->orderBy('created_at', 'desc')
             ->paginate(6);
         

@@ -11,9 +11,9 @@ class AdminMiddleware
     {
         $user = auth()->user();
 
-        if (!auth()->check() || !$user->is_admin) {
+        if (!auth()->check() || !$user->hasBackofficeAccess()) {
             return redirect()->route('admin.login.form')
-                ->with('error', 'You must be an administrator to access this area.');
+                ->with('error', 'You must have back-office access to enter this area.');
         }
 
         return $next($request);

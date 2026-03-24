@@ -1,27 +1,38 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+    <div class="auth-form-intro">
+        <span class="auth-kicker">Security Check</span>
+        <h2 class="auth-form-title">Confirm your password</h2>
+        <p class="auth-form-copy">
+            This protected action needs one more password confirmation before we continue.
+        </p>
     </div>
 
-    <form method="POST" action="{{ route('password.confirm') }}">
+    @if ($errors->any())
+        <div class="auth-alert auth-alert-danger mb-4">
+            Please confirm your password to proceed.
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('password.confirm') }}" class="auth-form-grid">
         @csrf
 
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="auth-field">
+            <label for="password" class="surface-form-label">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                class="surface-form-input @error('password') is-invalid @enderror"
+                autocomplete="current-password"
+                required
+            >
+            @error('password')
+                <div class="auth-error">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
+        <x-math-captcha />
+
+        <button type="submit" class="surface-button-primary w-100 justify-content-center">Confirm password</button>
     </form>
 </x-guest-layout>

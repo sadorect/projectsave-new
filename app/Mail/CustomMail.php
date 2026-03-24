@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\MailTemplate;
+use App\Services\HtmlSanitizer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Log;
@@ -14,11 +15,13 @@ class CustomMail extends Mailable
 
     protected $template;
     protected $customData;
+    protected $customMessage;
 
-    public function __construct(MailTemplate $template, array $customData = [])
+    public function __construct(MailTemplate $template, array $customData = [], ?string $customMessage = null)
     {
         $this->template = $template;
         $this->customData = $customData;
+        $this->customMessage = $customMessage ? HtmlSanitizer::clean($customMessage) : null;
     }
 
     public function build()
@@ -28,7 +31,8 @@ class CustomMail extends Mailable
                     ->view('emails.custom')
                     ->with([
                         'content' => $this->parseTemplate(),
-                        'template' => $this->template
+                        'template' => $this->template,
+                        'customMessage' => $this->customMessage,
                     ]);
     }
 
@@ -38,6 +42,6 @@ class CustomMail extends Mailable
         foreach ($this->customData as $key => $value) {
             $content = str_replace('{' . $key . '}', $value, $content);
         }
-        return $content;
+        return HtmlSanitizer::clean($content);
     }
 }

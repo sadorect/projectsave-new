@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CertificateSetting;
 use Illuminate\Http\Request;
+use App\Services\FileUploadService;
 use Illuminate\Support\Facades\Storage;
 
 class CertificateSettingsController extends Controller
@@ -66,19 +67,37 @@ class CertificateSettingsController extends Controller
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('certificates', 'public');
+            $logoPath = FileUploadService::uploadImage(
+                $request->file('logo'),
+                'certificates',
+                'public',
+                ['jpg', 'jpeg', 'png', 'svg'],
+                'logo'
+            );
             CertificateSetting::set('logo_path', 'storage/' . $logoPath, 'file', 'Certificate logo image path');
         }
 
         // Handle director signature image upload
         if ($request->hasFile('director_signature_image')) {
-            $directorSignaturePath = $request->file('director_signature_image')->store('certificates/signatures', 'public');
+            $directorSignaturePath = FileUploadService::uploadImage(
+                $request->file('director_signature_image'),
+                'certificates/signatures',
+                'public',
+                ['jpg', 'jpeg', 'png', 'svg'],
+                'director_signature_image'
+            );
             CertificateSetting::set('director_signature_path', 'storage/' . $directorSignaturePath, 'file', 'Director signature image path');
         }
 
         // Handle registrar signature image upload
         if ($request->hasFile('registrar_signature_image')) {
-            $registrarSignaturePath = $request->file('registrar_signature_image')->store('certificates/signatures', 'public');
+            $registrarSignaturePath = FileUploadService::uploadImage(
+                $request->file('registrar_signature_image'),
+                'certificates/signatures',
+                'public',
+                ['jpg', 'jpeg', 'png', 'svg'],
+                'registrar_signature_image'
+            );
             CertificateSetting::set('registrar_signature_path', 'storage/' . $registrarSignaturePath, 'file', 'Registrar signature image path');
         }
 

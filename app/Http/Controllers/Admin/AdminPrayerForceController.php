@@ -9,6 +9,13 @@ use Illuminate\Http\Request;
 
 class AdminPrayerForceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . PrayerForcePartner::class)->only('index');
+        $this->middleware('can:view,partner')->only('show');
+        $this->middleware('can:moderate,partner')->only(['approve', 'reject', 'updateStatus']);
+    }
+
     public function index()
     {
         $partners = PrayerForcePartner::latest()->get();
@@ -39,7 +46,17 @@ class AdminPrayerForceController extends Controller
       {
           return view('admin.prayer-force.show', compact('partner'));
       }
-}
 
+    public function updateStatus(Request $request, PrayerForcePartner $partner)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:approved,rejected',
+        ]);
+
+        return $validated['status'] === 'approved'
+            ? $this->approve($request, $partner)
+            : $this->reject($request, $partner);
+    }
+}
 
 

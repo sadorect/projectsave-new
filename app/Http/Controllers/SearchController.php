@@ -11,18 +11,36 @@ class SearchController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->input('q');
-        
-        $posts = Post::where('title', 'like', "%{$query}%")
-            ->orWhere('details', 'like', "%{$query}%")
+        $query = trim((string) $request->input('q', ''));
+
+        if ($query === '') {
+            return view('search.index', [
+                'posts' => collect(),
+                'events' => collect(),
+                'faqs' => collect(),
+                'query' => $query,
+            ]);
+        }
+
+        $posts = Post::published()
+            ->where(function ($builder) use ($query) {
+                $builder->where('title', 'like', "%{$query}%")
+                    ->orWhere('details', 'like', "%{$query}%");
+            })
             ->get();
             
-        $events = Event::where('title', 'like', "%{$query}%")
-            ->orWhere('description', 'like', "%{$query}%")
+        $events = Event::query()
+            ->where(function ($builder) use ($query) {
+                $builder->where('title', 'like', "%{$query}%")
+                    ->orWhere('description', 'like', "%{$query}%");
+            })
             ->get();
 
-            $faqs = Faq::where('title', 'like', "%{$query}%")
-            ->orWhere('details', 'like', "%{$query}%")
+        $faqs = Faq::published()
+            ->where(function ($builder) use ($query) {
+                $builder->where('title', 'like', "%{$query}%")
+                    ->orWhere('details', 'like', "%{$query}%");
+            })
             ->get();
             
         return view('search.index', compact('posts', 'events', 'query', 'faqs'));

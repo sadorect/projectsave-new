@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Blog;
 
-use console;
 use Carbon\Carbon;
 use App\Models\Tag;
 use App\Models\Post;
 use App\Models\Category;
+use App\Services\FileUploadService;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -31,18 +31,56 @@ class BlogController extends Controller
     public function index(Request $request)
     {
         $query = Post::with(['categories', 'tags'])
-            ->whereNotNull('published_at');
+            ->published();
+        $calendarDate = now();
+        $selectedDate = null;
             
-        // Filter by date if provided
-        if ($request->has('date')) {
-            $date = $request->get('date');
-            $query->whereDate('published_at', $date);
+        if ($request->filled('date')) {
+            try {
+                $calendarDate = Carbon::parse($request->get('date'));
+                $selectedDate = $calendarDate->format('F d, Y');
+                $query->whereDate('published_at', $calendarDate->toDateString());
+            } catch (\Throwable $exception) {
+                $calendarDate = now();
+                $selectedDate = null;
+            }
         }
         
         $posts = $query->orderBy('published_at', 'desc')
-            ->paginate(6);
+            ->paginate(6)
+            ->appends($request->query());
+
+        $categories = Category::withCount([
+            'posts' => fn ($builder) => $builder->published(),
+        ])->get();
+
+        $recentPosts = Post::published()
+            ->latest('published_at')
+            ->take(5)
+            ->get();
+
+        [
+            'calendar' => $calendar,
+            'currentMonth' => $currentMonth,
+            'calendarMonth' => $calendarMonth,
+            'calendarYear' => $calendarYear,
+            'postCalendarDays' => $postCalendarDays,
+        ] = $this->buildCalendarPayload(
+            $calendarDate->month,
+            $calendarDate->year
+        );
             
-        return view('pages.blog.index', compact('posts'));
+        return view('pages.blog.index', compact(
+            'posts',
+            'categories',
+            'recentPosts',
+            'calendar',
+            'currentMonth',
+            'calendarMonth',
+            'calendarYear',
+            'postCalendarDays',
+            'selectedDate'
+        ));
     }
 
     public function indexFaqs()
@@ -88,7 +126,13 @@ class BlogController extends Controller
         $validated['user_id'] = auth()->id();
         
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('posts', 'public');
+            $validated['image'] = FileUploadService::uploadImage(
+                $request->file('image'),
+                'posts',
+                'public',
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'image'
+            );
         }
 
         $post = Post::create($validated);
@@ -102,52 +146,61 @@ class BlogController extends Controller
      */
     public function show(Post $post)
     {
+        abort_unless(
+            optional($post->published_at)->lte(now()),
+            404
+        );
 
-        $recentPosts = Post::latest()
-            ->where('id', '!=', $post->id)
+        $recentPosts = Post::published()
+            ->whereKeyNot($post->getKey())
+            ->latest('published_at')
             ->take(5)
             ->get();
             
-        $categories = Category::withCount('posts')->get();
+        $categories = Category::withCount([
+            'posts' => fn ($query) => $query->published(),
+        ])->get();
         
-        $relatedPosts = Post::whereHas('categories', function($query) use ($post) {
-            $query->whereIn('categories.id', $post->categories->pluck('id'));
-        })
-        ->where('id', '!=', $post->id)
-        ->latest()
-        ->take(3)
-        ->get();
+        $relatedPosts = Post::published()
+            ->whereHas('categories', function ($query) use ($post) {
+                $query->whereIn('categories.id', $post->categories->pluck('id'));
+            })
+            ->whereKeyNot($post->getKey())
+            ->latest('published_at')
+            ->take(3)
+            ->get();
 
-          // Get dates that have posts
-          $calendar = $this->generateCalendar();
-          $currentMonth = Carbon::now()->format('F Y');
-
-          $postDates = Post::whereNotNull('published_at')
-          ->whereRaw('MONTH(published_at) = ?', [now()->month])
-          ->whereRaw('YEAR(published_at) = ?', [now()->year])
-          ->get(['published_at'])
-          ->map(fn($post) => $post->published_at->format('Y-m-d'))
-          ->toArray();
+        [
+            'calendar' => $calendar,
+            'currentMonth' => $currentMonth,
+            'calendarMonth' => $calendarMonth,
+            'calendarYear' => $calendarYear,
+            'postCalendarDays' => $postCalendarDays,
+        ] = $this->buildCalendarPayload(
+            $post->published_at?->month ?? now()->month,
+            $post->published_at?->year ?? now()->year
+        );
       
-          $previous = Post::where('status', 'published')
-                   ->where('published_at', '<', $post->published_at)
-                   ->orderBy('published_at', 'desc')
-                   ->first();
+        $previous = Post::published()
+            ->where('published_at', '<', $post->published_at)
+            ->orderBy('published_at', 'desc')
+            ->first();
                    
-    $next = Post::where('status', 'published')
-               ->where('published_at', '>', $post->published_at)
-               ->orderBy('published_at', 'asc')
-               ->first();
+        $next = Post::published()
+            ->where('published_at', '>', $post->published_at)
+            ->orderBy('published_at', 'asc')
+            ->first();
    
-        
-            return view('pages.blog.show', compact(
+        return view('pages.blog.show', compact(
             'post', 
             'recentPosts', 
             'categories', 
             'relatedPosts',
             'calendar',
             'currentMonth',
-            'postDates',
+            'calendarMonth',
+            'calendarYear',
+            'postCalendarDays',
             'previous',
             'next'
         ));
@@ -155,36 +208,41 @@ class BlogController extends Controller
 
     public function showFaqs(Post $post)
     {
+        abort_unless(
+            optional($post->published_at)->lte(now()),
+            404
+        );
 
-        $recentPosts = Post::latest()
-            ->where('id', '!=', $post->id)
+        $recentPosts = Post::published()
+            ->whereKeyNot($post->getKey())
+            ->latest('published_at')
             ->take(5)
             ->get();
             
-        $categories = Category::withCount('posts')->get();
+        $categories = Category::withCount([
+            'posts' => fn ($query) => $query->published(),
+        ])->get();
         
-        $relatedPosts = Post::whereHas('categories', function($query) use ($post) {
-            $query->whereIn('categories.id', $post->categories->pluck('id'));
-        })
-        ->where('id', '!=', $post->id)
-        ->latest()
-        ->take(3)
-        ->get();
+        $relatedPosts = Post::published()
+            ->whereHas('categories', function ($query) use ($post) {
+                $query->whereIn('categories.id', $post->categories->pluck('id'));
+            })
+            ->whereKeyNot($post->getKey())
+            ->latest('published_at')
+            ->take(3)
+            ->get();
 
-          // Get dates that have posts
-          $calendar = $this->generateCalendar();
-          $currentMonth = Carbon::now()->format('F Y');
+        $calendar = $this->generateCalendar();
+        $currentMonth = Carbon::now()->format('F Y');
 
-          $postDates = Post::where('status', 'published')
-          ->whereRaw('MONTH(created_at) = ?', [now()->month])
-          ->whereRaw('YEAR(created_at) = ?', [now()->year])
-          ->get(['created_at'])
-          ->map(fn($post) => $post->created_at->format('Y-m-d'))
-          ->toArray();
+        $postDates = Post::published()
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->get(['created_at'])
+            ->map(fn ($post) => $post->created_at->format('Y-m-d'))
+            ->toArray();
       
-   
-        
-            return view('pages.faqs.show', compact(
+        return view('pages.faqs.show', compact(
             'post', 
             'recentPosts', 
             'categories', 
@@ -196,33 +254,66 @@ class BlogController extends Controller
     }
 
     private function generateCalendar($month = null, $year = null)
-{
-    $month = $month ?? Carbon::now()->month;
-    $year = $year ?? Carbon::now()->year;
-    
-    $date = Carbon::createFromDate($year, $month, 1);
-    $calendar = collect();
-    
-    // Add empty days for the start of the month
-    for ($i = 0; $i < $date->dayOfWeek; $i++) {
-        $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
+    {
+        $month = $month ?? Carbon::now()->month;
+        $year = $year ?? Carbon::now()->year;
+        
+        $date = Carbon::createFromDate($year, $month, 1);
+        $calendar = collect();
+        
+        for ($i = 0; $i < $date->dayOfWeek; $i++) {
+            $calendar->push(Carbon::createFromDate($year, $month, 1)->subDays($date->dayOfWeek - $i));
+        }
+        
+        while ($date->month === (int) $month) {
+            $calendar->push(clone $date);
+            $date->addDay();
+        }
+        
+        $remainingDays = 42 - $calendar->count();
+        for ($i = 0; $i < $remainingDays; $i++) {
+            $calendar->push(clone $date);
+            $date->addDay();
+        }
+        
+        return $calendar;
     }
-    
-    // Add all days of the month
-    while ($date->month === (int) $month) {
-        $calendar->push(clone $date);
-        $date->addDay();
+
+    private function buildCalendarPayload(?int $month = null, ?int $year = null): array
+    {
+        $calendarMonth = $month ?? now()->month;
+        $calendarYear = $year ?? now()->year;
+        $calendar = $this->generateCalendar($calendarMonth, $calendarYear);
+        $currentMonth = Carbon::createFromDate($calendarYear, $calendarMonth, 1)->format('F Y');
+
+        $postCalendarDays = Post::published()
+            ->whereYear('published_at', $calendarYear)
+            ->whereMonth('published_at', $calendarMonth)
+            ->orderBy('published_at')
+            ->get(['title', 'slug', 'published_at'])
+            ->groupBy(fn (Post $post) => $post->published_at->format('Y-m-d'))
+            ->map(function ($posts, string $date) {
+                $firstPost = $posts->first();
+                $count = $posts->count();
+
+                return [
+                    'count' => $count,
+                    'url' => $count === 1
+                        ? route('posts.show', $firstPost->slug)
+                        : route('blog.index', ['date' => $date]),
+                    'titles' => $posts->pluck('title')->values()->all(),
+                ];
+            })
+            ->all();
+
+        return compact(
+            'calendar',
+            'currentMonth',
+            'calendarMonth',
+            'calendarYear',
+            'postCalendarDays'
+        );
     }
-    
-    // Add remaining days to complete the grid
-    $remainingDays = 42 - $calendar->count(); // 6 rows * 7 days
-    for ($i = 0; $i < $remainingDays; $i++) {
-        $calendar->push(clone $date);
-        $date->addDay();
-    }
-    
-    return $calendar;
-}
     /**
      * Show the form for editing the specified resource.
      */
@@ -251,7 +342,13 @@ class BlogController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('posts', 'public');
+            $validated['image'] = FileUploadService::uploadImage(
+                $request->file('image'),
+                'posts',
+                'public',
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'image'
+            );
         }
 
         $post->update($validated);
@@ -272,20 +369,20 @@ class BlogController extends Controller
 
     public function getCalendarData($year, $month)
     {
-        $calendar = $this->generateCalendar($month, $year);
-        $currentMonth = Carbon::createFromDate($year, $month)->format('F Y');
-        
-        $postDates = Post::whereNotNull('published_at')
-            ->whereRaw('MONTH(published_at) = ?', [$month])
-            ->whereRaw('YEAR(published_at) = ?', [$year])
-            ->get(['published_at'])
-            ->map(fn($post) => $post->published_at->format('Y-m-d'))
-            ->toArray();
+        [
+            'calendar' => $calendar,
+            'currentMonth' => $currentMonth,
+            'calendarMonth' => $calendarMonth,
+            'calendarYear' => $calendarYear,
+            'postCalendarDays' => $postCalendarDays,
+        ] = $this->buildCalendarPayload((int) $month, (int) $year);
             
         return response()->json([
-            'calendar' => $calendar->map(fn($date) => $date->format('Y-m-d'))->toArray(),
+            'calendar' => $calendar->map(fn ($date) => $date->format('Y-m-d'))->toArray(),
             'currentMonth' => $currentMonth,
-            'postDates' => $postDates
+            'month' => $calendarMonth,
+            'year' => $calendarYear,
+            'postCalendarDays' => $postCalendarDays,
         ]);
     }
 

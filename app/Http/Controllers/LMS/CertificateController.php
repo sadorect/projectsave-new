@@ -5,14 +5,17 @@ namespace App\Http\Controllers\LMS;
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use App\Models\Course;
-use App\Models\User;
 use App\Models\ExamAttempt;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Support\Lms\DiplomaProgramService;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class CertificateController extends Controller
 {
+    public function __construct(private DiplomaProgramService $diplomaProgram)
+    {
+    }
+
     /**
      * Display student's certificates
      */
@@ -20,10 +23,18 @@ class CertificateController extends Controller
     {
         $certificates = Certificate::where('user_id', Auth::id())
             ->with(['course', 'approver'])
+            ->orderByRaw('course_id is not null')
             ->orderBy('issued_at', 'desc')
             ->get();
 
-        return view('lms.certificates.index', compact('certificates'));
+        $certificateStats = [
+            'total' => $certificates->count(),
+            'approved' => $certificates->where('is_approved', true)->count(),
+            'pending' => $certificates->where('is_approved', false)->count(),
+            'program' => $certificates->whereNull('course_id')->count(),
+        ];
+
+        return view('lms.certificates.index', compact('certificates', 'certificateStats'));
     }
 
     /**
@@ -54,48 +65,25 @@ class CertificateController extends Controller
     public function generate(Course $course)
     {
         $user = Auth::user();
-        
-        // Check if user has completed the course
-        $progress = $user->getCourseProgress($course);
-        if ($progress < 100) {
-            return redirect()->back()->with('error', 'You must complete the course before generating a certificate.');
+        $eligibility = $this->diplomaProgram->eligibility($user);
+
+        if ($eligibility['certificate']) {
+            return redirect()->route('lms.certificates.show', $eligibility['certificate'])
+                ->with('info', 'Your ASOM program certificate is already on record.');
         }
 
-        // Check if certificate already exists
-        $existingCertificate = Certificate::where('user_id', $user->id)
-            ->where('course_id', $course->id)
-            ->first();
-
-        if ($existingCertificate) {
-            return redirect()->route('lms.certificates.show', $existingCertificate)
-                ->with('info', 'Certificate already exists for this course.');
+        if (! $eligibility['eligible']) {
+            return redirect()->route('lms.courses.show', $course->slug)
+                ->with('info', 'ASOM issues one program certificate after all diploma courses and qualifying exams are completed.');
         }
 
-        // Get final grade from exams
-        $finalGrade = null;
-        $examAttempts = ExamAttempt::where('user_id', $user->id)
-            ->whereHas('exam', function($query) use ($course) {
-                $query->where('course_id', $course->id);
-            })
-            ->whereNotNull('completed_at')
-            ->get();
-
-        if ($examAttempts->isNotEmpty()) {
-            $finalGrade = $examAttempts->avg('score');
-        }
-
-        // Create certificate
-        $certificate = Certificate::create([
-            'user_id' => $user->id,
-            'course_id' => $course->id,
-            'final_grade' => $finalGrade,
-            'issued_at' => now(),
-            'completed_at' => now(), // You might want to get actual completion date
-            'is_approved' => false, // Requires admin approval
-        ]);
+        $certificate = $this->diplomaProgram->ensurePendingCertificate(
+            $user,
+            'Program certificate requested from the learner workspace after all ASOM diploma requirements were met.'
+        );
 
         return redirect()->route('lms.certificates.show', $certificate)
-            ->with('success', 'Certificate generated successfully! It will be available for download once approved by an administrator.');
+            ->with('success', 'Your Diploma in Ministry certificate is now pending approval.');
     }
 
     /**
@@ -133,7 +121,7 @@ class CertificateController extends Controller
             'dpi' => 150,
         ]);
 
-        $courseSlug = $course ? $course->slug : 'unknown';
+        $courseSlug = $course ? $course->slug : 'diploma-in-ministry';
         $fileName = "Certificate_{$courseSlug}_{$student->name}_{$certificateId}.pdf";
         
         return $pdf->download($fileName);

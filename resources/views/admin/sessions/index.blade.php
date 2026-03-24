@@ -8,10 +8,6 @@
         <h1>Active Sessions (driver: {{ $driver }})</h1>
         <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Back to Users</a>
     </div>
-
-    @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
-    @if(session('error'))<div class="alert alert-danger">{{ session('error') }}</div>@endif
-
     <div class="mb-3">
         <form method="GET" class="form-inline">
             <div class="form-check mr-3">
@@ -69,7 +65,11 @@
                         </td>
                         <td>
                             @if($s['user'])
-                                <a href="{{ route('admin.users.show', $s['user']) }}">{{ $s['user']->name }} (ID: {{ $s['user']->id }})</a>
+                                @can('view', $s['user'])
+                                    <a href="{{ route('admin.users.show', $s['user']) }}">{{ $s['user']->name }} (ID: {{ $s['user']->id }})</a>
+                                @else
+                                    {{ $s['user']->name }} (ID: {{ $s['user']->id }})
+                                @endcan
                             @elseif($s['user_id'])
                                 Unknown user (ID: {{ $s['user_id'] }})
                             @else
@@ -79,11 +79,13 @@
                         <td>{{ $s['last_activity'] }}</td>
                         <td>{{ $s['size'] }}</td>
                         <td>
-                            <form action="{{ route('admin.sessions.destroy', $s['id']) }}" method="POST" onsubmit="return confirm('Terminate this session?');">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Terminate</button>
-                            </form>
+                            @can('manage-user-sessions')
+                                <form action="{{ route('admin.sessions.destroy', $s['id']) }}" method="POST" onsubmit="return confirm('Terminate this session?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger">Terminate</button>
+                                </form>
+                            @endcan
                         </td>
                     </tr>
                 @endforeach

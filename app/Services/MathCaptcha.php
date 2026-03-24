@@ -2,73 +2,84 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
+
 /**
  * Simple session-based math CAPTCHA.
  *
- * Generates random arithmetic questions (addition / subtraction / multiplication)
- * and stores the expected answer in the PHP session so no external service
- * or API key is required.
- *
- * Usage flow:
- *  1. In a controller or Blade component, call MathCaptcha::generate() to
- *     produce a question and write the answer to the session.
- *  2. Render the question text next to a plain text input named "math_captcha".
- *  3. Validate the submitted value with the MathCaptchaRule.
+ * Generates random arithmetic questions and stores the expected answer in the
+ * session so no external service or API key is required.
  */
 class MathCaptcha
 {
-    /** Session key that holds the expected answer. */
     public const SESSION_KEY = 'math_captcha_answer';
+    public const SESSION_COLLECTION_KEY = 'math_captcha_answers';
 
     /**
-     * Generate a new math question, store its answer in the session, and
-     * return the display string (e.g. "7 + 4 = ?").
+     * Generate a new math question and keep the answer in session storage.
+     *
+     * @return array{key:string,question:string}
      */
-    public static function generate(): string
+    public static function generate(?string $key = null): array
     {
-        $operations = ['+', '-', '×'];
-        $op = $operations[array_rand($operations)];
+        $operations = ['+', '-'];
+        $operation = $operations[array_rand($operations)];
 
-        switch ($op) {
+        switch ($operation) {
             case '+':
-                $a = rand(1, 20);
-                $b = rand(1, 20);
-                $answer = $a + $b;
+                $first = rand(0, 9);
+                $second = rand(0, 9 - $first);
+                $answer = $first + $second;
                 break;
 
             case '-':
-                // Ensure non-negative result
-                $a = rand(5, 20);
-                $b = rand(1, $a);
-                $answer = $a - $b;
-                break;
-
-            case '×':
-                $a = rand(2, 10);
-                $b = rand(2, 10);
-                $answer = $a * $b;
+                $first = rand(0, 9);
+                $second = rand(0, $first);
+                $answer = $first - $second;
                 break;
 
             default:
-                $a = rand(1, 10);
-                $b = rand(1, 10);
-                $answer = $a + $b;
+                $first = rand(0, 9);
+                $second = rand(0, 9 - $first);
+                $answer = $first + $second;
+                $operation = '+';
         }
 
-        session([self::SESSION_KEY => $answer]);
+        $captchaKey = $key ?: (string) Str::uuid();
+        $answers = session(self::SESSION_COLLECTION_KEY, []);
+        $answers[$captchaKey] = $answer;
 
-        return "{$a} {$op} {$b} = ?";
+        session([
+            self::SESSION_KEY => $answer,
+            self::SESSION_COLLECTION_KEY => $answers,
+        ]);
+
+        return [
+            'key' => $captchaKey,
+            'question' => "{$first} {$operation} {$second} = ?",
+        ];
     }
 
     /**
-     * Validate whether the given value matches the session answer.
-     * Clears the session answer after checking to prevent replay attacks.
+     * Validate whether the given value matches the stored answer.
      */
-    public static function validate(mixed $value): bool
+    public static function validate(mixed $value, ?string $key = null): bool
     {
-        $expected = session(self::SESSION_KEY);
+        if ($key) {
+            $answers = session(self::SESSION_COLLECTION_KEY, []);
+            $expected = $answers[$key] ?? null;
 
-        // Clear immediately to make it one-time-use
+            unset($answers[$key]);
+            session([self::SESSION_COLLECTION_KEY => $answers]);
+
+            if ($expected === null) {
+                return false;
+            }
+
+            return (int) $value === (int) $expected;
+        }
+
+        $expected = session(self::SESSION_KEY);
         session()->forget(self::SESSION_KEY);
 
         if ($expected === null) {

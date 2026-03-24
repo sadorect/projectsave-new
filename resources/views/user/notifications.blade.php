@@ -49,27 +49,30 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Notification Settings</h5>
-                    <form action="{{ route('notification-preferences.update') }}" method="POST">
+                    <form action="{{ route('user.preferences.update') }}" method="POST">
                         @csrf
                         @method('patch')
                         
                         <div class="mb-3">
+                            <input type="hidden" name="preferences[email]" value="0">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="emailNotifications" name="preferences[email]">
+                                <input class="form-check-input" type="checkbox" id="emailNotifications" name="preferences[email]" value="1" {{ !empty($accountPreferences['email']) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="emailNotifications">Email Notifications</label>
                             </div>
                         </div>
 
                         <div class="mb-3">
+                            <input type="hidden" name="preferences[prayer_updates]" value="0">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="prayerUpdates" name="preferences[prayer_updates]">
+                                <input class="form-check-input" type="checkbox" id="prayerUpdates" name="preferences[prayer_updates]" value="1" {{ !empty($accountPreferences['prayer_updates']) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="prayerUpdates">Prayer Updates</label>
                             </div>
                         </div>
 
                         <div class="mb-3">
+                            <input type="hidden" name="preferences[event_reminders]" value="0">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="eventReminders" name="preferences[event_reminders]">
+                                <input class="form-check-input" type="checkbox" id="eventReminders" name="preferences[event_reminders]" value="1" {{ !empty($accountPreferences['event_reminders']) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="eventReminders">Event Reminders</label>
                             </div>
                         </div>

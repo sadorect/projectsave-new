@@ -1,182 +1,264 @@
-<x-layouts.app>
-    <!-- Hero Section with Background Image -->
-    <!--div class="hero-section page text-white" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{{ asset('frontend/img/asom-bg.jpg') }}') center/cover;">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="display-4">Archippus School of Ministry</h1>
-                    <p class="lead">Equipping Saints for Kingdom Impact</p>
-                    <div class="mt-4">
-                        <a href="#courses" class="btn btn-primary btn-lg">View Courses</a>
-                        <a href="#program-overview" class="btn btn-outline-light btn-lg ms-2">Learn More</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div-->
-    <div class="page-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12">
-                    <h2>Archippus School of Ministry</h2>
-                </div>
-                <div class="col-12">
-                    <a>Equipping Saints for Kingdom Impact</a>
-                   
-                </div>
-               
-            </div>
-        </div>
-    </div>
-    
+@php
+    $landingHero = $pageContent['landing_hero'];
+    $landingHeroStats = $landingHero['stats'] ?? [];
+    $bridgeSection = $pageContent['bridge_section'];
+    $ministryBridgeLinks = $pageContent['bridge_links'];
+    $reviewSection = $pageContent['review_section'];
+    $reviewChecks = $pageContent['review_checks'];
+    $formationPillars = $pageContent['formation_pillars'];
+    $previewSection = $pageContent['preview_section'];
+    $learningSection = $pageContent['learning_section'];
+    $learningSteps = $pageContent['learning_steps'];
+    $programSection = $pageContent['program_section'];
+    $programMilestones = $pageContent['program_milestones'];
+    $outcomesSection = $pageContent['outcomes_section'];
+    $outcomes = $pageContent['outcomes'];
+    $ctaSection = $pageContent['cta_section'];
+@endphp
 
-    <!-- Key Features Section -->
-    <div class="container my-5">
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <i class="fas fa-bible fa-3x text-primary mb-3"></i>
-                    <h3>Biblical Foundation</h3>
-                    <p>Deep understanding of scripture and theological principles</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                    <h3>Community Learning</h3>
-                    <p>Interactive learning environment with peer collaboration</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
-                    <h3>Practical Ministry</h3>
-                    <p>Hands-on training for effective ministry leadership</p>
-                </div>
-            </div>
-        </div>
-    </div>
+<x-layouts.lms
+    title="ASOM | Projectsave International"
+    :show-sidebar="false"
+    :flush-top="true"
+>
+    <div class="d-grid gap-4">
+        <section class="lms-landing-hero-section">
+            <div class="lms-landing-hero-shell" style="--lms-landing-image: url('{{ $landingHero['image_url'] }}');">
+                <div class="lms-hero-frame">
+                    <div class="lms-landing-hero">
+                        <div class="row g-4 align-items-end">
+                            <div class="col-xl-7">
+                                <div class="lms-landing-copy">
+                                    <span class="surface-eyebrow border-0 bg-white/10 text-white">{{ $landingHero['eyebrow'] }}</span>
+                                    <h1>{{ $landingHero['title'] }}</h1>
+                                    <p class="lead mb-0 text-white-50">{{ $landingHero['lead'] }}</p>
+                                    <p class="mb-0 text-white-50">{{ $landingHero['body'] }}</p>
 
-    <!-- Program Overview -->
-    <div id="program-overview" class="bg-light py-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h2 class="mb-4">Program Overview</h2>
-                    <p class="lead">Our Diploma in Ministry program provides comprehensive theological education and practical ministry training.</p>
-                    <ul class="list-unstyled">
-                        <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i> Comprehensive Biblical Studies</li>
-                        <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i> Practical Ministry Training</li>
-                        <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i> Experienced Instructors</li>
-                        <li class="mb-3"><i class="fas fa-check-circle text-success me-2"></i> Flexible Learning Options</li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <img src="{{ asset('frontend/img/bible-study.jpg') }}" alt="Bible Study" class="img-fluid rounded shadow">
-                </div>
-            </div>
-        </div>
-    </div>
+                                    <div class="lms-landing-welcome-note">
+                                        <strong>{{ $landingHero['welcome_title'] }}</strong>
+                                        <span>{{ $landingHero['welcome_copy'] }}</span>
+                                    </div>
 
-    <!-- Available Courses -->
-    <div id="courses" class="container my-5">
-        <h2 class="text-center mb-5">Available Courses</h2>
-        <div class="row g-4">
-            @foreach($courses as $course)
-                <div class="col-md-4">
-                    <div class="course-card h-100">
-                        <div class="course-image">
-                            @if($course->featured_image)
-                            <img src="{{ Storage::disk('s3')->url($course->featured_image) }}" 
-                                     alt="{{ $course->title }}" 
-                         class="img-fluid"
-                         onerror="this.src='{{ asset('frontend/img/course-placeholder.jpg') }}'; this.onerror=null;">
-                @else
-                    <img src="{{ asset('frontend/img/course-placeholder.jpg') }}" 
-                         alt="{{ $course->title }}" 
-                         class="img-fluid">
-                @endif
-                            <div class="course-overlay">
-                                <span class="badge bg-{{ $course->status === 'published' ? 'success' : 'warning' }}">
-                                    {{ ucfirst($course->status) }}
-                                </span>
+                                    <div class="lms-dashboard-actions mt-4">
+                                        @auth
+                                            <a href="{{ $landingHero['authenticated_primary_url'] }}" class="btn btn-light rounded-pill px-4">{{ $landingHero['authenticated_primary_label'] }}</a>
+                                            <a href="{{ $landingHero['secondary_cta_url'] }}" class="surface-button-ghost text-white">{{ $landingHero['secondary_cta_label'] }}</a>
+                                        @else
+                                            <a href="{{ $landingHero['primary_cta_url'] }}" class="btn btn-light rounded-pill px-4">{{ $landingHero['primary_cta_label'] }}</a>
+                                            <a href="{{ $landingHero['secondary_cta_url'] }}" class="surface-button-ghost text-white">{{ $landingHero['secondary_cta_label'] }}</a>
+                                        @endauth
+                                    </div>
+
+                                    <div class="lms-landing-metrics mt-4">
+                                        <article class="lms-landing-metric">
+                                            <span class="label">{{ $landingHeroStats[0]['label'] ?? 'Published courses' }}</span>
+                                            <span class="value">{{ $catalogStats['total_courses'] }}</span>
+                                        </article>
+                                        <article class="lms-landing-metric">
+                                            <span class="label">{{ $landingHeroStats[1]['label'] ?? 'Total lessons' }}</span>
+                                            <span class="value">{{ $catalogStats['total_lessons'] }}</span>
+                                        </article>
+                                        <article class="lms-landing-metric">
+                                            <span class="label">{{ $landingHeroStats[2]['label'] ?? 'Active exams' }}</span>
+                                            <span class="value">{{ $catalogStats['total_exams'] }}</span>
+                                        </article>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="course-content p-4">
-                            <h4>{{ $course->title }}</h4>
-                            <p>{!! Str::limit($course->description, 100) !!}</p>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <a href="{{ route('lms.courses.show', $course->slug) }}" class="btn btn-outline-primary">View Details</a>
-                                <!--small class="text-muted">By {{ $course->instructor->name }}</small-->
+
+                            <div class="col-xl-5">
+                                <div class="lms-landing-visual">
+                                    <div class="lms-landing-visual-card">
+                                        <span class="lms-landing-visual-label">{{ $landingHero['featured_label'] }}</span>
+                                        <div class="d-grid gap-3 mt-3">
+                                            @foreach($featuredCourses as $course)
+                                                <a href="{{ $course->course_url }}" class="lms-landing-course-teaser">
+                                                    <div>
+                                                        <strong>{{ $course->title }}</strong>
+                                                        <span>{{ $course->lessons_count }} {{ $landingHero['featured_lessons_label'] }} / {{ $course->active_exams_count }} {{ $landingHero['featured_exams_label'] }}</span>
+                                                    </div>
+                                                    <i class="bi bi-arrow-up-right-circle"></i>
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    <div class="lms-landing-visual-note">
+                                        <span class="surface-eyebrow border-0 bg-white/10 text-white">{{ $landingHero['identity_eyebrow'] }}</span>
+                                        <p class="mb-0">{{ $landingHero['identity_copy'] }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section class="row g-4">
+            <div class="col-lg-7">
+                <article class="lms-section-shell h-100">
+                    <span class="surface-eyebrow">{{ $bridgeSection['eyebrow'] }}</span>
+                    <h2 class="mt-3 mb-3">{{ $bridgeSection['title'] }}</h2>
+                    <p class="mb-0 text-muted">{{ $bridgeSection['copy'] }}</p>
+
+                    <div class="lms-landing-bridge-grid mt-4">
+                        @foreach($ministryBridgeLinks as $link)
+                            <a href="{{ $link['url'] }}" class="lms-landing-bridge-card">
+                                <strong>{{ $link['title'] }}</strong>
+                                <span>{{ $link['copy'] }}</span>
+                                <span class="fw-semibold text-brand-700">{{ $link['cta'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-lg-5">
+                <article class="lms-section-shell h-100">
+                    <span class="surface-eyebrow">{{ $reviewSection['eyebrow'] }}</span>
+                    <h2 class="mt-3 mb-3">{{ $reviewSection['title'] }}</h2>
+                    <div class="d-grid gap-3">
+                        @foreach($reviewChecks as $check)
+                            <div class="lms-outcome-card">
+                                <i class="bi bi-check2-circle"></i>
+                                <div>
+                                    <strong class="d-block mb-1">{{ $check['title'] }}</strong>
+                                    <span class="text-muted">{{ $check['copy'] }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="lms-feature-strip">
+            @foreach($formationPillars as $pillar)
+                <article class="lms-feature-card">
+                    <div class="lms-feature-icon">
+                        <i class="{{ $pillar['icon'] }}"></i>
+                    </div>
+                    <div>
+                        <h2 class="h5 mb-2">{{ $pillar['title'] }}</h2>
+                        <p class="mb-0 text-muted">{{ $pillar['copy'] }}</p>
+                    </div>
+                </article>
             @endforeach
-        </div>
-        <div class="text-center mt-4">
-            {{ $courses->links() }}
-        </div>
+        </section>
+
+        <section class="lms-section-shell">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
+                <div>
+                    <span class="surface-eyebrow">{{ $previewSection['eyebrow'] }}</span>
+                    <h2 class="mt-3 mb-2">{{ $previewSection['title'] }}</h2>
+                    <p class="mb-0 text-muted">{{ $previewSection['copy'] }}</p>
+                </div>
+                <a href="{{ $previewSection['button_url'] }}" class="surface-button-secondary">{{ $previewSection['button_label'] }}</a>
+            </div>
+
+            <div class="lms-catalog-grid mt-4">
+                @foreach($catalogPreview as $course)
+                    <article class="lms-course-card">
+                        <div class="lms-course-media">
+                            <img src="{{ $course->featured_image_url }}" alt="{{ $course->title }}" loading="lazy">
+                        </div>
+                        <div class="lms-course-body">
+                            <div class="lms-badge-row">
+                                <span class="lms-pill"><i class="fas fa-book-open"></i>{{ $course->lessons_count }} lessons</span>
+                                <span class="lms-pill"><i class="fas fa-file-signature"></i>{{ $course->active_exams_count }} exams</span>
+                                @if($course->is_enrolled)
+                                    <span class="lms-pill"><i class="fas fa-chart-line"></i>{{ $course->progress }}% complete</span>
+                                @endif
+                            </div>
+                            <div>
+                                <h3 class="h4 mb-2">{{ $course->title }}</h3>
+                                <p class="text-muted mb-2">{{ $course->description_excerpt }}</p>
+                                <small class="text-muted">Instructor: {{ $course->instructor_name }}</small>
+                            </div>
+                            <div class="lms-course-footer">
+                                <span class="small text-muted">{{ $course->is_enrolled ? 'Visible in student workspace' : 'Open for review' }}</span>
+                                <a href="{{ $course->course_url }}" class="{{ $course->is_enrolled ? 'surface-button-primary' : 'surface-button-secondary' }}">
+                                    {{ $course->is_enrolled ? 'Continue course' : 'View details' }}
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="row g-4">
+            <div class="col-lg-6">
+                <article class="lms-section-shell h-100">
+                    <span class="surface-eyebrow">{{ $learningSection['eyebrow'] }}</span>
+                    <h2 class="mt-3 mb-3">{{ $learningSection['title'] }}</h2>
+                    <div class="d-grid gap-3">
+                        @foreach($learningSteps as $step)
+                            <div class="lms-step-card">
+                                <span class="lms-step-number">{{ $loop->iteration }}</span>
+                                <p class="mb-0">{{ $step }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </article>
+            </div>
+
+            <div class="col-lg-6">
+                <article class="lms-section-shell h-100">
+                    <span class="surface-eyebrow">{{ $programSection['eyebrow'] }}</span>
+                    <h2 class="mt-3 mb-3">{{ $programSection['title'] }}</h2>
+                    <div class="d-grid gap-3">
+                        @foreach($programMilestones as $milestone)
+                            <div class="lms-outcome-card">
+                                <i class="bi bi-check2-circle"></i>
+                                <span>{{ $milestone }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <p class="mt-4 mb-0 text-muted">{{ $programSection['copy'] }}</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="lms-section-shell">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
+                <div>
+                    <span class="surface-eyebrow">{{ $outcomesSection['eyebrow'] }}</span>
+                    <h2 class="mt-3 mb-2">{{ $outcomesSection['title'] }}</h2>
+                    <p class="mb-0 text-muted">{{ $outcomesSection['copy'] }}</p>
+                </div>
+                <a href="{{ $outcomesSection['button_url'] }}" class="surface-button-secondary">{{ $outcomesSection['button_label'] }}</a>
+            </div>
+
+            <div class="row g-3 mt-1">
+                @foreach($outcomes as $outcome)
+                    <div class="col-lg-4">
+                        <div class="lms-outcome-card h-100">
+                            <i class="bi bi-check2-circle"></i>
+                            <span>{{ $outcome }}</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="lms-landing-cta">
+            <div>
+                <span class="surface-eyebrow border-0 bg-white/10 text-white">{{ $ctaSection['eyebrow'] }}</span>
+                <h2 class="mt-3 mb-2 text-white">{{ $ctaSection['title'] }}</h2>
+                <p class="mb-0 text-white-50">{{ $ctaSection['copy'] }}</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                @auth
+                    <a href="{{ $ctaSection['authenticated_url'] }}" class="btn btn-light rounded-pill px-4">{{ $ctaSection['authenticated_label'] }}</a>
+                @else
+                    <a href="{{ $ctaSection['guest_primary_url'] }}" class="btn btn-light rounded-pill px-4">{{ $ctaSection['guest_primary_label'] }}</a>
+                    <a href="{{ $ctaSection['guest_secondary_url'] }}" class="surface-button-ghost text-white">{{ $ctaSection['guest_secondary_label'] }}</a>
+                @endauth
+            </div>
+        </section>
     </div>
 
-    <!-- Call to Action -->
-    <div class="cta-section bg-primary text-white py-5">
-        <div class="container text-center">
-            <h3 class="mb-4">Ready to Begin Your Journey?</h3>
-            <p class="lead mb-4">Join our program and equip yourself for effective ministry</p>
-            <a href="{{ route('register') }}" class="btn btn-light btn-lg">Enroll Now</a>
-        </div>
-    </div>
-
-    <style>
-    .hero-section {
-        min-height: 60vh;
-        display: flex;
-        align-items: center;
-    }
-
-    .feature-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease;
-    }
-
-    .feature-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .course-card {
-        border-radius: 10px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
-
-    .course-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .course-image {
-        position: relative;
-        height: 200px;
-        overflow: hidden;
-    }
-
-    .course-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .course-overlay {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-
-    .cta-section {
-        background: linear-gradient(45deg, #1a237e, #283593);
-    }
-    </style>
-</x-layouts.app>
+    
+</x-layouts.lms>

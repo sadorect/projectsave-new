@@ -7,11 +7,22 @@ use Exception;
 use App\Models\Course;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Services\FileUploadService;
+use App\Services\HtmlSanitizer;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
 class AdminCourseController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . Course::class)->only('index');
+        $this->middleware('can:create,' . Course::class)->only(['create', 'store']);
+        $this->middleware('can:view,course')->only('show');
+        $this->middleware('can:update,course')->only(['edit', 'update']);
+        $this->middleware('can:delete,course')->only('destroy');
+    }
+
     public function index()
     {
         $courses = Course::with('instructor')
@@ -41,20 +52,26 @@ class AdminCourseController extends Controller
     ]);
 
     if ($request->hasFile('featured_image')) {
-         $path = $request->file('featured_image')->store('projectsave/lms/courses/images', [
-            'disk' => 's3',
-            'visibility' => 'private'
-        ]);
+        $path = FileUploadService::uploadImage(
+            $request->file('featured_image'),
+            'projectsave/lms/courses/images',
+            's3',
+            ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+            'featured_image'
+        );
         $validated['featured_image'] = $path;
     }
 
     if ($request->hasFile('documents')) {
         $documents = [];
         foreach($request->file('documents') as $file) {
-            $docPath = $file->store('projectsave/lms/courses/documents', [
-                'disk' => 's3',
-                'visibility' => 'private'
-            ]);
+            $docPath = FileUploadService::uploadDocument(
+                $file,
+                'projectsave/lms/courses/documents',
+                's3',
+                ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
+                'documents'
+            );
             $documents[] = [
                 'name' => $file->getClientOriginalName(),
                 'path' => $docPath,
@@ -67,6 +84,13 @@ class AdminCourseController extends Controller
 
     $validated['slug'] = Str::slug($validated['title']);
     $validated['instructor_id'] = auth()->id();
+    $validated['description'] = HtmlSanitizer::clean($validated['description']);
+    $validated['objectives'] = HtmlSanitizer::clean($validated['objectives']);
+    $validated['outcomes'] = HtmlSanitizer::clean($validated['outcomes']);
+    $validated['evaluation'] = HtmlSanitizer::clean($validated['evaluation']);
+    if (isset($validated['recommended_books'])) {
+        $validated['recommended_books'] = HtmlSanitizer::clean($validated['recommended_books']);
+    }
 
    
     
@@ -105,10 +129,13 @@ class AdminCourseController extends Controller
             if ($course->featured_image) {
                 Storage::disk('s3')->delete($course->featured_image);
             }
-            $path = $request->file('featured_image')->store('projectsave/lms/courses/images', [
-                'disk' => 's3',
-                'visibility' => 'private'
-            ]);
+            $path = FileUploadService::uploadImage(
+                $request->file('featured_image'),
+                'projectsave/lms/courses/images',
+                's3',
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'featured_image'
+            );
             $validated['featured_image'] = $path;
         }
 
@@ -123,10 +150,13 @@ class AdminCourseController extends Controller
 
             $documents = [];
             foreach ($request->file('documents') as $file) {
-                $docPath = $file->store('projectsave/lms/courses/documents', [
-                    'disk' => 's3',
-                    'visibility' => 'private'
-                ]);
+                $docPath = FileUploadService::uploadDocument(
+                    $file,
+                    'projectsave/lms/courses/documents',
+                    's3',
+                    ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'],
+                    'documents'
+                );
                 $documents[] = [
                     'name' => $file->getClientOriginalName(),
                     'path' => $docPath,
@@ -138,6 +168,13 @@ class AdminCourseController extends Controller
         }
 
         $validated['slug'] = Str::slug($validated['title']);
+        $validated['description'] = HtmlSanitizer::clean($validated['description']);
+        $validated['objectives'] = HtmlSanitizer::clean($validated['objectives']);
+        $validated['outcomes'] = HtmlSanitizer::clean($validated['outcomes']);
+        $validated['evaluation'] = HtmlSanitizer::clean($validated['evaluation']);
+        if (isset($validated['recommended_books'])) {
+            $validated['recommended_books'] = HtmlSanitizer::clean($validated['recommended_books']);
+        }
         $course->update($validated);
 
         return redirect()->route('admin.courses.index')
@@ -150,13 +187,17 @@ class AdminCourseController extends Controller
     
 
     
-        public function show(Course $course)
+    public function show(Course $course)
     {
         $course->load(['instructor', 'lessons' => function($query) {
             $query->orderBy('order');
         }]);
+
+        $featuredImageUrl = $course->featured_image
+            ? Storage::disk('s3')->temporaryUrl($course->featured_image, now()->addMinutes(10))
+            : asset('frontend/img/course-placeholder.jpg');
         
-        return view('admin.courses.show', compact('course'));
+        return view('admin.courses.show', compact('course', 'featuredImageUrl'));
     }
 
 

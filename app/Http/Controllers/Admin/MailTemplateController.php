@@ -3,11 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\MailTemplate;
+use App\Services\HtmlSanitizer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class MailTemplateController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . MailTemplate::class)->only('index');
+        $this->middleware('can:create,' . MailTemplate::class)->only(['create', 'store']);
+        $this->middleware('can:update,mailTemplate')->only(['edit', 'update']);
+    }
+
     public function index()
     {
         $templates = MailTemplate::latest()->paginate(10);
@@ -27,6 +35,9 @@ class MailTemplateController extends Controller
             'body' => 'required|string',
             'variables' => 'nullable|string'
         ]);
+
+        $validated['body'] = HtmlSanitizer::clean($validated['body']);
+
         if ($request->variables) {
           $validated['variables'] = array_map('trim', explode(',', $request->variables));
         }
@@ -49,6 +60,9 @@ class MailTemplateController extends Controller
             'body' => 'required|string',
             'variables' => 'nullable|string'
         ]);
+
+        $validated['body'] = HtmlSanitizer::clean($validated['body']);
+
         if ($request->variables) {
           $validated['variables'] = array_map('trim', explode(',', $request->variables));
         }

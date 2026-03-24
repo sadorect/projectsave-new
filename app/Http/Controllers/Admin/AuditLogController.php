@@ -5,21 +5,22 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AdminAuditLog;
-use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use App\Models\AppSetting;
 
 
 class AuditLogController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view-audit-log,manage-audit-log,admin')->only('index');
+        $this->middleware('permission:manage-audit-log,admin')->only(['destroy', 'bulkDestroy', 'toggleErrorAudit']);
+    }
+
     public function index(Request $request)
     {
-        // Restrict access to admins only for now
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-
-        $query = AdminAuditLog::query()->with('adminUser')->orderBy('created_at', 'desc');
+        $baseQuery = AdminAuditLog::query();
+        $query = AdminAuditLog::query()->with('adminUser')->orderByDesc('created_at');
 
         // Date range filters
         if ($from = $request->get('from')) {
@@ -72,15 +73,32 @@ class AuditLogController extends Controller
             return $response;
         }
 
-        // For the action dropdown, fetch distinct actions
-        $actions = AdminAuditLog::select('action')->distinct()->pluck('action')->toArray();
+        $actions = AdminAuditLog::query()
+            ->select('action')
+            ->distinct()
+            ->orderBy('action')
+            ->pluck('action')
+            ->toArray();
 
         $logs = $query->paginate(25);
+        $summary = [
+            'total_logs' => (clone $baseQuery)->count(),
+            'today_logs' => (clone $baseQuery)->whereDate('created_at', today())->count(),
+            'unique_admins' => (clone $baseQuery)->whereNotNull('admin_user_id')->distinct()->count('admin_user_id'),
+            'destructive_actions' => (clone $baseQuery)
+                ->where(function ($builder) {
+                    $builder
+                        ->where('action', 'like', '%delete%')
+                        ->orWhere('action', 'like', '%destroy%')
+                        ->orWhere('action', 'like', '%reject%')
+                        ->orWhere('action', 'like', '%remove%');
+                })
+                ->count(),
+        ];
 
-        // current toggle for error audit
         $errorAuditEnabled = AppSetting::get('error_audit_enabled', ['enabled' => false]);
 
-        return view('admin.audit.index', compact('logs', 'actions', 'errorAuditEnabled'));
+        return view('admin.audit.index', compact('logs', 'actions', 'errorAuditEnabled', 'summary'));
     }
 
     /**
@@ -88,10 +106,6 @@ class AuditLogController extends Controller
      */
     public function destroy($id)
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $log = AdminAuditLog::findOrFail($id);
         $log->delete();
 
@@ -103,10 +117,6 @@ class AuditLogController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $ids = $request->input('ids', []);
         if (!is_array($ids) || empty($ids)) {
             return redirect()->back()->with('error', 'No items selected.');
@@ -122,10 +132,6 @@ class AuditLogController extends Controller
      */
     public function toggleErrorAudit(Request $request)
     {
-        if (!auth()->check() || !auth()->user()->is_admin) {
-            abort(403);
-        }
-
         $enabled = $request->boolean('enabled');
 
         AppSetting::set('error_audit_enabled', ['enabled' => $enabled]);

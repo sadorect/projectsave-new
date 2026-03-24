@@ -1,130 +1,121 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Exam Attempts')
+@section('page_kicker', 'Learning Operations')
+@section('page_subtitle', 'Track attempt history, review student performance, and manage exceptional records across the exam system.')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-clipboard-list me-2"></i>
-                        All Exam Attempts
-                    </h3>
-                    <div class="card-tools">
-                        <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-arrow-left me-1"></i>Back to Exams
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="card-body">
-                    @if($attempts->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Student</th>
-                                        <th>Exam</th>
-                                        <th>Score</th>
-                                        <th>Result</th>
-                                        <th>Date</th>
-                                        <th>Duration</th>
-                                        <th>Type</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($attempts as $attempt)
-                                        <tr>
-                                            <td>
-                                                <strong>{{ $attempt->user->name }}</strong><br>
-                                                <small class="text-muted">{{ $attempt->user->email }}</small>
-                                            </td>
-                                            <td>
-                                                <strong>{{ $attempt->exam->title }}</strong><br>
-                                                <small class="text-muted">{{ $attempt->exam->course->title ?? 'N/A' }}</small>
-                                            </td>
-                                            <td>
-                                                <span class="h5 mb-0 text-{{ $attempt->score >= $attempt->exam->passing_score ? 'success' : 'danger' }}">
-                                                    {{ number_format($attempt->score, 1) }}%
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-{{ $attempt->score >= $attempt->exam->passing_score ? 'success' : 'danger' }} text-white">
-                                                    {{ $attempt->score >= $attempt->exam->passing_score ? 'PASSED' : 'FAILED' }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $attempt->started_at->format('M d, Y H:i') }}</td>
-                                            <td>
-                                                @if($attempt->completed_at && $attempt->started_at)
-                                                    {{ $attempt->started_at->diffInMinutes($attempt->completed_at) }}m
-                                                @else
-                                                    <span class="text-muted">N/A</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if(isset($attempt->answers['manual_pass']) && $attempt->answers['manual_pass'])
-                                                    <span class="badge bg-info text-white" title="Manually passed by administrator">
-                                                        <i class="fas fa-hand-paper me-1"></i>Manual
-                                                    </span>
-                                                @else
-                                                    <span class="badge bg-primary text-white">
-                                                        <i class="fas fa-pencil-alt me-1"></i>Exam
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <div class="btn-group" role="group">
-                                                    <a href="{{ route('admin.exam-attempts.show', $attempt) }}" 
-                                                       class="btn btn-sm btn-info" title="View Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-danger" 
-                                                            onclick="deleteAttempt({{ $attempt->id }})" title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                                
-                                                <!-- Hidden delete form -->
-                                                <form id="delete-form-{{ $attempt->id }}" 
-                                                      action="{{ route('admin.exam-attempts.destroy', $attempt) }}" 
-                                                      method="POST" style="display: none;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Pagination -->
-                        <div class="d-flex justify-content-center">
-                            {{ $attempts->links() }}
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No Exam Attempts Found</h5>
-                            <p class="text-muted">No students have taken any exams yet.</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
+<div class="admin-page-shell">
+    <section class="admin-stat-grid">
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Attempt records</span>
+            <strong class="admin-stat-value">{{ number_format($summary['total']) }}</strong>
+            <p class="admin-stat-note mb-0">All attempt records currently stored in the LMS.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Logged today</span>
+            <strong class="admin-stat-value">{{ number_format($summary['today']) }}</strong>
+            <p class="admin-stat-note mb-0">Attempts created since midnight.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Students</span>
+            <strong class="admin-stat-value">{{ number_format($summary['students']) }}</strong>
+            <p class="admin-stat-note mb-0">Distinct learners represented in attempt history.</p>
+        </article>
+        <article class="admin-stat-card">
+            <span class="admin-stat-label">Exams touched</span>
+            <strong class="admin-stat-value">{{ number_format($summary['exams']) }}</strong>
+            <p class="admin-stat-note mb-0">Assessments that have recorded at least one attempt.</p>
+        </article>
+    </section>
+
+    <x-ui.panel title="Attempt History" subtitle="Use this queue to inspect score outcomes, manual passes, and deletion actions.">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <a href="{{ route('admin.exams.index') }}" class="surface-button-secondary">Back to exams</a>
         </div>
-    </div>
+
+        @if($attempts->isNotEmpty())
+            <div class="surface-table-shell">
+                <table class="table admin-table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Exam</th>
+                            <th>Score</th>
+                            <th>Result</th>
+                            <th>Date</th>
+                            <th>Duration</th>
+                            <th>Type</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($attempts as $attempt)
+                            @php
+                                $passed = $attempt->score >= $attempt->exam->passing_score;
+                                $isManual = data_get($attempt->answers, 'manual_pass') === true;
+                            @endphp
+                            <tr>
+                                <td>
+                                    <strong class="d-block">{{ $attempt->user->name }}</strong>
+                                    <small class="text-muted">{{ $attempt->user->email }}</small>
+                                </td>
+                                <td>
+                                    <strong class="d-block">{{ $attempt->exam->title }}</strong>
+                                    <small class="text-muted">{{ $attempt->exam->course->title ?? 'No course assigned' }}</small>
+                                </td>
+                                <td>{{ number_format($attempt->score, 1) }}%</td>
+                                <td>
+                                    <span class="admin-status-chip {{ $passed ? 'is-success' : 'is-danger' }}">
+                                        {{ $passed ? 'Passed' : 'Failed' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong class="d-block">{{ $attempt->started_at?->format('M j, Y H:i') ?? 'n/a' }}</strong>
+                                    <small class="text-muted">{{ $attempt->started_at?->diffForHumans() ?? 'No start time' }}</small>
+                                </td>
+                                <td>
+                                    @if($attempt->completed_at && $attempt->started_at)
+                                        {{ $attempt->started_at->diffInMinutes($attempt->completed_at) }}m
+                                    @else
+                                        <span class="text-muted">n/a</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="admin-status-chip {{ $isManual ? 'is-info' : 'is-muted' }}">
+                                        {{ $isManual ? 'Manual pass' : 'Exam' }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="admin-action-row justify-content-end">
+                                        <a href="{{ route('admin.exam-attempts.show', $attempt) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        <form action="{{ route('admin.exam-attempts.destroy', $attempt) }}" method="POST" class="d-inline-flex" data-admin-confirm="Delete this exam attempt record?">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $attempts->links() }}
+            </div>
+        @else
+            <x-ui.empty-state
+                title="No exam attempts found"
+                message="Attempt history will appear here once students start taking assessments."
+                icon="bi bi-clipboard-data"
+            >
+                <x-slot:actions>
+                    <a href="{{ route('admin.exams.index') }}" class="surface-button-secondary">Open exams</a>
+                </x-slot:actions>
+            </x-ui.empty-state>
+        @endif
+    </x-ui.panel>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-function deleteAttempt(attemptId) {
-    if (confirm('Are you sure you want to delete this exam attempt? This action cannot be undone.')) {
-        document.getElementById('delete-form-' + attemptId).submit();
-    }
-}
-</script>
-@endpush

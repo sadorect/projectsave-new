@@ -13,6 +13,18 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminUserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:viewAny,' . User::class)->only('index');
+        $this->middleware('can:create,' . User::class)->only(['create', 'store']);
+        $this->middleware('can:view,user')->only('show');
+        $this->middleware('can:update,user')->only(['edit', 'update']);
+        $this->middleware('can:delete,user')->only('destroy');
+        $this->middleware('can:bulkManage,' . User::class)->only('bulkAction');
+        $this->middleware('can:verify,user')->only('verify');
+        $this->middleware('can:toggleActive,user')->only('toggleActive');
+    }
+
     public function index(Request $request)
     {
         $roles   = Role::all();
@@ -69,7 +81,9 @@ class AdminUserController extends Controller
             $activeSessions = [];
         }
 
-        return view('admin.users.index', compact('users', 'roles', 'activeSessions', 'perPage'));
+        $activeSessionLookup = array_fill_keys($activeSessions, true);
+
+        return view('admin.users.index', compact('users', 'roles', 'activeSessionLookup', 'perPage'));
     }
 
     public function create()
@@ -226,7 +240,8 @@ class AdminUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'is_admin' => 'boolean',
-             'roles' => 'array|nullable'
+            'roles' => 'array|nullable',
+            'roles.*' => 'integer|exists:roles,id',
         ]);
 
         if ($request->filled('password')) {
@@ -234,7 +249,11 @@ class AdminUserController extends Controller
         }
 
         $user->update($validated);
-        $user->roles()->sync($request->input('roles', []));
+        $roles = Role::query()
+            ->whereIn('id', $validated['roles'] ?? [])
+            ->get();
+
+        $user->syncRoles($roles);
         try {
             AdminAuditLog::create([
                 'admin_user_id' => Auth::id(),

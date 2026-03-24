@@ -1,82 +1,69 @@
-<x-layouts.asom-auth>
-    <div class="container mx-auto px-4 py-8">
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-bold text-gray-800">My Certificates</h1>
-                <a href="{{ route('asom.welcome') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
-                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                </a>
-            </div>
+<x-layouts.asom-auth
+    page-title="My Certificates"
+    subtitle="Review issued certificates, pending approvals, and the records attached to your completed ASOM journey."
+>
+    <div class="d-grid gap-4">
+        <section class="lms-summary-grid">
+            <article class="lms-summary-card">
+                <span class="label">Total certificates</span>
+                <span class="value">{{ $certificateStats['total'] }}</span>
+            </article>
+            <article class="lms-summary-card">
+                <span class="label">Approved</span>
+                <span class="value">{{ $certificateStats['approved'] }}</span>
+            </article>
+            <article class="lms-summary-card">
+                <span class="label">Pending</span>
+                <span class="value">{{ $certificateStats['pending'] }}</span>
+            </article>
+            <article class="lms-summary-card">
+                <span class="label">Program</span>
+                <span class="value">{{ $certificateStats['program'] }}</span>
+            </article>
+        </section>
 
-            @if($certificates->isEmpty())
-                <div class="text-center py-12">
-                    <div class="text-gray-400 mb-4">
-                        <i class="fas fa-certificate text-6xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No Certificates Yet</h3>
-                    <p class="text-gray-500 mb-6">Complete courses and pass exams to earn certificates</p>
-                    <a href="{{ route('asom.welcome') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg transition duration-200">
-                        View Available Courses
-                    </a>
-                </div>
-            @else
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($certificates as $certificate)
-                        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-6 border border-blue-200 hover:shadow-lg transition duration-200">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center">
-                                    <i class="fas fa-certificate text-2xl text-indigo-600 mr-3"></i>
-                                    <div>
-                                        <h3 class="font-semibold text-gray-800">{{ $certificate->course->title }}</h3>
-                                        <p class="text-sm text-gray-600">{{ $certificate->certificate_id }}</p>
-                                    </div>
-                                </div>
-                                @if($certificate->is_approved)
-                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
-                                        <i class="fas fa-check-circle mr-1"></i>Approved
-                                    </span>
-                                @else
-                                    <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">
-                                        <i class="fas fa-clock mr-1"></i>Pending
-                                    </span>
-                                @endif
+        @if($certificates->isEmpty())
+            <x-ui.empty-state
+                title="No certificates yet"
+                message="Your Diploma in Ministry certificate and any admin-issued course recognitions will appear here after approval."
+            >
+                <x-slot:actions>
+                    <a href="{{ route('lms.dashboard') }}" class="surface-button-primary">Back to workspace</a>
+                    <a href="{{ route('lms.courses.index') }}" class="surface-button-secondary">Browse courses</a>
+                </x-slot:actions>
+            </x-ui.empty-state>
+        @else
+            <section class="lms-course-grid">
+                @foreach($certificates as $certificate)
+                    <article class="lms-certificate-card">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                            <div>
+                                <h3 class="h5 mb-1">{{ $certificate->certificate_type }}</h3>
+                                <p class="text-muted small mb-0">{{ $certificate->certificate_id }}</p>
                             </div>
-
-                            <div class="space-y-2 mb-4">
-                                <div class="flex justify-between text-sm">
-                                    <span class="text-gray-600">Issued Date:</span>
-                                    <span class="font-medium">{{ $certificate->issued_at->format('M j, Y') }}</span>
-                                </div>
-                                @if($certificate->final_grade)
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-gray-600">Final Grade:</span>
-                                        <span class="font-medium text-green-600">{{ number_format($certificate->final_grade, 1) }}%</span>
-                                    </div>
-                                @endif
-                                @if($certificate->is_approved && $certificate->approved_at)
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-gray-600">Approved:</span>
-                                        <span class="font-medium">{{ $certificate->approved_at->format('M j, Y') }}</span>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="flex space-x-2">
-                                <a href="{{ route('lms.certificates.show', $certificate) }}" 
-                                   class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-center py-2 px-4 rounded-lg transition duration-200 text-sm">
-                                    <i class="fas fa-eye mr-2"></i>View
-                                </a>
-                                @if($certificate->is_approved)
-                                    <a href="{{ route('lms.certificates.download', $certificate) }}" 
-                                       class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-lg transition duration-200 text-sm">
-                                        <i class="fas fa-download mr-2"></i>Download
-                                    </a>
-                                @endif
-                            </div>
+                            <span class="lms-pill">
+                                <i class="fas {{ $certificate->is_approved ? 'fa-check-circle text-success' : 'fa-clock text-warning' }}"></i>
+                                {{ $certificate->is_approved ? 'Approved' : 'Pending' }}
+                            </span>
                         </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
+
+                        <div class="d-grid gap-2 small text-muted mb-4">
+                            <div><strong>Completed:</strong> {{ optional($certificate->completed_at)->format('M j, Y') ?? 'In review' }}</div>
+                            <div><strong>Issued:</strong> {{ optional($certificate->issued_at)->format('M j, Y') ?? 'Awaiting approval' }}</div>
+                            @if($certificate->final_grade)
+                                <div><strong>Final grade:</strong> {{ number_format($certificate->final_grade, 1) }}%</div>
+                            @endif
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ route('lms.certificates.show', $certificate) }}" class="surface-button-secondary">View</a>
+                            @if($certificate->is_approved)
+                                <a href="{{ route('lms.certificates.download', $certificate) }}" class="surface-button-primary">Download</a>
+                            @endif
+                        </div>
+                    </article>
+                @endforeach
+            </section>
+        @endif
     </div>
 </x-layouts.asom-auth>

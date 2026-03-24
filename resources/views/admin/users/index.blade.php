@@ -149,20 +149,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                if (!isset($activeSessions)) {
-                                    try {
-                                        $sessionTable  = config('session.table', 'sessions');
-                                        $activeSessions = \Illuminate\Support\Facades\DB::table($sessionTable)
-                                            ->whereNotNull('user_id')
-                                            ->pluck('user_id')->unique()
-                                            ->map(fn($v) => (int) $v)->toArray();
-                                    } catch (\Throwable $e) {
-                                        $activeSessions = [];
-                                    }
-                                }
-                            @endphp
-
                             @forelse($users as $user)
                             <tr>
                                 <td>
@@ -170,7 +156,7 @@
                                            class="form-check-input user-checkbox">
                                 </td>
                                 <td>
-                                    @if(in_array($user->id, $activeSessions))
+                                    @if(! empty($activeSessionLookup[$user->id]))
                                         <span class="badge bg-success">Online</span>
                                     @else
                                         <span class="badge bg-secondary">Offline</span>

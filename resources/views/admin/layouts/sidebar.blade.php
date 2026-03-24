@@ -1,257 +1,132 @@
-<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px; min-height: 100vh;">
-    <a href="{{ route('home') }}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <span class="fs-4">You're Here!</span>
+<aside
+    class="surface-sidebar surface-sidebar-shell offcanvas-lg offcanvas-start d-flex flex-column gap-4"
+    tabindex="-1"
+    id="adminSidebar"
+    aria-labelledby="adminSidebarLabel"
+>
+    <div class="offcanvas-header d-lg-none px-0 pt-0">
+        <div>
+            <div class="text-sm text-white-50 text-uppercase tracking-[0.2em]">Projectsave</div>
+            <div class="fs-5 fw-semibold text-white" id="adminSidebarLabel">Back Office</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close navigation"></button>
+    </div>
+
+    <div class="offcanvas-body d-flex flex-column gap-4 p-0">
+    <a href="{{ route('home') }}" class="surface-sidebar-brand text-decoration-none">
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex h-12 w-12 align-items-center justify-content-center rounded-4 bg-white/10 text-white shadow-sm">
+                <i class="bi bi-command"></i>
+            </div>
+            <div>
+                <div class="text-sm text-white-50 text-uppercase tracking-[0.2em]">Projectsave</div>
+                <div class="fs-5 fw-semibold text-white">Back Office</div>
+            </div>
+        </div>
     </a>
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            <a href="{{ route('admin.dashboard') }}" class="nav-link text-white {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <i class="bi bi-speedometer2 me-2"></i>
-                Dashboard
-            </a>
-        </li>
-      <li>
-          <a href="{{ route('admin.posts.index') }}" class="nav-link text-white {{ request()->routeIs('admin.posts.*') ? 'active' : '' }}">
-              <i class="bi bi-file-text me-2"></i>
-              Posts
-          </a>
-      </li>
-      <li>
-          <a href="{{ route('admin.events.index') }}" class="nav-link text-white {{ request()->routeIs('admin.events.*') ? 'active' : '' }}">
-              <i class="bi bi-calendar-event me-2"></i>
-              Events
-          </a>
-      </li>
-      <!-- Add this within your existing sidebar navigation -->
-    <li class="nav-item">
-        <a href="{{ route('admin.faqs.index') }}" class="nav-link text-white {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
-            <i class="nav-icon fas fa-question-circle"></i>
-            <p>FAQs</p>
-        </a>
-    </li>
-      <li>
-          <a href="{{ route('admin.categories.index') }}" class="nav-link text-white {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
-              <i class="bi bi-folder me-2"></i>
-              Categories
-          </a>
-      </li>
-      <li>
-          <a href="{{ route('admin.tags.index') }}" class="nav-link text-white {{ request()->routeIs('admin.tags.*') ? 'active' : '' }}">
-              <i class="bi bi-tags me-2"></i>
-              Tags
-          </a>
-      </li>
-      <li>
-        <a href="{{ route('news.index') }}" class="nav-link text-white {{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
-            <i class="bi bi-newspaper me-2"></i>
-            News Updates
-        </a>
-    </li>
 
-    <li>
-        <a href="{{ route('videos.index') }}" class="nav-link text-white {{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
-            <i class="bi bi-camera-video me-2"></i>
-            Video Reels
-        </a>
-    </li>
-
-      <li>
-          <!-- Update the users link in the sidebar -->
-      <a href="{{ route('admin.users.index') }}" class="nav-link text-white {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-        <i class="bi bi-people me-2"></i>
-        Users
-      </a>
-
-            <a href="{{ route('admin.sessions.index') }}" class="nav-link text-white {{ request()->routeIs('admin.sessions.*') ? 'active' : '' }}">
-                <i class="bi bi-box-arrow-in-right me-2"></i>
-                Sessions (Logged in)
-            </a>
-
-                            @if(auth()->check() && auth()->user()->is_admin)
-                            <a href="{{ route('admin.audit.index') }}" class="nav-link text-white {{ request()->routeIs('admin.audit.*') ? 'active' : '' }}">
-                                <i class="bi bi-clipboard-data me-2"></i>
-                                Audit Log
-                            </a>
-                            @endif
-
-      <li class="nav-item">
-        <a class="nav-link {{ request()->routeIs('admin.celebrations.*') ? 'active' : '' }}" 
-           href="#celebrationsSubmenu" 
-           data-bs-toggle="collapse">
-            <i class="bi bi-gift"></i>
-            <span>Celebrations</span>
-        </a>
-        <div class="collapse {{ request()->routeIs('admin.celebrations.*') ? 'show' : '' }}" 
-             id="celebrationsSubmenu">
-            <ul class="nav flex-column pl-3">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.celebrations.calendar') }}">
-                        <i class="bi bi-calendar-event"></i> Calendar
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.celebrations.statistics') }}">
-                        <i class="bi bi-graph-up"></i> Statistics
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.celebrations.logs') }}">
-                        <i class="bi bi-journal-text"></i> Wish Logs
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
-    <li class="nav-item">
-            <a class="nav-link text-white" data-bs-toggle="collapse" href="#fileManagement" role="button" aria-expanded="false" aria-controls="fileManagement">
-                <i class="bi bi-folder me-2"></i>
-                File Management
-            </a>
-            <div class="collapse" id="fileManagement">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{{ route('admin.files.index') }}">
-                            <i class="bi bi-file-earmark me-2"></i> All Files
-                        </a>
-                    </li>
-                    
-                </ul>
-            </div>
-        </li>
-    
-    <li class="nav-item">
-        <a class="nav-link text-white {{ request()->routeIs('admin.forms.*') ? 'bg-primary' : '' }}" data-bs-toggle="collapse" href="#formsManagement" role="button" aria-expanded="{{ request()->routeIs('admin.forms.*') ? 'true' : 'false' }}" aria-controls="formsManagement">
-            <i class="fas fa-clipboard-list me-2"></i>
-            Forms Management
-            @php
-                $pendingSubmissions = \App\Models\FormSubmission::whereDate('created_at', today())->count();
-            @endphp
-            @if($pendingSubmissions > 0)
-                <span class="badge bg-success ms-1">{{ $pendingSubmissions }}</span>
-            @endif
-        </a>
-        <div class="collapse {{ request()->routeIs('admin.forms.*') || request()->routeIs('admin.submissions.*') ? 'show' : '' }}" id="formsManagement">
-            <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ request()->routeIs('admin.forms.index') ? 'active' : '' }}" href="{{ route('admin.forms.index') }}">
-                        <i class="fas fa-list me-2"></i> All Forms
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white {{ request()->routeIs('admin.forms.create') ? 'active' : '' }}" href="{{ route('admin.forms.create') }}">
-                        <i class="fas fa-plus me-2"></i> Create Form
-                    </a>
-                </li>
-
-            </ul>
-        </div>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link text-white" data-bs-toggle="collapse" href="#lms" role="button" aria-expanded="false" aria-controls="lms">
-            <i class="bi bi-mortarboard me-2"></i>
-            LMS Management
-        </a>
-        <div class="collapse" id="lms">
-            <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('admin.courses.index') }}">
-                        <i class="bi bi-book me-2"></i> Courses
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('admin.lessons.index') }}">
-                        <i class="bi bi-journal-text me-2"></i> Lessons
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('admin.enrollments.index') }}">
-                        <i class="bi bi-people me-2"></i> Enrollments
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('admin.exams.index') }}">
-                        <i class="bi bi-pencil-square me-2"></i> Exams
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('admin.exam-attempts.index') }}">
-                        <i class="bi bi-clock-history me-2"></i> Exam Attempts
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="{{ route('admin.certificates.index') }}">
-                        <i class="bi bi-award me-2"></i> Certificates
-                        @if(\App\Models\Certificate::where('is_approved', false)->whereNull('approved_at')->count() > 0)
-                            <span class="badge bg-warning ms-1">
-                                {{ \App\Models\Certificate::where('is_approved', false)->whereNull('approved_at')->count() }}
-                            </span>
-                        @endif
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
-    
-    <li class="nav-item">
-        <a href="#mailSubmenu" data-bs-toggle="collapse" class="nav-link">
-            <i class="bi bi-envelope"></i>
-            <span>Mail System</span>
-        </a>
-        <div class="collapse {{ request()->routeIs('admin.mail.*') ? 'show' : '' }}" id="mailSubmenu">
-            <ul class="nav flex-column pl-3">
-                <li class="nav-item">
-                    <a href="{{ route('admin.mail.compose') }}" class="nav-link text-white">
-                        <i class="bi bi-pencil-square me-2"></i>
-                        Compose Mail
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.mail-templates.index') }}" class="nav-link text-white">
-                        <i class="bi bi-file-text me-2"></i>
-                        Mail Templates
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </li>
-    
-    <li>
-        <a href="{{route('admin.partners.index')}}" class="nav-link text-white">
-            <i class="bi bi-raised-hands me-2"></i>
-            Partners ( <span style="color: yellow">{{ App\Models\Partner::where('status', 'pending')->count() }} </span> )
-        </a>
-        
-    </li>
-      </li>
-        <li>
-            <a href="#settingsSubmenu" class="nav-link text-white" data-bs-toggle="collapse">
-                <i class="bi bi-gear me-2"></i>
-                Settings
-            </a>
-            <div class="collapse {{ request()->routeIs('admin.notification-settings.*') ? 'show' : '' }}" id="settingsSubmenu">
-                <ul class="nav flex-column pl-3">
-                    <li class="nav-item">
-                        <a href="{{ route('admin.notification-settings.edit') }}" class="nav-link text-white {{ request()->routeIs('admin.notification-settings.*') ? 'active' : '' }}">
-                            <i class="bi bi-bell me-2"></i>
-                            Notification Settings
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-
-        <div class="nav-item">
-            <a href="{{ route('admin.deletion-requests.index') }}" class="nav-link">
-                <i class="bi bi-trash"></i>
-                <span>Deletion Requests</span>
-                @if($pendingDeletions = \App\Models\DeletionRequest::where('status', 'pending')->count())
-                    <span class="badge bg-danger">{{ $pendingDeletions }}</span>
+    <nav class="d-flex flex-column gap-4 flex-grow-1">
+        @foreach($adminNavigation ?? [] as $section)
+            <div class="d-flex flex-column gap-2">
+                @if(! empty($section['label']))
+                    <div class="surface-sidebar-section">{{ $section['label'] }}</div>
                 @endif
-            </a>
+
+                <ul class="nav flex-column gap-1">
+                    @foreach($section['items'] as $item)
+                        @if($item['children'] !== [])
+                            <li class="nav-item admin-nav-group {{ $item['open'] ? 'is-open' : '' }}">
+                                <button
+                                    type="button"
+                                    class="surface-nav-link admin-nav-toggle justify-content-between w-100 border-0 {{ $item['open'] ? 'active' : '' }}"
+                                    data-admin-nav-toggle
+                                    data-admin-nav-target="nav-{{ $item['id'] }}"
+                                    aria-expanded="{{ $item['open'] ? 'true' : 'false' }}"
+                                    aria-controls="nav-{{ $item['id'] }}"
+                                >
+                                    <span class="d-flex align-items-center gap-3">
+                                        @if($item['icon'])
+                                            <i class="{{ $item['icon'] }}"></i>
+                                        @endif
+                                        <span>{{ $item['label'] }}</span>
+                                    </span>
+
+                                    <span class="d-flex align-items-center gap-2">
+                                        @if($item['badge'])
+                                            <span class="badge rounded-pill bg-warning text-dark">{{ $item['badge'] }}</span>
+                                        @endif
+                                        <i class="bi bi-chevron-down small admin-nav-chevron"></i>
+                                    </span>
+                                </button>
+
+                                <div class="admin-subnav {{ $item['open'] ? 'is-open' : '' }}" id="nav-{{ $item['id'] }}" data-admin-nav-section>
+                                    <ul class="nav flex-column gap-1 admin-subnav-list">
+                                        @foreach($item['children'] as $child)
+                                            <li class="nav-item">
+                                                <a href="{{ $child['url'] }}" class="surface-nav-link admin-subnav-link {{ $child['active'] ? 'active' : '' }}" data-admin-nav-link>
+                                                    @if($child['icon'])
+                                                        <i class="{{ $child['icon'] }}"></i>
+                                                    @endif
+                                                    <span>{{ $child['label'] }}</span>
+                                                    @if($child['badge'])
+                                                        <span class="badge rounded-pill bg-warning text-dark ms-auto">{{ $child['badge'] }}</span>
+                                                    @endif
+                                                </a>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </li>
+                        @elseif($item['url'])
+                            <li class="nav-item">
+                                <a href="{{ $item['url'] }}" class="surface-nav-link {{ $item['active'] ? 'active' : '' }}" data-admin-nav-link>
+                                    @if($item['icon'])
+                                        <i class="{{ $item['icon'] }}"></i>
+                                    @endif
+                                    <span>{{ $item['label'] }}</span>
+                                    @if($item['badge'])
+                                        <span class="badge rounded-pill bg-warning text-dark ms-auto">{{ $item['badge'] }}</span>
+                                    @endif
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+            </ul>
         </div>
-    </ul>
+    @endforeach
+    </nav>
 
+    <div class="surface-sidebar-footer">
+        <div class="dropdown">
+            <a
+                href="#"
+                class="surface-nav-link active justify-content-between"
+                id="adminUserMenu"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+            >
+                <span class="d-flex align-items-center gap-3">
+                    <i class="bi bi-person-circle"></i>
+                    <span>
+                        <span class="d-block">{{ auth()->user()->name }}</span>
+                        <small class="text-white-50">{{ auth()->user()->email }}</small>
+                    </span>
+                </span>
+                <i class="bi bi-chevron-up small"></i>
+            </a>
 
-
-
+            <ul class="dropdown-menu dropdown-menu-dark w-100 text-small shadow" aria-labelledby="adminUserMenu">
+                <li><a class="dropdown-item" href="{{ route('user.dashboard') }}">Account dashboard</a></li>
+                <li><a class="dropdown-item" href="{{ route('home') }}">Public site</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <form method="POST" action="{{ route('admin.logout') }}">
+                        @csrf
+                        <button type="submit" class="dropdown-item">Sign out</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </div>
+</aside>

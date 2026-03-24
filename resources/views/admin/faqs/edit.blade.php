@@ -23,8 +23,14 @@
 
                 <div class="mb-3">
                     <label for="details" class="form-label">Details</label>
-                    <textarea class="form-control @error('details') is-invalid @enderror" 
-                              id="details" name="details" rows="5" required>{{ old('details', $faq->details) }}</textarea>
+                    <textarea
+                        class="form-control @error('details') is-invalid @enderror"
+                        id="details"
+                        name="details"
+                        rows="8"
+                        data-admin-rich-text
+                        required
+                    >{{ old('details', $faq->details) }}</textarea>
                     @error('details')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -45,21 +51,5 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-<script src="{{ asset('ckeditor/ckeditor.js') }}"></script>
-<script>
-    CKEDITOR.replace('details', {
-        toolbar: [
-            ['Bold', 'Italic', 'Underline', 'Strike'],
-            ['NumberedList', 'BulletedList'],
-            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
-            ['Link', 'Unlink'],
-            ['RemoveFormat']
-        ]
-    });
-</script>
-@endpush
-
 
 @endsection

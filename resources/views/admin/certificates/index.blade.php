@@ -203,9 +203,13 @@
                                                 <i class="bi bi-check-circle"></i> Approved
                                             </span>
                                             <br>
-                                            <small class="text-muted">
-                                                {{ $certificate->approved_at->format('M d, Y') }}
-                                            </small>
+                                            @if($certificate->approved_at)
+                                                <small class="text-muted">
+                                                    {{ $certificate->approved_at->format('M d, Y') }}
+                                                </small>
+                                            @else
+                                                <small class="text-muted">Approval date unavailable</small>
+                                            @endif
                                         @else
                                             <span class="badge bg-warning">
                                                 <i class="bi bi-clock"></i> Pending

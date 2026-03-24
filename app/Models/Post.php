@@ -24,6 +24,7 @@ class Post extends Model
         'author',
         'user_id',
         'comments_count',
+        'status',
         'slug',
         'published_at',
     ];
@@ -53,37 +54,28 @@ class Post extends Model
 
     public function scopePublished($query)
     {
-        return $query->where('status', 'published')
-                    ->whereNotNull('published_at')
-                    ->where('published_at', '<=', now());
+        return $query->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
     }
 
     protected static function boot()
-{
-    parent::boot();
-    
-    static::creating(function ($post) {
-        $post->slug = Str::slug($post->title);
-    });
+    {
+        parent::boot();
+
+        static::creating(function ($post) {
+            $post->slug = Str::slug($post->title);
+        });
+    }
+
+    protected function setDetailsAttribute($value)
+    {
+        $pattern = '/\*((?:[^*]|\\\*)+)\*/';
+        $value = preg_replace($pattern, '<strong>$1</strong>', $value);
+        $this->attributes['details'] = $value;
+    }
+
+    protected function getDetailsAttribute($value)
+    {
+        return preg_replace('/\*((?:[^*]|\\\*)+)\*/', '<strong>$1</strong>', $value);
+    }
 }
-
-// In the Post model:
-protected function setDetailsAttribute($value) {
-    // Match and convert all asterisk-wrapped text while preserving paragraphs
-    $pattern = '/\*((?:[^*]|\\\*)+)\*/';
-    $value = preg_replace($pattern, '<strong>$1</strong>', $value);
-    $this->attributes['details'] = $value;
-}
-
-// In the Post model
-protected function getDetailsAttribute($value) {
-    return preg_replace('/\*((?:[^*]|\\\*)+)\*/', '<strong>$1</strong>', $value);
-}
-
-
-}
-
-
-
-
-
