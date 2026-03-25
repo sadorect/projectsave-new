@@ -1011,14 +1011,17 @@
 }
 
 /* ─── Dashboard sidebar (sticky scroll behaviour for longer pages) ──────── */
-.surface-sidebar,
-.surface-sidebar-shell {
-    position: sticky;
-    top: 0;
-    max-height: 100vh;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+/* Only apply sticky on desktop — on mobile Bootstrap offcanvas-lg must control positioning */
+@media (min-width: 992px) {
+    .surface-sidebar,
+    .surface-sidebar-shell {
+        position: sticky;
+        top: 0;
+        max-height: 100vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+    }
 }
 
 /* ─── Sidebar scrollbar chrome ────────────────────────────────────────────────── */
