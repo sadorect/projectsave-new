@@ -6,6 +6,38 @@ import Alpine from "alpinejs";
 window.Alpine = Alpine;
 Alpine.start();
 
+/* ─── Mobile navigation burger toggle ───────────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
+    const navToggle = document.querySelector("[data-site-nav-toggle]");
+    const navPanel = document.getElementById("publicNavigation");
+
+    if (navToggle && navPanel) {
+        navToggle.addEventListener("click", () => {
+            const isOpen = navPanel.classList.toggle("is-open");
+            navToggle.setAttribute("aria-expanded", String(isOpen));
+        });
+
+        // Close when a nav link is tapped (single-page-style navigation)
+        navPanel.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+                navPanel.classList.remove("is-open");
+                navToggle.setAttribute("aria-expanded", "false");
+            });
+        });
+
+        // Close when clicking outside the nav panel or toggle button
+        document.addEventListener("click", (e) => {
+            if (
+                !navPanel.contains(e.target) &&
+                !navToggle.contains(e.target)
+            ) {
+                navPanel.classList.remove("is-open");
+                navToggle.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
+});
+
 /* ─── Partnership form conditionals ─────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
     // ── Leadership details toggle ────────────────────────────────

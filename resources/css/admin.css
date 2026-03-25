@@ -775,6 +775,12 @@
     .surface-admin-content {
         padding: 1rem;
     }
+
+    /* On mobile the sidebar is an offcanvas — give it a proper dark bg */
+    .surface-sidebar.offcanvas-lg {
+        background: #1e293b;
+        padding: 1.25rem 1rem;
+    }
 }
 
 @media (max-width: 767.98px) {
@@ -1043,4 +1049,153 @@
 
 .surface-admin-content {
     flex: 1 1 auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN MOBILE ENHANCEMENT — comprehensive responsive layer
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── All tables scroll horizontally rather than overflowing ─────── */
+.surface-admin-content table,
+.admin-page-shell table {
+    min-width: 600px;
+}
+
+.surface-admin-content .table-wrap,
+.admin-page-shell .table-wrap,
+.surface-admin-content form + .table-responsive,
+.surface-admin-content .card-body > .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Auto-wrap bare tables that don't have .table-responsive */
+.surface-admin-content > table,
+.surface-admin-content .card > table,
+.surface-admin-content .card-body > table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+/* ── Admin page shell grid ──────────────────────────────────────── */
+@media (max-width: 991.98px) {
+    .admin-page-shell {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Form rows — stack on small screens ─────────────────────────── */
+@media (max-width: 767.98px) {
+    .surface-admin-content .row > [class*="col-md-"],
+    .surface-admin-content .row > [class*="col-lg-"] {
+        width: 100%;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    /* Action/filter bars — wrap buttons */
+    .surface-admin-content .d-flex.justify-content-between,
+    .admin-page-shell .d-flex.justify-content-between {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* Make search inputs full-width on mobile */
+    .surface-admin-content input[type="search"],
+    .surface-admin-content input[type="text"].form-control {
+        width: 100%;
+    }
+
+    /* Header row — stack title + operator name */
+    .surface-admin-header-row {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    /* Header actions — wrap, smaller gap */
+    .surface-admin-header-actions {
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    /* Sidebar toggle gets more breathing room */
+    .surface-admin-sidebar-toggle {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+
+    /* Card/panel grids inside content — single column */
+    .admin-workflow-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Alert/flash messages full-width */
+    .surface-admin-content .alert {
+        border-radius: 14px;
+    }
+
+    /* Modal dialogs full-width on small screens */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    .modal-dialog .modal-content {
+        border-radius: 18px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    /* Topbar header — very small screens */
+    .surface-admin-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
+
+    /* Tables — allow horizontal scroll at any size */
+    .surface-admin-content table {
+        font-size: 0.82rem;
+    }
+
+    /* Buttons in action bars — shrink text */
+    .surface-admin-header-actions .surface-button-ghost,
+    .surface-admin-header-actions .surface-button-secondary {
+        font-size: 0.78rem;
+        padding: 0.35rem 0.7rem;
+    }
+
+    /* Page title on very small screens */
+    .surface-admin-heading h1.h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Stack admin heading — allow subtitle to wrap */
+    .surface-admin-heading {
+        flex-wrap: wrap;
+    }
+
+    /* Sidebar operator name — hide on very small */
+    .surface-admin-operator.d-none {
+        display: none !important;
+    }
+
+    /* Give form labels more space */
+    .surface-admin-content .form-label {
+        font-size: 0.85rem;
+    }
+}
+
+/* ── Sticky header on mobile so the burger stays accessible ─────── */
+.surface-admin-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+/* ── Prevent whole-page horizontal scroll ───────────────────────── */
+.surface-admin-shell,
+.surface-admin-main {
+    max-width: 100%;
+    overflow-x: hidden;
 }
