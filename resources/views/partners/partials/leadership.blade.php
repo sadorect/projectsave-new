@@ -18,7 +18,11 @@
 </div>
 
 <div id="leadershipDetails" class="d-none mt-4" aria-hidden="true">
-    <div class="leadership-entry public-card p-4">
+    <div class="leadership-entry public-card p-4 position-relative">
+        <button type="button" class="remove-leadership-entry btn btn-sm btn-outline-danger position-absolute d-none"
+                style="top: 0.75rem; right: 0.75rem;" aria-label="Remove this entry">
+            <i class="bi bi-trash"></i> Remove
+        </button>
         <div class="row g-3">
             <div class="col-md-6">
                 <label class="form-label fw-semibold">Name of Church or Fellowship</label>

@@ -245,8 +245,12 @@ public function getNextCelebrationDateAttribute()
 
 public function hasRole($role, ?string $guard = null): bool
 {
-    if ($this->spatieHasRole($role, $guard)) {
-        return true;
+    try {
+        if ($this->spatieHasRole($role, $guard)) {
+            return true;
+        }
+    } catch (\Illuminate\Database\QueryException) {
+        // Spatie role tables may not exist; fall through to legacy role lookup.
     }
 
     $roles = $this->relationLoaded('roles') ? $this->roles : $this->roles()->get();
@@ -272,6 +276,8 @@ public function hasPermission($permission): bool
         }
     } catch (PermissionDoesNotExist) {
         // Fall through to legacy slug lookup for transitional compatibility.
+    } catch (\Illuminate\Database\QueryException) {
+        // Spatie permission tables may not exist yet; fall through to legacy lookup.
     }
 
     if (! is_string($permission)) {

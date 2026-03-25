@@ -119,12 +119,18 @@
                         </div>
 
                         <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-2 site-nav-actions">
+                            <a href="{{ route('partners.create', ['type' => 'ground']) }}" class="site-nav-give-btn">
+                                <i class="fas fa-hand-holding-heart"></i>
+                                <span>Partner</span>
+                            </a>
+
                             @guest
                                 <a href="{{ route('login') }}" class="site-account-link">Login</a>
-                                <a href="{{ route('register') }}" class="surface-button-secondary">Create account</a>
                             @else
-                                <a href="{{ $dashboardRoute }}" class="site-account-link">Dashboard</a>
-                                <a href="{{ route('asom.welcome') }}" class="site-account-link">My learning</a>
+                                <a href="{{ $dashboardRoute }}" class="site-account-link">
+                                    <i class="fas fa-th-large" style="font-size:0.75rem;opacity:0.7;"></i>
+                                    Dashboard
+                                </a>
                                 <form method="POST" action="{{ route('logout') }}" class="m-0">
                                     @csrf
                                     <button type="submit" class="surface-button-ghost">Logout</button>

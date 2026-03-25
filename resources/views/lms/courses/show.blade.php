@@ -11,25 +11,26 @@
                         <div class="row g-4 align-items-end">
                             <div class="col-xl-7">
                                 <div class="lms-course-hero-copy">
-                                    <span class="surface-eyebrow border-0 bg-white/10 text-white">Course Detail</span>
+                                    <span class="lms-hero-eyebrow">Course Detail</span>
                                     <h1>{{ $course->title }}</h1>
-                                    <p class="lead mb-0 text-white-50">{{ $courseLead }}</p>
+                                    <p class="lms-hero-lead mb-0">{{ $courseLead }}</p>
 
                                     <div class="lms-dashboard-actions mt-4">
                                         @if($isEnrolled && $nextLesson)
-                                            <a href="{{ route('lms.lessons.show', [$course->slug, $nextLesson->slug]) }}" class="btn btn-light rounded-pill px-4">
+                                            <a href="{{ route('lms.lessons.show', [$course->slug, $nextLesson->slug]) }}" class="lms-landing-btn-primary">
+                                                <i class="bi bi-play-circle-fill"></i>
                                                 {{ $progress > 0 ? 'Continue learning' : 'Start course' }}
                                             </a>
-                                            <a href="{{ route('lms.lessons.index', $course->slug) }}" class="surface-button-ghost text-white">Open lesson outline</a>
+                                            <a href="{{ route('lms.lessons.index', $course->slug) }}" class="lms-landing-btn-ghost">Open lesson outline</a>
                                         @elseif(auth()->check())
                                             <form action="{{ route('lms.courses.enroll', $course->slug) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="btn btn-light rounded-pill px-4">Enroll now</button>
+                                                <button type="submit" class="lms-landing-btn-primary"><i class="bi bi-plus-circle-fill"></i>Enroll now</button>
                                             </form>
-                                            <a href="{{ route('lms.dashboard') }}" class="surface-button-ghost text-white">Open my workspace</a>
+                                            <a href="{{ route('lms.dashboard') }}" class="lms-landing-btn-ghost">Open my workspace</a>
                                         @else
-                                            <a href="{{ route('asom.register') }}" class="btn btn-light rounded-pill px-4">Register to enroll</a>
-                                            <a href="{{ route('login') }}" class="surface-button-ghost text-white">Sign in</a>
+                                            <a href="{{ route('asom.register') }}" class="lms-landing-btn-primary"><i class="bi bi-person-fill-add"></i>Register to enroll</a>
+                                            <a href="{{ route('login') }}" class="lms-landing-btn-ghost">Sign in</a>
                                         @endif
                                     </div>
 
@@ -46,7 +47,7 @@
 
                             <div class="col-xl-5">
                                 <div class="lms-course-hero-panel">
-                                    <span class="surface-eyebrow border-0 bg-white/10 text-white">Inside this learning track</span>
+                                        <span class="lms-hero-eyebrow">Inside this learning track</span>
                                     <div class="d-grid gap-3 mt-3">
                                         @forelse($courseHeroHighlights as $highlight)
                                             <div class="lms-course-hero-highlight">

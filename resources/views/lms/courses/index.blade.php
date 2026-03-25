@@ -17,23 +17,23 @@
                         <div class="row g-4 align-items-end">
                             <div class="col-xl-7">
                                 <div class="lms-landing-copy">
-                                    <span class="surface-eyebrow border-0 bg-white/10 text-white">{{ $catalogHero['eyebrow'] }}</span>
+                                    <span class="lms-hero-eyebrow">{{ $catalogHero['eyebrow'] }}</span>
                                     <h1>{{ $catalogHero['title'] }}</h1>
-                                    <p class="lead mb-0 text-white-50">{{ $catalogHero['lead'] }}</p>
-                                    <p class="mb-0 text-white-50">{{ $catalogHero['body'] }}</p>
+                                    <p class="lms-hero-lead mb-0">{{ $catalogHero['lead'] }}</p>
+                                    <p class="lms-hero-body mb-0">{{ $catalogHero['body'] }}</p>
 
                                     <div class="lms-landing-welcome-note">
                                         <strong>{{ $catalogHero['welcome_title'] }}</strong>
                                         <span>{{ $catalogHero['welcome_copy'] }}</span>
                                     </div>
 
-                                    <div class="lms-dashboard-actions mt-4">
+                                    <div class="lms-dashboard-actions">
                                         @auth
-                                            <a href="{{ $catalogHero['authenticated_primary_url'] }}" class="btn btn-light rounded-pill px-4">{{ $catalogHero['authenticated_primary_label'] }}</a>
-                                            <a href="{{ $catalogHero['secondary_cta_url'] }}" class="surface-button-ghost text-white">{{ $catalogHero['secondary_cta_label'] }}</a>
+                                            <a href="{{ $catalogHero['authenticated_primary_url'] }}" class="lms-landing-btn-primary"><i class="bi bi-grid-3x3-gap-fill"></i>{{ $catalogHero['authenticated_primary_label'] }}</a>
+                                            <a href="{{ $catalogHero['secondary_cta_url'] }}" class="lms-landing-btn-ghost">{{ $catalogHero['secondary_cta_label'] }}</a>
                                         @else
-                                            <a href="{{ $catalogHero['primary_cta_url'] }}" class="btn btn-light rounded-pill px-4">{{ $catalogHero['primary_cta_label'] }}</a>
-                                            <a href="{{ $catalogHero['secondary_cta_url'] }}" class="surface-button-ghost text-white">{{ $catalogHero['secondary_cta_label'] }}</a>
+                                            <a href="{{ $catalogHero['primary_cta_url'] }}" class="lms-landing-btn-primary"><i class="bi bi-play-circle-fill"></i>{{ $catalogHero['primary_cta_label'] }}</a>
+                                            <a href="{{ $catalogHero['secondary_cta_url'] }}" class="lms-landing-btn-ghost">{{ $catalogHero['secondary_cta_label'] }}</a>
                                         @endauth
                                     </div>
 
@@ -68,9 +68,9 @@
                                         </div>
                                     </div>
 
-                                    <div class="lms-landing-visual-note">
-                                        <span class="surface-eyebrow border-0 bg-white/10 text-white">{{ $catalogHero['identity_eyebrow'] }}</span>
-                                        <p class="mb-0">{{ $catalogHero['identity_copy'] }}</p>
+                                    <div class="lms-landing-welcome-note">
+                                        <span class="lms-hero-eyebrow">{{ $catalogHero['identity_eyebrow'] }}</span>
+                                        <p class="mb-0 mt-2">{{ $catalogHero['identity_copy'] }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -81,11 +81,11 @@
         </section>
 
         <section class="lms-section-shell">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
                 <div>
                     <span class="surface-eyebrow">Published catalog</span>
-                    <h2 class="mt-3 mb-2">Course Catalog</h2>
-                    <p class="mb-0 text-muted">
+                    <h2 class="lms-section-title">Course Catalog</h2>
+                    <p class="lms-section-lead mb-0 mt-2">
                         Review every published ASOM course below, compare the lesson and exam load, and move forward into
                         a learning path that now opens with ministry context before the course inventory itself.
                     </p>
@@ -112,8 +112,8 @@
                                 @endif
                             </div>
                             <div>
-                                <h3 class="h4 mb-2">{{ $course->title }}</h3>
-                                <p class="text-muted mb-2">{{ $course->description_excerpt }}</p>
+                                <h3 class="h5 mb-2">{{ $course->title }}</h3>
+                                <p class="text-muted small mb-2">{{ $course->description_excerpt }}</p>
                                 <small class="text-muted">Instructor: {{ $course->instructor_name }}</small>
                             </div>
                             @if($course->is_enrolled)

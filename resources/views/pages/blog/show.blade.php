@@ -5,31 +5,40 @@
     <x-ui.public-page-hero
         eyebrow="Devotional"
         :title="$post->title"
-        :subtitle="trim((optional($post->published_at)->format('F d, Y') ?? '') . ' | ' . ($post->author ?? 'Projectsave International'), ' |')"
+        :subtitle="trim((optional($post->published_at)->format('F d, Y') ?? '') . ' · ' . ($post->author ?? 'Projectsave International'), ' ·')"
     >
         <x-slot:actions>
-            <a href="{{ route('blog.index') }}" class="surface-button-secondary">Back to devotionals</a>
-            <a href="{{ route('contact.show') }}" class="surface-button-primary">Contact the ministry</a>
+            <a href="{{ route('blog.index') }}" class="surface-button-secondary">
+                <i class="bi bi-arrow-left me-2"></i>All devotionals
+            </a>
+            <a href="{{ route('contact.show') }}" class="surface-button-primary">
+                <i class="bi bi-envelope me-2"></i>Contact ministry
+            </a>
         </x-slot:actions>
     </x-ui.public-page-hero>
 
-    <section class="surface-section pt-2">
+    <section class="surface-section">
         <div class="surface-frame">
-            <div class="row g-4 align-items-start">
+            <div class="row g-5 align-items-start">
+
+                {{-- Article --}}
                 <div class="col-lg-8">
-                    <article class="public-card p-4 p-lg-5">
+                    <article class="devotional-article">
+
                         @if($post->image)
-                            <div class="public-image-frame mb-4">
+                            <div class="public-image-frame mb-4" style="aspect-ratio:16/7;border-radius:14px;">
                                 <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" loading="lazy">
                             </div>
                         @endif
 
                         @if($post->bible_text)
-                            <div class="public-chip mb-3">{{ $post->bible_text }}</div>
+                            <div class="devotional-scripture-box">
+                                <i class="bi bi-book me-2"></i>{{ $post->bible_text }}
+                            </div>
                         @endif
 
                         @if($post->subtitle)
-                            <h2 class="h4 mb-3">{{ $post->subtitle }}</h2>
+                            <h2 style="font-size:1.18rem;font-weight:700;color:#0f172a;margin-bottom:1.25rem;line-height:1.4;">{{ $post->subtitle }}</h2>
                         @endif
 
                         <div class="public-richtext">
@@ -37,9 +46,12 @@
                         </div>
 
                         @if($post->action_point)
-                            <div class="public-card mt-4 p-4">
-                                <div class="public-kicker mb-2">Action point</div>
-                                <p class="mb-0">{{ $post->action_point }}</p>
+                            <div class="devotional-action-point">
+                                <div class="devotional-action-label">
+                                    <i class="bi bi-lightning-charge-fill"></i>
+                                    Action point
+                                </div>
+                                <p style="font-size:0.95rem;color:#374151;line-height:1.75;margin:0;">{{ $post->action_point }}</p>
                             </div>
                         @endif
 
@@ -51,19 +63,19 @@
                             </div>
                         @endif
 
-                        <div class="d-flex justify-content-between gap-3 mt-5">
+                        <div class="article-nav">
                             @if($previous)
-                                <a href="{{ route('posts.show', $previous->slug) }}" class="surface-button-secondary">
+                                <a href="{{ route('posts.show', $previous->slug) }}" class="article-nav-link">
                                     <i class="bi bi-arrow-left"></i>
-                                    Previous article
+                                    Previous
                                 </a>
                             @else
                                 <span></span>
                             @endif
 
                             @if($next)
-                                <a href="{{ route('posts.show', $next->slug) }}" class="surface-button-secondary">
-                                    Next article
+                                <a href="{{ route('posts.show', $next->slug) }}" class="article-nav-link">
+                                    Next
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
                             @endif
@@ -72,20 +84,20 @@
 
                     @if($relatedPosts->isNotEmpty())
                         <div class="mt-5">
-                            <x-ui.public-section-heading
-                                eyebrow="Keep reading"
-                                title="Related devotionals"
-                            />
+                            <span class="page-section-eyebrow">Keep reading</span>
+                            <h2 class="page-section-title" style="font-size:1.5rem;">Related devotionals</h2>
 
                             <div class="row g-3 mt-1">
                                 @foreach($relatedPosts as $relatedPost)
                                     <div class="col-md-6">
-                                        <article class="public-card p-4">
-                                            <div class="public-chip mb-3">{{ optional($relatedPost->published_at)->format('M d, Y') }}</div>
-                                            <h3 class="h5 mb-2">
-                                                <a href="{{ route('posts.show', $relatedPost->slug) }}" class="text-decoration-none">{{ $relatedPost->title }}</a>
-                                            </h3>
-                                            <p class="mb-0 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($relatedPost->details), 120) }}</p>
+                                        <article class="devotional-card">
+                                            <div class="devotional-card-body">
+                                                <span class="public-chip">{{ optional($relatedPost->published_at)->format('M d, Y') }}</span>
+                                                <h3 class="m-0">
+                                                    <a href="{{ route('posts.show', $relatedPost->slug) }}" class="devotional-card-title">{{ $relatedPost->title }}</a>
+                                                </h3>
+                                                <p class="devotional-card-excerpt">{{ \Illuminate\Support\Str::limit(strip_tags($relatedPost->details), 120) }}</p>
+                                            </div>
                                         </article>
                                     </div>
                                 @endforeach
@@ -94,19 +106,17 @@
                     @endif
                 </div>
 
+                {{-- Sidebar --}}
                 <div class="col-lg-4">
                     <div class="d-flex flex-column gap-4">
                         <div class="public-sidebar-card">
-                            <x-ui.public-section-heading
-                                eyebrow="Search"
-                                title="Find another devotional"
-                            />
-
-                            <form method="GET" action="{{ route('search') }}" class="mt-4">
-                                <label for="devotional-search" class="form-label fw-semibold">Search keyword</label>
+                            <span class="page-section-eyebrow mb-2 d-block">Search</span>
+                            <h3 style="font-size:1rem;font-weight:700;color:#0f172a;margin-bottom:0.8rem;">Find another devotional</h3>
+                            <form method="GET" action="{{ route('search') }}">
+                                <label for="devotional-search" class="visually-hidden">Search keyword</label>
                                 <div class="d-flex gap-2">
                                     <input id="devotional-search" class="form-control" type="text" name="q" placeholder="Faith, prayer, mission...">
-                                    <button class="surface-button-primary" type="submit">Go</button>
+                                    <button class="surface-button-primary" type="submit"><i class="bi bi-search"></i></button>
                                 </div>
                             </form>
                         </div>
@@ -120,17 +130,14 @@
                         />
 
                         <div class="public-sidebar-card">
-                            <x-ui.public-section-heading
-                                eyebrow="Recent"
-                                title="Recent devotionals"
-                            />
-
-                            <div class="d-flex flex-column gap-3 mt-4">
+                            <span class="page-section-eyebrow mb-2 d-block">Recent</span>
+                            <h3 style="font-size:1rem;font-weight:700;color:#0f172a;margin-bottom:0.8rem;">Recent devotionals</h3>
+                            <div class="d-flex flex-column gap-2">
                                 @foreach($recentPosts as $recentPost)
                                     <a href="{{ route('posts.show', $recentPost->slug) }}" class="text-decoration-none">
-                                        <div class="border rounded-4 p-3">
-                                            <h3 class="h6 mb-1">{{ $recentPost->title }}</h3>
-                                            <small class="text-muted">{{ optional($recentPost->published_at)->format('M d, Y') }}</small>
+                                        <div style="border:1px solid rgba(148,163,184,0.15);border-radius:12px;padding:0.75rem 1rem;background:#f8fafc;">
+                                            <p style="font-size:0.87rem;font-weight:600;color:#0f172a;margin:0 0 0.15rem;">{{ $recentPost->title }}</p>
+                                            <small style="color:#94a3b8;font-size:0.75rem;">{{ optional($recentPost->published_at)->format('M d, Y') }}</small>
                                         </div>
                                     </a>
                                 @endforeach
@@ -138,14 +145,11 @@
                         </div>
 
                         <div class="public-sidebar-card">
-                            <x-ui.public-section-heading
-                                eyebrow="Categories"
-                                title="Topics"
-                            />
-
-                            <div class="d-flex flex-wrap gap-2 mt-4">
+                            <span class="page-section-eyebrow mb-2 d-block">Categories</span>
+                            <h3 style="font-size:1rem;font-weight:700;color:#0f172a;margin-bottom:0.8rem;">Topics</h3>
+                            <div class="d-flex flex-wrap gap-2">
                                 @foreach($categories as $category)
-                                    <span class="public-chip">{{ $category->name }} ({{ $category->posts_count }})</span>
+                                    <span class="public-chip" style="cursor:default;">{{ $category->name }} ({{ $category->posts_count }})</span>
                                 @endforeach
                             </div>
                         </div>
