@@ -9,7 +9,7 @@
             <div class="text-sm text-white-50 text-uppercase tracking-[0.2em]">Projectsave</div>
             <div class="fs-5 fw-semibold text-white" id="adminSidebarLabel">Back Office</div>
         </div>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close navigation"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Close navigation"></button>
     </div>
 
     <div class="offcanvas-body d-flex flex-column gap-4 p-0">

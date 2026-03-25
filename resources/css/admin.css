@@ -3,6 +3,33 @@
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 @import "./system.css";
 
+/* ─── Skip-to-content (accessibility link must stay off-screen until focused) ─ */
+.skip-to-content {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: -9999;
+}
+
+.skip-to-content:focus {
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    width: auto;
+    height: auto;
+    z-index: 9999;
+    overflow: visible;
+    border-radius: 12px;
+    background: #c1121f;
+    color: #ffffff;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
 /* ─── Design tokens ──────────────────────────────────────────────────── */
 .surface-admin {
     --surface-brand: #c1121f;
@@ -1017,8 +1044,6 @@
     .surface-sidebar-shell {
         position: sticky;
         top: 0;
-        max-height: 100vh;
-        overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
     }

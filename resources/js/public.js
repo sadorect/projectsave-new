@@ -27,10 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Close when clicking outside the nav panel or toggle button
         document.addEventListener("click", (e) => {
-            if (
-                !navPanel.contains(e.target) &&
-                !navToggle.contains(e.target)
-            ) {
+            if (!navPanel.contains(e.target) && !navToggle.contains(e.target)) {
                 navPanel.classList.remove("is-open");
                 navToggle.setAttribute("aria-expanded", "false");
             }
