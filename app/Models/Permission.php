@@ -10,6 +10,8 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
 
 class Permission extends SpatiePermission
 {
+    protected string $guard_name = 'web';
+
     protected $fillable = ['name', 'slug', 'description', 'category', 'guard_name'];
 
     protected static function booted(): void
@@ -23,6 +25,16 @@ class Permission extends SpatiePermission
             $permission->guard_name ??= config('auth.defaults.guard', 'web');
             $permission->slug ??= Str::slug($permission->name);
         });
+    }
+
+    public function getGuardNameAttribute(?string $value): string
+    {
+        return $value ?: config('auth.defaults.guard', 'web');
+    }
+
+    protected function getDefaultGuardName(): string
+    {
+        return $this->guard_name;
     }
 
     public static function findByName(string $name, ?string $guardName = null): PermissionContract

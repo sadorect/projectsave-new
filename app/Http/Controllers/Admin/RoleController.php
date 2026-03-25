@@ -12,14 +12,18 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::with('permissions')->get();
+        $roles = Role::with('permissions')
+            ->orderBy('name')
+            ->get();
+
         return view('admin.roles.index', compact('roles'));
     }
 
     public function create()
     {
-        $permissions = Permission::all();
-        return view('admin.roles.create', compact('permissions'));
+        $permissionGroups = $this->permissionGroups();
+
+        return view('admin.roles.create', compact('permissionGroups'));
     }
 
     public function store(Request $request)
@@ -27,18 +31,23 @@ class RoleController extends Controller
         $validated = $request->validate([
             'name' => 'required|unique:roles,name',
             'description' => 'nullable|string',
-            'permissions' => 'array|exists:permissions,id'
+            'permissions' => 'array|nullable',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
 
         $role = Role::create([
             'name' => $validated['name'],
             'slug' => Str::slug($validated['name']),
-            'description' => $validated['description']
+            'description' => $validated['description'] ?? null,
+            'guard_name' => config('auth.defaults.guard', 'web'),
         ]);
 
-        if (!empty($validated['permissions'])) {
-            $role->permissions()->attach($validated['permissions']);
-        }
+        $permissions = Permission::query()
+            ->whereIn('id', $validated['permissions'] ?? [])
+            ->where('guard_name', config('auth.defaults.guard', 'web'))
+            ->get();
+
+        $role->syncPermissions($permissions);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role created successfully');
@@ -46,8 +55,9 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
-        $permissions = Permission::all();
-        return view('admin.roles.edit', compact('role', 'permissions'));
+        $permissionGroups = $this->permissionGroups();
+
+        return view('admin.roles.edit', compact('role', 'permissionGroups'));
     }
 
     public function update(Request $request, Role $role)
@@ -55,16 +65,22 @@ class RoleController extends Controller
         $validated = $request->validate([
             'name' => 'required|unique:roles,name,' . $role->id,
             'description' => 'nullable|string',
-            'permissions' => 'array|exists:permissions,id'
+            'permissions' => 'array|nullable',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
 
         $role->update([
             'name' => $validated['name'],
             'slug' => Str::slug($validated['name']),
-            'description' => $validated['description']
+            'description' => $validated['description'] ?? null,
         ]);
 
-        $role->permissions()->sync($validated['permissions'] ?? []);
+        $permissions = Permission::query()
+            ->whereIn('id', $validated['permissions'] ?? [])
+            ->where('guard_name', config('auth.defaults.guard', 'web'))
+            ->get();
+
+        $role->syncPermissions($permissions);
 
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role updated successfully');
@@ -75,5 +91,14 @@ class RoleController extends Controller
         $role->delete();
         return redirect()->route('admin.roles.index')
             ->with('success', 'Role deleted successfully');
+    }
+
+    private function permissionGroups()
+    {
+        return Permission::query()
+            ->orderByRaw("COALESCE(category, 'Uncategorized')")
+            ->orderBy('name')
+            ->get()
+            ->groupBy(fn (Permission $permission) => $permission->category ?: 'Uncategorized');
     }
 }

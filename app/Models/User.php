@@ -33,6 +33,8 @@ class User extends Authenticatable implements MustVerifyEmail
         hasPermissionTo as protected spatieHasPermissionTo;
     }
 
+    protected string $guard_name = 'web';
+
     /**
       * The attributes that are mass assignable.
       *
@@ -86,6 +88,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'preferences' => 'array',
         'notification_preferences' => 'array',
     ];
+
+    protected function getDefaultGuardName(): string
+    {
+        return $this->guard_name;
+    }
 
     public function videoInteractions()
     {

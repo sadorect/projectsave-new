@@ -1,18 +1,13 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Edit Role')
+@section('page_subtitle', 'Adjust role coverage without losing visibility into category-level permissions.')
 
 @section('content')
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12 mb-4">
-            <h1>Edit Role: {{ $role->name }}</h1>
-        </div>
-    </div>
-
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.roles.update', $role) }}" method="POST">
+            <form action="{{ route('admin.roles.update', $role) }}" method="POST" id="role-edit-form">
                 @csrf
                 @method('PUT')
 
@@ -35,35 +30,11 @@
                     @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label">Permissions</label>
-                    <div class="row">
-                        @foreach($permissions->groupBy('category') as $category => $categoryPermissions)
-                            <div class="col-md-4 mb-3">
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">{{ $category }}</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        @foreach($categoryPermissions as $permission)
-                                            <div class="form-check mb-2">
-                                                <input type="checkbox" class="form-check-input" 
-                                                       name="permissions[]" 
-                                                       value="{{ $permission->id }}" 
-                                                       id="permission_{{ $permission->id }}"
-                                                       {{ $role->permissions->contains($permission->id) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="permission_{{ $permission->id }}">
-                                                    {{ $permission->name }}
-                                                    <small class="d-block text-muted">{{ $permission->description }}</small>
-                                                </label>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+                @include('admin.roles.partials.permission-matrix', [
+                    'permissionGroups' => $permissionGroups,
+                    'selectedPermissions' => old('permissions', $role->permissions->pluck('id')->all()),
+                    'formId' => 'role-edit-form',
+                ])
 
                 <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>

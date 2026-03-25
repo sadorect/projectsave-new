@@ -167,9 +167,12 @@ Route::prefix('admin')->group(function() {
             Route::put('roles/{role}', [RoleController::class, 'update'])->name('admin.roles.update');
             Route::delete('roles/{role}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');
             Route::get('permissions', [PermissionController::class, 'index'])->name('admin.permissions.index');
+            Route::get('permissions/{permission}/edit', [PermissionController::class, 'edit'])->name('admin.permissions.edit');
         });
         Route::middleware('permission:manage-user-roles,manage-roles,admin')->group(function () {
             Route::post('permissions', [PermissionController::class, 'store'])->name('admin.permissions.store');
+            Route::put('permissions/{permission}', [PermissionController::class, 'update'])->name('admin.permissions.update');
+            Route::delete('permissions/{permission}', [PermissionController::class, 'destroy'])->name('admin.permissions.destroy');
         });
         Route::middleware('permission:manage-user-sessions,admin')->group(function () {
             Route::get('sessions', [\App\Http\Controllers\Admin\AdminSessionController::class, 'index'])->name('admin.sessions.index');

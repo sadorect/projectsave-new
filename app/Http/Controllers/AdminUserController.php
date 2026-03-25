@@ -249,8 +249,14 @@ class AdminUserController extends Controller
         }
 
         $user->update($validated);
+        $guardName = config('auth.defaults.guard', 'web');
         $roles = Role::query()
             ->whereIn('id', $validated['roles'] ?? [])
+            ->where(function ($query) use ($guardName) {
+                $query->where('guard_name', $guardName)
+                    ->orWhereNull('guard_name')
+                    ->orWhere('guard_name', '');
+            })
             ->get();
 
         $user->syncRoles($roles);

@@ -1,18 +1,13 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Create Role')
+@section('page_subtitle', 'Build focused admin roles by assigning permissions in clear category groups.')
 
 @section('content')
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12 mb-4">
-            <h1>Create New Role</h1>
-        </div>
-    </div>
-
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.roles.store') }}" method="POST">
+            <form action="{{ route('admin.roles.store') }}" method="POST" id="role-create-form">
                 @csrf
 
                 <div class="mb-3">
@@ -33,35 +28,11 @@
                     @enderror
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label">Permissions</label>
-                    <div class="row">
-                        @foreach($permissions->groupBy('category') as $category => $categoryPermissions)
-                            <div class="col-md-4 mb-3">
-                                <div class="card">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">{{ $category }}</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        @foreach($categoryPermissions as $permission)
-                                            <div class="form-check mb-2">
-                                                <input type="checkbox" class="form-check-input" 
-                                                       name="permissions[]" 
-                                                       value="{{ $permission->id }}" 
-                                                       id="permission_{{ $permission->id }}"
-                                                       {{ (old('permissions') && in_array($permission->id, old('permissions'))) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="permission_{{ $permission->id }}">
-                                                    {{ $permission->name }}
-                                                    <small class="d-block text-muted">{{ $permission->description }}</small>
-                                                </label>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+                @include('admin.roles.partials.permission-matrix', [
+                    'permissionGroups' => $permissionGroups,
+                    'selectedPermissions' => old('permissions', []),
+                    'formId' => 'role-create-form',
+                ])
 
                 <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('admin.roles.index') }}" class="btn btn-secondary">Cancel</a>

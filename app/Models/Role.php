@@ -10,6 +10,8 @@ use Spatie\Permission\Models\Role as SpatieRole;
 
 class Role extends SpatieRole
 {
+    protected string $guard_name = 'web';
+
     protected $fillable = ['name', 'slug', 'description', 'guard_name'];
 
     protected static function booted(): void
@@ -23,6 +25,16 @@ class Role extends SpatieRole
             $role->guard_name ??= config('auth.defaults.guard', 'web');
             $role->slug ??= Str::slug($role->name);
         });
+    }
+
+    public function getGuardNameAttribute(?string $value): string
+    {
+        return $value ?: config('auth.defaults.guard', 'web');
+    }
+
+    protected function getDefaultGuardName(): string
+    {
+        return $this->guard_name;
     }
 
     public static function findByName(string $name, ?string $guardName = null): RoleContract
