@@ -28,7 +28,28 @@ return new class extends Migration
 
         $desiredPrimary = ['role_id', 'model_id', 'model_type'];
 
-        if ($primaryColumns !== [] && $primaryColumns !== $desiredPrimary) {
+        $userIdForeignKeys = collect(DB::select(
+            "SELECT CONSTRAINT_NAME
+             FROM information_schema.KEY_COLUMN_USAGE
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'role_user'
+               AND COLUMN_NAME = 'user_id'
+               AND REFERENCED_TABLE_NAME IS NOT NULL"
+        ))->pluck('CONSTRAINT_NAME');
+
+        $userIdIndexes = collect(DB::select("SHOW INDEX FROM role_user WHERE Column_name = 'user_id'"))
+            ->pluck('Key_name')
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($userIdForeignKeys->isNotEmpty() && ! in_array('role_user_user_id_index', $userIdIndexes, true)) {
+            Schema::table('role_user', function (Blueprint $table) {
+                $table->index('user_id', 'role_user_user_id_index');
+            });
+        }
+
+        if (in_array('user_id', $primaryColumns, true) && $primaryColumns !== $desiredPrimary) {
             DB::statement('ALTER TABLE role_user DROP PRIMARY KEY');
         }
 
