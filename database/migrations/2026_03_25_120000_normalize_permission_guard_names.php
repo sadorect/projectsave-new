@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -9,15 +10,19 @@ return new class extends Migration
     {
         $defaultGuard = config('auth.defaults.guard', 'web');
 
-        DB::table('roles')
-            ->whereNull('guard_name')
-            ->orWhere('guard_name', '')
-            ->update(['guard_name' => $defaultGuard]);
+        if (Schema::hasTable('roles') && Schema::hasColumn('roles', 'guard_name')) {
+            DB::table('roles')
+                ->whereNull('guard_name')
+                ->orWhere('guard_name', '')
+                ->update(['guard_name' => $defaultGuard]);
+        }
 
-        DB::table('permissions')
-            ->whereNull('guard_name')
-            ->orWhere('guard_name', '')
-            ->update(['guard_name' => $defaultGuard]);
+        if (Schema::hasTable('permissions') && Schema::hasColumn('permissions', 'guard_name')) {
+            DB::table('permissions')
+                ->whereNull('guard_name')
+                ->orWhere('guard_name', '')
+                ->update(['guard_name' => $defaultGuard]);
+        }
     }
 
     public function down(): void
