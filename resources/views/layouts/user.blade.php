@@ -44,7 +44,7 @@
 
                         <div class="surface-admin-header-actions">
                             @if(auth()->user()->hasBackofficeAccess())
-                                <a href="{{ route(auth()->user()->preferredBackofficeRoute() ?? 'admin.dashboard') }}" class="surface-button-ghost">Open back office</a>
+                                <a href="{{ route('admin.open') }}" class="surface-button-ghost">Open back office</a>
                             @endif
                             <a href="{{ route('home') }}" class="surface-button-secondary">Return to public site</a>
                         </div>

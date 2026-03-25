@@ -4,6 +4,7 @@
 @section('page_subtitle', 'Update the permission definition and immediately review which roles inherit it.')
 
 @section('content')
+@php($selectedRoleIds = collect(old('roles', $permission->roles->pluck('id')->all()))->map(fn ($roleId) => (int) $roleId)->all())
 <div class="container-fluid">
     <div class="card">
         <div class="card-body">
@@ -23,7 +24,7 @@
 
                         <div class="mb-3">
                             <label for="category" class="form-label">Category</label>
-                            <input type="text" id="category" name="category" class="form-control @error('category') is-invalid @enderror" value="{{ old('category', $permission->category) }}">
+                            <input type="text" id="category" name="category" list="permission-category-options" class="form-control @error('category') is-invalid @enderror" value="{{ old('category', $permission->category) }}">
                             @error('category')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -39,6 +40,9 @@
 
                         <div class="small text-muted">
                             Slug: {{ $permission->slug }}
+                        </div>
+                        <div class="small text-muted mt-1">
+                            Guard: {{ $permission->guard_name }}
                         </div>
                     </div>
 
@@ -60,7 +64,7 @@
                                         value="{{ $role->id }}"
                                         class="form-check-input"
                                         id="role-{{ $role->id }}"
-                                        {{ in_array($role->id, old('roles', $permission->roles->pluck('id')->all()), true) ? 'checked' : '' }}
+                                        {{ in_array($role->id, $selectedRoleIds, true) ? 'checked' : '' }}
                                     >
                                     <label class="form-check-label" for="role-{{ $role->id }}">
                                         {{ $role->name }}
@@ -82,4 +86,10 @@
         </div>
     </div>
 </div>
+
+<datalist id="permission-category-options">
+    @foreach($categories as $category)
+        <option value="{{ $category }}"></option>
+    @endforeach
+</datalist>
 @endsection

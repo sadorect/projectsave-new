@@ -6,7 +6,12 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12 mb-4 d-flex justify-content-between align-items-center">
+        <div class="col-md-12 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary-subtle text-primary px-3 py-2">{{ $roles->count() }} roles</span>
+                <span class="badge bg-secondary-subtle text-secondary px-3 py-2">{{ $roles->sum(fn ($role) => $role->permissions->count()) }} permission assignments</span>
+            </div>
+
             <a href="{{ route('admin.roles.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i>Create New Role
             </a>
@@ -21,6 +26,7 @@
                             <th>Name</th>
                             <th>Description</th>
                             <th>Permissions</th>
+                            <th>Guard</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -47,6 +53,9 @@
                                     @if($role->permissions->count() > 6)
                                         <span class="badge bg-light text-dark mb-1">+{{ $role->permissions->count() - 6 }} more</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ $role->guard_name }}</span>
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">

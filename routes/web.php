@@ -134,6 +134,7 @@ Route::prefix('admin')->group(function() {
     Route::get('/login', [AdminController::class, 'loginForm'])->name('admin.login.form');
     Route::post('/login', [AdminController::class, 'login'])->name('admin.login')->middleware('throttle:5,1');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
+    Route::get('/open', [AdminController::class, 'open'])->middleware(['auth', 'verified'])->name('admin.open');
     
     // Permission-aware Admin Routes
     Route::middleware(['auth', 'verified', 'permission:access-admin-dashboard,admin'])->group(function() {

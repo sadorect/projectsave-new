@@ -28,7 +28,7 @@
     ];
 
     $workspaceItems = collect([
-        $user->hasBackofficeAccess() ? ['label' => 'Primary Workspace', 'route' => route($user->dashboardRoute()), 'icon' => 'bi bi-briefcase', 'active' => request()->routeIs('admin.*') || request()->routeIs('news.*') || request()->routeIs('videos.*')] : null,
+        $user->hasBackofficeAccess() ? ['label' => 'Primary Workspace', 'route' => route('admin.open'), 'icon' => 'bi bi-briefcase', 'active' => request()->routeIs('admin.*') || request()->routeIs('news.*') || request()->routeIs('videos.*')] : null,
         ($user->isAdmin() || $user->hasPermission('manage-files')) ? ['label' => 'My Files', 'route' => route('user.files'), 'icon' => 'bi bi-folder2-open', 'active' => request()->routeIs('user.files') || request()->routeIs('files.*')] : null,
     ])->filter()->values();
 @endphp

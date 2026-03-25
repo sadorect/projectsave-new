@@ -153,6 +153,14 @@
                         const visible = item.textContent.toLowerCase().includes(term);
                         item.classList.toggle('is-hidden', !visible);
                     });
+
+                    matrix.querySelectorAll('[data-permission-category]').forEach(function (category) {
+                        const hasVisibleItems = Array.from(category.querySelectorAll('[data-permission-item]')).some(function (item) {
+                            return !item.classList.contains('is-hidden');
+                        });
+
+                        category.classList.toggle('d-none', !hasVisibleItems);
+                    });
                 });
 
                 syncCount();

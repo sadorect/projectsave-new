@@ -44,6 +44,38 @@
                             </div>
                         </div>
 
+                        @php($selectedRoles = collect(old('roles', []))->map(fn ($roleId) => (int) $roleId)->all())
+                        <div class="mb-4">
+                            <label class="form-label">Roles</label>
+                            <div class="small text-muted mb-2">A user can hold more than one role at the same time.</div>
+                            <div class="border rounded p-3">
+                                @forelse($roles as $role)
+                                    <div class="form-check mb-2">
+                                        <input
+                                            type="checkbox"
+                                            name="roles[]"
+                                            value="{{ $role->id }}"
+                                            class="form-check-input"
+                                            id="create-role-{{ $role->id }}"
+                                            {{ in_array($role->id, $selectedRoles, true) ? 'checked' : '' }}
+                                        >
+                                        <label class="form-check-label" for="create-role-{{ $role->id }}">
+                                            {{ $role->name }}
+                                            <span class="d-block small text-muted">{{ $role->slug }}</span>
+                                        </label>
+                                    </div>
+                                @empty
+                                    <div class="text-muted small">No roles are available yet.</div>
+                                @endforelse
+                            </div>
+                            @error('roles')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
+                            @error('roles.*')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancel</a>
                             <button type="submit" class="btn btn-primary">Create User</button>

@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 use App\Models\AdminAuditLog;
@@ -128,10 +130,42 @@ class Handler extends ExceptionHandler
         }
     }
 
+    public function render($request, Throwable $exception)
+    {
+        if ($this->isForbiddenException($exception) && ! $request->expectsJson()) {
+            return $this->renderForbiddenResponse($request);
+        }
+
+        return parent::render($request, $exception);
+    }
+
     private function errorAuditEnabled(): bool
     {
         $value = $_ENV['ERROR_AUDIT'] ?? $_SERVER['ERROR_AUDIT'] ?? getenv('ERROR_AUDIT') ?? env('ERROR_AUDIT', false);
 
         return filter_var($value, FILTER_VALIDATE_BOOL);
+    }
+
+    private function isForbiddenException(Throwable $exception): bool
+    {
+        if ($exception instanceof AuthorizationException) {
+            return true;
+        }
+
+        return $exception instanceof HttpExceptionInterface && $exception->getStatusCode() === 403;
+    }
+
+    private function renderForbiddenResponse(Request $request)
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        $dashboardRoute = $user ? route($user->dashboardRoute()) : route('home');
+        $backofficeRoute = $user && $user->hasBackofficeAccess() ? route('admin.open') : null;
+
+        return response()->view('errors.403', [
+            'dashboardRoute' => $dashboardRoute,
+            'backofficeRoute' => $backofficeRoute,
+            'requestPath' => $request->path(),
+        ], 403);
     }
 }

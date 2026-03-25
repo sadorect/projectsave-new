@@ -7,6 +7,7 @@
 @php
     $permissionCount = $permissions->flatten(1)->count();
     $categoryCount = $permissions->count();
+    $selectedRoleIds = collect(old('roles', []))->map(fn ($roleId) => (int) $roleId)->all();
 @endphp
 
 <div class="container-fluid">
@@ -39,6 +40,7 @@
                                 <thead>
                                     <tr>
                                         <th>Permission</th>
+                                        <th>Guard</th>
                                         <th>Assigned Roles</th>
                                         <th class="text-end">Actions</th>
                                     </tr>
@@ -50,6 +52,9 @@
                                                 <div class="fw-semibold">{{ $permission->name }}</div>
                                                 <div class="small text-muted mb-1">{{ $permission->slug }}</div>
                                                 <div class="small text-muted">{{ $permission->description ?: 'No description provided.' }}</div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark">{{ $permission->guard_name }}</span>
                                             </td>
                                             <td>
                                                 @forelse($permission->roles as $role)
@@ -100,17 +105,21 @@
                     </div>
                     <div class="mb-3">
                         <label for="permission_category" class="form-label">Category</label>
-                        <input type="text" id="permission_category" name="category" class="form-control" value="Custom">
+                        <input type="text" id="permission_category" name="category" class="form-control" list="permission-category-options" value="{{ old('category', 'Custom') }}">
                     </div>
                     <div class="mb-3">
                         <label for="permission_description" class="form-label">Description</label>
-                        <textarea id="permission_description" name="description" class="form-control" rows="3"></textarea>
+                        <textarea id="permission_description" name="description" class="form-control" rows="3">{{ old('description') }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Guard</label>
+                        <input type="text" class="form-control" value="{{ config('auth.defaults.guard', 'web') }}" readonly>
                     </div>
                     <div class="mb-0">
                         <label class="form-label">Assign to Roles</label>
                         @foreach($roles as $role)
                             <div class="form-check mb-2">
-                                <input type="checkbox" name="roles[]" value="{{ $role->id }}" class="form-check-input" id="role{{ $role->id }}">
+                                <input type="checkbox" name="roles[]" value="{{ $role->id }}" class="form-check-input" id="role{{ $role->id }}" {{ in_array($role->id, $selectedRoleIds, true) ? 'checked' : '' }}>
                                 <label class="form-check-label" for="role{{ $role->id }}">
                                     {{ $role->name }}
                                 </label>
@@ -126,4 +135,10 @@
         </div>
     </div>
 </div>
+
+<datalist id="permission-category-options">
+    @foreach($categories as $category)
+        <option value="{{ $category }}"></option>
+    @endforeach
+</datalist>
 @endsection

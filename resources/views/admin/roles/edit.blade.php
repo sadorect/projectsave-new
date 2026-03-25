@@ -21,6 +21,12 @@
                     @enderror
                 </div>
 
+                @if($isProtected)
+                    <div class="alert alert-warning">
+                        This is a protected system role. You can adjust its permission matrix, but its core identity cannot be renamed or deleted.
+                    </div>
+                @endif
+
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea class="form-control @error('description') is-invalid @enderror" 

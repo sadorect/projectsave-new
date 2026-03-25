@@ -85,7 +85,9 @@ class AdminUserController extends Controller
 
     public function create()
     {
-        return view('admin.users.create');
+        $roles = Role::all();
+
+        return view('admin.users.create', compact('roles'));
     }
 
     /**
@@ -201,11 +203,25 @@ class AdminUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'is_admin' => 'boolean'
+            'is_admin' => 'boolean',
+            'roles' => 'array|nullable',
+            'roles.*' => 'integer|exists:roles,id',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
         $createdUser = User::create($validated);
+
+        $guardName = config('auth.defaults.guard', 'web');
+        $roles = Role::query()
+            ->whereIn('id', $validated['roles'] ?? [])
+            ->where(function ($query) use ($guardName) {
+                $query->where('guard_name', $guardName)
+                    ->orWhereNull('guard_name')
+                    ->orWhere('guard_name', '');
+            })
+            ->get();
+
+        $createdUser->syncRoles($roles);
 
         // Audit log
         try {
@@ -214,7 +230,11 @@ class AdminUserController extends Controller
                 'action' => 'create_user',
                 'target_type' => 'User',
                 'target_id' => $createdUser->id,
-                'meta' => ['email' => $validated['email'], 'name' => $validated['name']],
+                'meta' => [
+                    'email' => $validated['email'],
+                    'name' => $validated['name'],
+                    'roles' => $roles->pluck('name')->values()->all(),
+                ],
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);

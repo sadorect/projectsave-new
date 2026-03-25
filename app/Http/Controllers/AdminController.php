@@ -21,6 +21,23 @@ use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    public function open()
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+
+        if (! $user) {
+            return redirect()->route('admin.login.form');
+        }
+
+        if (! $user->hasBackofficeAccess()) {
+            return redirect()->route($user->dashboardRoute())
+                ->with('warning', 'Your back-office access has changed. You were redirected to the workspace you can still access.');
+        }
+
+        return redirect()->route($user->preferredBackofficeRoute() ?? $user->dashboardRoute());
+    }
+
     public function loginForm()
     {
         return view('admin.login');
@@ -40,6 +57,7 @@ class AdminController extends Controller
         ];
 
         if (Auth::attempt($credentials)) {
+            /** @var \App\Models\User $user */
             $user = Auth::user();
 
             if (! $user->hasBackofficeAccess()) {
@@ -67,6 +85,7 @@ class AdminController extends Controller
 
     public function dashboard(NavigationBuilder $navigationBuilder)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $dashboardUrl = route('admin.dashboard');
 

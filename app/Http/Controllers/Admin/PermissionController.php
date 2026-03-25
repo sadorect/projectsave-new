@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class PermissionController extends Controller
@@ -15,15 +17,25 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions = Permission::with('roles')
-            ->orderByRaw("COALESCE(category, 'Uncategorized')")
+        $permissionQuery = Permission::query()->with(['roles' => fn (Builder $query) => $this->applyRoleGuard($query)]);
+
+        if ($this->permissionHasColumn('guard_name')) {
+            $permissionQuery->where('guard_name', $this->defaultGuardName());
+        }
+
+        if ($this->permissionHasColumn('category')) {
+            $permissionQuery->orderByRaw("COALESCE(category, 'Uncategorized')");
+        }
+
+        $permissions = $permissionQuery
             ->orderBy('name')
             ->get()
-            ->groupBy(fn (Permission $permission) => $permission->category ?: 'Uncategorized');
+            ->groupBy(fn (Permission $permission) => $this->categoryLabel($permission));
 
-        $roles = Role::query()->orderBy('name')->get();
+        $roles = $this->roleQuery()->orderBy('name')->get();
+        $categories = $permissions->keys()->values();
 
-        return view('admin.permissions.index', compact('permissions', 'roles'));
+        return view('admin.permissions.index', compact('permissions', 'roles', 'categories'));
     }
 
     /**
@@ -47,18 +59,11 @@ class PermissionController extends Controller
             'roles.*' => 'integer|exists:roles,id',
         ]);
 
-        $permission = Permission::create([
-            'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
-            'category' => $validated['category'] ?? 'Custom',
-            'description' => $validated['description'] ?? null,
-            'guard_name' => config('auth.defaults.guard', 'web'),
-        ]);
+        $permission = Permission::query()->create($this->buildPermissionPayload($validated, true));
 
         if (! empty($validated['roles'])) {
-            $roles = Role::query()
+            $roles = $this->roleQuery()
                 ->whereIn('id', $validated['roles'])
-                ->where('guard_name', config('auth.defaults.guard', 'web'))
                 ->get();
 
             $permission->syncRoles($roles);
@@ -80,9 +85,10 @@ class PermissionController extends Controller
      */
     public function edit(Permission $permission)
     {
-        $roles = Role::query()->orderBy('name')->get();
+        $roles = $this->roleQuery()->orderBy('name')->get();
+        $categories = $this->permissionQuery()->pluck('category')->filter()->unique()->values();
 
-        return view('admin.permissions.edit', compact('permission', 'roles'));
+        return view('admin.permissions.edit', compact('permission', 'roles', 'categories'));
     }
 
     /**
@@ -98,16 +104,10 @@ class PermissionController extends Controller
             'roles.*' => 'integer|exists:roles,id',
         ]);
 
-        $permission->update([
-            'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
-            'category' => $validated['category'] ?? 'Custom',
-            'description' => $validated['description'] ?? null,
-        ]);
+        $permission->update($this->buildPermissionPayload($validated));
 
-        $roles = Role::query()
+        $roles = $this->roleQuery()
             ->whereIn('id', $validated['roles'] ?? [])
-            ->where('guard_name', config('auth.defaults.guard', 'web'))
             ->get();
 
         $permission->syncRoles($roles);
@@ -124,5 +124,84 @@ class PermissionController extends Controller
         $permission->delete();
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permission deleted successfully');
+    }
+
+    private function buildPermissionPayload(array $validated, bool $includeGuard = false): array
+    {
+        $payload = [
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+        ];
+
+        if ($this->permissionHasColumn('category')) {
+            $payload['category'] = filled($validated['category'] ?? null) ? trim((string) $validated['category']) : 'Custom';
+        }
+
+        if ($this->permissionHasColumn('description')) {
+            $payload['description'] = $validated['description'] ?? null;
+        }
+
+        if ($includeGuard && $this->permissionHasColumn('guard_name')) {
+            $payload['guard_name'] = $this->defaultGuardName();
+        }
+
+        return $payload;
+    }
+
+    private function roleQuery(): Builder
+    {
+        $query = Role::query();
+
+        return $this->applyRoleGuard($query);
+    }
+
+    private function permissionQuery(): Builder
+    {
+        $query = Permission::query();
+
+        if ($this->permissionHasColumn('guard_name')) {
+            $query->where('guard_name', $this->defaultGuardName());
+        }
+
+        return $query;
+    }
+
+    private function applyRoleGuard(Builder $query): Builder
+    {
+        if ($this->roleHasColumn('guard_name')) {
+            $query->where('guard_name', $this->defaultGuardName());
+        }
+
+        return $query;
+    }
+
+    private function categoryLabel(Permission $permission): string
+    {
+        if (! $this->permissionHasColumn('category')) {
+            return 'Permissions';
+        }
+
+        return $permission->category ?: 'Uncategorized';
+    }
+
+    private function defaultGuardName(): string
+    {
+        return config('auth.defaults.guard', 'web');
+    }
+
+    private function permissionHasColumn(string $column): bool
+    {
+        static $columns;
+        $columns ??= array_flip(Schema::getColumnListing((new Permission())->getTable()));
+
+        return isset($columns[$column]);
+    }
+
+    private function roleHasColumn(string $column): bool
+    {
+        static $columns;
+        $columns ??= array_flip(Schema::getColumnListing((new Role())->getTable()));
+
+        return isset($columns[$column]);
     }
 }

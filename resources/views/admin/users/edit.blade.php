@@ -39,16 +39,34 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="roles">User Roles</label>
-                            <select name="roles[]" id="roles" class="form-control" multiple>
+                        @php($selectedRoles = collect(old('roles', $user->roles->pluck('id')->all()))->map(fn ($roleId) => (int) $roleId)->all())
+                        <div class="mb-4">
+                            <label class="form-label">User Roles</label>
+                            <div class="small text-muted mb-2">Select every role this user should currently hold.</div>
+                            <div class="border rounded p-3">
                                 @foreach($roles as $role)
-                                    <option value="{{ $role->id }}" 
-                                        {{ $user->roles->contains($role->id) ? 'selected' : '' }}>
-                                        {{ $role->name }}
-                                    </option>
+                                    <div class="form-check mb-2">
+                                        <input
+                                            type="checkbox"
+                                            name="roles[]"
+                                            value="{{ $role->id }}"
+                                            class="form-check-input"
+                                            id="edit-role-{{ $role->id }}"
+                                            {{ in_array($role->id, $selectedRoles, true) ? 'checked' : '' }}
+                                        >
+                                        <label class="form-check-label" for="edit-role-{{ $role->id }}">
+                                            {{ $role->name }}
+                                            <span class="d-block small text-muted">{{ $role->slug }}</span>
+                                        </label>
+                                    </div>
                                 @endforeach
-                            </select>
+                            </div>
+                            @error('roles')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
+                            @error('roles.*')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
                         </div>
                         
 
