@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Verified;
 use App\Models\AdminAuditLog;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class AdminUserController extends Controller
 {
@@ -17,7 +18,6 @@ class AdminUserController extends Controller
     {
         $this->middleware('can:viewAny,' . User::class)->only('index');
         $this->middleware('can:create,' . User::class)->only(['create', 'store']);
-        $this->middleware('can:view,user')->only('show');
         $this->middleware('can:update,user')->only(['edit', 'update']);
         $this->middleware('can:delete,user')->only('destroy');
         $this->middleware('can:bulkManage,' . User::class)->only('bulkAction');
@@ -34,7 +34,6 @@ class AdminUserController extends Controller
 
         $query = User::with('roles')->latest();
 
-        // Search by name or email
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -51,7 +50,6 @@ class AdminUserController extends Controller
             }
         }
 
-        // Filter by admin flag
         if ($request->filled('is_admin')) {
             $query->where('is_admin', (bool) $request->get('is_admin'));
         }
@@ -68,7 +66,6 @@ class AdminUserController extends Controller
         $users = $query->paginate($perPage)->withQueryString();
 
         // Find active sessions mapped to user IDs (database sessions)
-        $activeSessions = [];
         try {
             $sessionTable   = config('session.table', 'sessions');
             $activeSessions = DB::table($sessionTable)
@@ -108,7 +105,6 @@ class AdminUserController extends Controller
         $userIds = collect($validated['user_ids']);
         $adminId = Auth::id();
 
-        // Prevent acting on yourself in destructive operations
         if (in_array($action, ['delete', 'deactivate']) && $userIds->contains($adminId)) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'You cannot perform that action on your own account.');
@@ -120,7 +116,7 @@ class AdminUserController extends Controller
             switch ($action) {
                 case 'delete':
                     try {
-                        AdminAuditLog::create([
+                        AdminAuditLog::record([
                             'admin_user_id' => $adminId,
                             'action'        => 'bulk_delete_user',
                             'target_type'   => 'User',
@@ -137,8 +133,8 @@ class AdminUserController extends Controller
                     if (!$user->hasVerifiedEmail()) {
                         $user->forceFill(['email_verified_at' => now()])->save();
                         try {
-                            event(new \Illuminate\Auth\Events\Verified($user));
-                            AdminAuditLog::create([
+                            event(new Verified($user));
+                            AdminAuditLog::record([
                                 'admin_user_id' => $adminId,
                                 'action'        => 'bulk_verify_user',
                                 'target_type'   => 'User',
@@ -155,7 +151,7 @@ class AdminUserController extends Controller
                     if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active')) {
                         $user->forceFill(['is_active' => true])->save();
                         try {
-                            AdminAuditLog::create([
+                            AdminAuditLog::record([
                                 'admin_user_id' => $adminId,
                                 'action'        => 'bulk_activate_user',
                                 'target_type'   => 'User',
@@ -169,10 +165,10 @@ class AdminUserController extends Controller
                     break;
 
                 case 'deactivate':
-                    if (\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active')) {
+                    if (Schema::hasColumn('users', 'is_active')) {
                         $user->forceFill(['is_active' => false])->save();
                         try {
-                            AdminAuditLog::create([
+                            AdminAuditLog::record([
                                 'admin_user_id' => $adminId,
                                 'action'        => 'bulk_deactivate_user',
                                 'target_type'   => 'User',
@@ -209,14 +205,15 @@ class AdminUserController extends Controller
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
-        User::create($validated);
+        $createdUser = User::create($validated);
+
         // Audit log
         try {
-            AdminAuditLog::create([
+            AdminAuditLog::record([
                 'admin_user_id' => Auth::id(),
                 'action' => 'create_user',
                 'target_type' => 'User',
-                'target_id' => null,
+                'target_id' => $createdUser->id,
                 'meta' => ['email' => $validated['email'], 'name' => $validated['name']],
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
@@ -261,7 +258,7 @@ class AdminUserController extends Controller
 
         $user->syncRoles($roles);
         try {
-            AdminAuditLog::create([
+            AdminAuditLog::record([
                 'admin_user_id' => Auth::id(),
                 'action' => 'update_user',
                 'target_type' => 'User',
@@ -306,7 +303,7 @@ class AdminUserController extends Controller
         $this->safeDeleteUser($user);
 
         try {
-            AdminAuditLog::create([
+            AdminAuditLog::record([
                 'admin_user_id' => Auth::id(),
                 'action' => 'delete_user',
                 'target_type' => 'User',
@@ -325,7 +322,7 @@ class AdminUserController extends Controller
     public function show(User $user)
     {
         try {
-            AdminAuditLog::create([
+            AdminAuditLog::record([
                 'admin_user_id' => Auth::id(),
                 'action' => 'view_user',
                 'target_type' => 'User',
@@ -367,7 +364,7 @@ class AdminUserController extends Controller
 
         // If this is an AJAX/JSON request, return JSON so the UI can update in-place
         try {
-            AdminAuditLog::create([
+            AdminAuditLog::record([
                 'admin_user_id' => Auth::id(),
                 'action' => 'verify_user_email',
                 'target_type' => 'User',
@@ -397,7 +394,7 @@ class AdminUserController extends Controller
     public function toggleActive(Request $request, User $user)
     {
         // Some installations may not have an is_active column. Check before updating.
-        if (!\Illuminate\Support\Facades\Schema::hasColumn('users', 'is_active')) {
+        if (!Schema::hasColumn('users', 'is_active')) {
             return redirect()->back()->with('error', "The 'is_active' column is not present in the users table.");
         }
 
@@ -405,7 +402,7 @@ class AdminUserController extends Controller
         $user->update(['is_active' => !$user->is_active]);
 
         try {
-            AdminAuditLog::create([
+            AdminAuditLog::record([
                 'admin_user_id' => Auth::id(),
                 'action' => 'toggle_user_active',
                 'target_type' => 'User',

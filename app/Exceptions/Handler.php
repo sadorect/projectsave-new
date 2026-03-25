@@ -111,7 +111,7 @@ class Handler extends ExceptionHandler
                 $existing->user_agent = $request?->userAgent() ?? $existing->user_agent;
                 $existing->save();
             } else {
-                AdminAuditLog::create([
+                AdminAuditLog::record([
                     'admin_user_id' => Auth::id(),
                     'action' => 'server_error',
                     'target_type' => null,
