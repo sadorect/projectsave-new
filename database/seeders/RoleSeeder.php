@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\PermissionRegistrar;
 
 class RoleSeeder extends Seeder
@@ -218,15 +219,24 @@ class RoleSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $allPermissions = Permission::all();
+        $columns = array_flip(Schema::getColumnListing('roles'));
 
         foreach ($this->roles as $name => $attributes) {
+            $roleAttributes = [
+                'name' => $name,
+            ];
+
+            if (isset($columns['description'])) {
+                $roleAttributes['description'] = $attributes['description'];
+            }
+
+            if (isset($columns['guard_name'])) {
+                $roleAttributes['guard_name'] = 'web';
+            }
+
             $role = Role::query()->updateOrCreate(
                 ['slug' => $attributes['slug']],
-                [
-                    'name' => $name,
-                    'description' => $attributes['description'],
-                    'guard_name' => 'web',
-                ]
+                $roleAttributes
             );
 
             // Handle special case for Super Admin

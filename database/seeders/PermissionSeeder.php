@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Permission;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\PermissionRegistrar;
 
 class PermissionSeeder extends Seeder
@@ -325,16 +326,29 @@ class PermissionSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
+        $columns = array_flip(Schema::getColumnListing('permissions'));
+
         foreach ($this->permissions as $category => $permissions) {
             foreach ($permissions as $permission) {
+                $attributes = [
+                    'name' => $permission['name'],
+                ];
+
+                if (isset($columns['description'])) {
+                    $attributes['description'] = $permission['description'];
+                }
+
+                if (isset($columns['category'])) {
+                    $attributes['category'] = $category;
+                }
+
+                if (isset($columns['guard_name'])) {
+                    $attributes['guard_name'] = 'web';
+                }
+
                 Permission::query()->updateOrCreate(
                     ['slug' => $permission['slug']],
-                    [
-                        'name' => $permission['name'],
-                        'description' => $permission['description'],
-                        'category' => $category,
-                        'guard_name' => 'web',
-                    ]
+                    $attributes
                 );
             }
         }
