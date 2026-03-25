@@ -78,4 +78,9 @@ class Post extends Model
     {
         return preg_replace('/\*((?:[^*]|\\\*)+)\*/', '<strong>$1</strong>', $value);
     }
+
+    protected function getTitleAttribute($value)
+    {
+        return str_replace('*', '', $value);
+    }
 }
