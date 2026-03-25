@@ -43,9 +43,36 @@ return new class extends Migration
             ->values()
             ->all();
 
-        if ($userIdForeignKeys->isNotEmpty() && ! in_array('role_user_user_id_index', $userIdIndexes, true)) {
+        $roleIdForeignKeys = collect(DB::select(
+            "SELECT CONSTRAINT_NAME
+             FROM information_schema.KEY_COLUMN_USAGE
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'role_user'
+               AND COLUMN_NAME = 'role_id'
+               AND REFERENCED_TABLE_NAME IS NOT NULL"
+        ))->pluck('CONSTRAINT_NAME');
+
+        $roleIdIndexes = collect(DB::select("SHOW INDEX FROM role_user WHERE Column_name = 'role_id'"))
+            ->pluck('Key_name')
+            ->unique()
+            ->values()
+            ->all();
+
+        $userIdHasStandaloneIndex = collect($userIdIndexes)
+            ->contains(fn (string $indexName) => $indexName !== 'PRIMARY');
+
+        $roleIdHasStandaloneIndex = collect($roleIdIndexes)
+            ->contains(fn (string $indexName) => $indexName !== 'PRIMARY');
+
+        if ($userIdForeignKeys->isNotEmpty() && ! $userIdHasStandaloneIndex) {
             Schema::table('role_user', function (Blueprint $table) {
                 $table->index('user_id', 'role_user_user_id_index');
+            });
+        }
+
+        if ($roleIdForeignKeys->isNotEmpty() && ! $roleIdHasStandaloneIndex) {
+            Schema::table('role_user', function (Blueprint $table) {
+                $table->index('role_id', 'role_user_role_id_index');
             });
         }
 
