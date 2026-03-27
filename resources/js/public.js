@@ -1,4 +1,5 @@
 import "./bootstrap";
+import "./calendar";
 import * as BootstrapJS from "bootstrap";
 window.bootstrap = BootstrapJS;
 

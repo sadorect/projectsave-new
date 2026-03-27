@@ -23,6 +23,11 @@ class Kernel extends ConsoleKernel
             ->everyTenMinutes()
             ->withoutOverlapping()
             ->timezone('UTC');
+
+        $schedule->command('newsletter:send-post-updates')
+            ->everyTenMinutes()
+            ->withoutOverlapping()
+            ->timezone('UTC');
     }
 
     /**
@@ -40,7 +45,7 @@ class Kernel extends ConsoleKernel
         Commands\OptimizeImages::class,
         Commands\PruneAuditLogs::class,
         Commands\QueuePublishedPostFeaturedImages::class,
+        Commands\SendNewsletterPostUpdates::class,
     ];
 }
-
 

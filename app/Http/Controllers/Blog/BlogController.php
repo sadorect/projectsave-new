@@ -34,6 +34,8 @@ class BlogController extends Controller
             ->published();
         $calendarDate = now();
         $selectedDate = null;
+        $selectedCategory = null;
+        $selectedTag = null;
             
         if ($request->filled('date')) {
             try {
@@ -43,6 +45,30 @@ class BlogController extends Controller
             } catch (\Throwable $exception) {
                 $calendarDate = now();
                 $selectedDate = null;
+            }
+        }
+
+        if ($request->filled('category')) {
+            $selectedCategory = Category::query()
+                ->where('slug', (string) $request->string('category'))
+                ->first();
+
+            if ($selectedCategory) {
+                $query->whereHas('categories', function ($builder) use ($selectedCategory) {
+                    $builder->whereKey($selectedCategory->getKey());
+                });
+            }
+        }
+
+        if ($request->filled('tag')) {
+            $selectedTag = Tag::query()
+                ->where('slug', (string) $request->string('tag'))
+                ->first();
+
+            if ($selectedTag) {
+                $query->whereHas('tags', function ($builder) use ($selectedTag) {
+                    $builder->whereKey($selectedTag->getKey());
+                });
             }
         }
         
@@ -79,7 +105,9 @@ class BlogController extends Controller
             'calendarMonth',
             'calendarYear',
             'postCalendarDays',
-            'selectedDate'
+            'selectedDate',
+            'selectedCategory',
+            'selectedTag'
         ));
     }
 
@@ -150,6 +178,10 @@ class BlogController extends Controller
             optional($post->published_at)->lte(now()),
             404
         );
+
+        $post = $post->load(['categories', 'tags']);
+        $this->trackPostView($post);
+        $post->refresh()->load(['categories', 'tags']);
 
         $recentPosts = Post::published()
             ->whereKeyNot($post->getKey())
@@ -384,6 +416,18 @@ class BlogController extends Controller
             'year' => $calendarYear,
             'postCalendarDays' => $postCalendarDays,
         ]);
+    }
+
+    private function trackPostView(Post $post): void
+    {
+        $sessionKey = 'analytics.post_viewed.' . $post->getKey() . '.' . now()->toDateString();
+
+        if (!request()->hasSession() || request()->session()->has($sessionKey)) {
+            return;
+        }
+
+        $post->increment('view_count');
+        request()->session()->put($sessionKey, true);
     }
 
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Rules\MathCaptchaRule;
 use App\Services\FileUploadService;
 use App\Models\DeletionRequest;
 use App\Notifications\DataDeletionRequestNotification;
@@ -161,27 +162,51 @@ class UserDashboardController extends Controller
 
     public function showDeletionForm()
     {
-        return view('user.account-deletion');
+        $pendingDeletionRequest = DeletionRequest::query()
+            ->where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+
+        return view('user.account-deletion', compact('pendingDeletionRequest'));
     }
 
     public function requestDeletion(Request $request)
     {
+        $request->validate([
+            'reason' => ['nullable', 'string', 'max:5000'],
+            'confirm_deletion' => ['accepted'],
+            'password' => ['required', 'current_password'],
+            'math_captcha' => ['required', new MathCaptchaRule],
+        ]);
+
+        $pendingDeletionRequest = DeletionRequest::query()
+            ->where('user_id', auth()->id())
+            ->where('status', 'pending')
+            ->latest()
+            ->first();
+
+        if ($pendingDeletionRequest) {
+            return back()->withErrors([
+                'reason' => 'You already have a pending deletion request under review.',
+            ]);
+        }
+
         $deletionRequest = DeletionRequest::create([
             'user_id' => auth()->id(),
+            'requester_name' => auth()->user()->name,
+            'requester_email' => auth()->user()->email,
             'reason' => $request->reason,
             'status' => 'pending',
         ]);
 
-        $admin = User::where('is_admin', true)->first();
+        User::query()
+            ->where('is_admin', true)
+            ->get()
+            ->each
+            ->notify(new DataDeletionRequestNotification($deletionRequest));
 
-        if ($admin) {
-            $admin->notify(new DataDeletionRequestNotification($deletionRequest));
-        }
-
-        auth()->logout();
-
-        return redirect()->route('login')
-            ->with('success', 'Your account deletion request has been submitted. You will receive confirmation once processed.');
+        return back()->with('success', 'Your account deletion request has been submitted and is now awaiting admin review.');
     }
 
     private function accountPreferences(User $user): array

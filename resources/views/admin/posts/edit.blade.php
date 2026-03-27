@@ -33,7 +33,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Bible Text</label>
-                            <textarea name="bible_text" class="form-control @error('bible_text') is-invalid @enderror" rows="3">{{ old('bible_text', $post->bible_text) }}</textarea>
+                            <textarea name="bible_text" class="form-control @error('bible_text') is-invalid @enderror" rows="3" data-rich-text-editor>{{ old('bible_text', $post->bible_text) }}</textarea>
                             @error('bible_text')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -50,7 +50,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Details</label>
-                            <textarea name="details" id="details" class="form-control @error('details') is-invalid @enderror" rows="5" required>{{ old('details', $post->details) }}</textarea>
+                            <textarea name="details" id="details" class="form-control @error('details') is-invalid @enderror" rows="5" required data-rich-text-editor>{{ old('details', $post->details) }}</textarea>
                             @error('details')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -58,7 +58,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Action Point</label>
-                            <textarea name="action_point" class="form-control @error('action_point') is-invalid @enderror" rows="3">{{ old('action_point', $post->action_point) }}</textarea>
+                            <textarea name="action_point" class="form-control @error('action_point') is-invalid @enderror" rows="3" data-rich-text-editor>{{ old('action_point', $post->action_point) }}</textarea>
                             @error('action_point')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

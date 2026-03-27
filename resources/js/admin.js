@@ -8,6 +8,58 @@ Alpine.start();
 
 /* ─── Admin sidebar nav group toggles ──────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
+    const richTextElements = document.querySelectorAll("[data-rich-text-editor]");
+
+    if (typeof window.ClassicEditor !== "undefined" && richTextElements.length) {
+        richTextElements.forEach((element) => {
+            if (element.dataset.editorReady === "true") {
+                return;
+            }
+
+            window.ClassicEditor.create(element, {
+                toolbar: [
+                    "heading",
+                    "|",
+                    "bold",
+                    "italic",
+                    "underline",
+                    "strikethrough",
+                    "link",
+                    "bulletedList",
+                    "numberedList",
+                    "|",
+                    "blockQuote",
+                    "insertTable",
+                    "undo",
+                    "redo",
+                ],
+                list: {
+                    properties: {
+                        styles: true,
+                        startIndex: true,
+                        reversed: true,
+                    },
+                },
+                table: {
+                    contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
+                },
+            })
+                .then((editor) => {
+                    element.dataset.editorReady = "true";
+                    const form = element.closest("form");
+
+                    if (form) {
+                        form.addEventListener("submit", () => {
+                            editor.updateSourceElement();
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Failed to initialize rich text editor.", error);
+                });
+        });
+    }
+
     // Wire up every collapsible nav group in the sidebar
     document.querySelectorAll("[data-admin-nav-toggle]").forEach((btn) => {
         btn.addEventListener("click", () => {

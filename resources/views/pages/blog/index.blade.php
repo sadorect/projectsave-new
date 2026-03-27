@@ -10,12 +10,18 @@
     <x-ui.public-page-hero
         eyebrow="Devotionals"
         title="Daily bread for spiritual growth"
-        :subtitle="$selectedDate ? 'Archive for ' . $selectedDate . '. Read the devotionals published on that day.' : 'Scripture-rooted teaching and devotional encouragement that strengthens faith, clarifies calling, and supports kingdom service.'"
+        :subtitle="$selectedDate
+            ? 'Archive for ' . $selectedDate . '. Read the devotionals published on that day.'
+            : ($selectedCategory
+                ? 'Browsing devotionals in the ' . $selectedCategory->name . ' category.'
+                : ($selectedTag
+                    ? 'Browsing devotionals tagged with ' . $selectedTag->name . '.'
+                    : 'Scripture-rooted teaching and devotional encouragement that strengthens faith, clarifies calling, and supports kingdom service.'))"
     >
         <x-slot:actions>
-            @if($selectedDate)
+            @if($selectedDate || $selectedCategory || $selectedTag)
                 <a href="{{ route('blog.index') }}" class="surface-button-secondary">
-                    <i class="bi bi-x-circle me-2"></i>Clear date filter
+                    <i class="bi bi-x-circle me-2"></i>Clear filters
                 </a>
             @else
                 <a href="{{ route('faqs.list') }}" class="surface-button-secondary">Browse FAQs</a>
@@ -51,6 +57,7 @@
                                 <div class="devotional-featured-meta">
                                     <span><i class="bi bi-person-fill"></i>{{ $featuredPost->author }}</span>
                                     <span><i class="bi bi-calendar-event-fill"></i>{{ optional($featuredPost->published_at)->format('M d, Y') }}</span>
+                                    <span><i class="bi bi-bar-chart-fill"></i>{{ number_format($featuredPost->view_count) }} views</span>
                                 </div>
                                 <div class="mt-3">
                                     <a href="{{ route('posts.show', $featuredPost->slug) }}" class="surface-button-primary" style="font-size:0.88rem;">
@@ -66,7 +73,7 @@
                         <div>
                             <span class="page-section-eyebrow">Archive</span>
                             <h2 class="page-section-title mb-0" style="font-size:1.5rem;">
-                                {{ $selectedDate ? 'Devotionals on ' . $selectedDate : 'Recent devotionals' }}
+                                {{ $selectedDate ? 'Devotionals on ' . $selectedDate : ($selectedCategory ? $selectedCategory->name . ' devotionals' : ($selectedTag ? 'Tagged: ' . $selectedTag->name : 'Recent devotionals')) }}
                             </h2>
                         </div>
                     </div>
@@ -88,13 +95,17 @@
                                         <div class="d-flex flex-wrap gap-2">
                                             <span class="public-chip">{{ optional($post->published_at)->format('M d, Y') }}</span>
                                             @foreach($post->categories as $category)
-                                                <span class="public-chip">{{ $category->name }}</span>
+                                                <a href="{{ route('blog.index', ['category' => $category->slug]) }}" class="public-chip text-decoration-none">{{ $category->name }}</a>
                                             @endforeach
                                         </div>
                                         <h3 class="m-0" style="font-size:0.0rem;">
                                             <a href="{{ route('posts.show', $post->slug) }}" class="devotional-card-title">{{ $post->title }}</a>
                                         </h3>
                                         <p class="devotional-card-excerpt">{{ \Illuminate\Support\Str::limit(strip_tags($post->details), 140) }}</p>
+                                        <div class="d-flex align-items-center gap-2 text-muted" style="font-size:0.8rem;">
+                                            <i class="bi bi-bar-chart-fill"></i>
+                                            <span>{{ number_format($post->view_count) }} views</span>
+                                        </div>
                                         <a href="{{ route('posts.show', $post->slug) }}" class="surface-button-secondary" style="font-size:0.82rem;padding:0.45rem 0.9rem;align-self:flex-start;margin-top:auto;">
                                             Read more <i class="bi bi-arrow-right ms-1"></i>
                                         </a>
@@ -161,7 +172,7 @@
                             <h3 style="font-size:1.05rem;font-weight:700;color:#0f172a;margin-bottom:1rem;">Browse categories</h3>
                             <div class="d-flex flex-wrap gap-2">
                                 @foreach($categories as $category)
-                                    <span class="public-chip" style="cursor:default;">{{ $category->name }} ({{ $category->posts_count }})</span>
+                                    <a href="{{ route('blog.index', ['category' => $category->slug]) }}" class="public-chip text-decoration-none">{{ $category->name }} ({{ $category->posts_count }})</a>
                                 @endforeach
                             </div>
                         </div>

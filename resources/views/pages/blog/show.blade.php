@@ -5,7 +5,7 @@
     <x-ui.public-page-hero
         eyebrow="Devotional"
         :title="$post->title"
-        :subtitle="trim((optional($post->published_at)->format('F d, Y') ?? '') . ' · ' . ($post->author ?? 'Projectsave International'), ' ·')"
+        :subtitle="trim((optional($post->published_at)->format('F d, Y') ?? '') . ' · ' . ($post->author ?? 'Projectsave International') . ' · ' . number_format($post->view_count) . ' views', ' ·')"
     >
         <x-slot:actions>
             <a href="{{ route('blog.index') }}" class="surface-button-secondary">
@@ -33,12 +33,21 @@
 
                         @if($post->bible_text)
                             <div class="devotional-scripture-box">
-                                <i class="bi bi-book me-2"></i>{{ $post->bible_text }}
+                                <i class="bi bi-book me-2"></i>
+                                <div class="public-richtext d-inline">{!! $post->bible_text !!}</div>
                             </div>
                         @endif
 
                         @if($post->subtitle)
                             <h2 style="font-size:1.18rem;font-weight:700;color:#0f172a;margin-bottom:1.25rem;line-height:1.4;">{{ $post->subtitle }}</h2>
+                        @endif
+
+                        @if($post->categories->isNotEmpty())
+                            <div class="d-flex flex-wrap gap-2 mb-4">
+                                @foreach($post->categories as $category)
+                                    <a href="{{ route('blog.index', ['category' => $category->slug]) }}" class="public-chip text-decoration-none">{{ $category->name }}</a>
+                                @endforeach
+                            </div>
                         @endif
 
                         <div class="public-richtext">
@@ -51,14 +60,16 @@
                                     <i class="bi bi-lightning-charge-fill"></i>
                                     Action point
                                 </div>
-                                <p style="font-size:0.95rem;color:#374151;line-height:1.75;margin:0;">{{ $post->action_point }}</p>
+                                <div class="public-richtext" style="font-size:0.95rem;color:#374151;line-height:1.75;margin:0;">
+                                    {!! $post->action_point !!}
+                                </div>
                             </div>
                         @endif
 
                         @if($post->tags->isNotEmpty())
                             <div class="d-flex flex-wrap gap-2 mt-4">
                                 @foreach($post->tags as $tag)
-                                    <span class="public-chip">{{ $tag->name }}</span>
+                                    <a href="{{ route('blog.index', ['tag' => $tag->slug]) }}" class="public-chip text-decoration-none">{{ $tag->name }}</a>
                                 @endforeach
                             </div>
                         @endif
@@ -149,7 +160,7 @@
                             <h3 style="font-size:1rem;font-weight:700;color:#0f172a;margin-bottom:0.8rem;">Topics</h3>
                             <div class="d-flex flex-wrap gap-2">
                                 @foreach($categories as $category)
-                                    <span class="public-chip" style="cursor:default;">{{ $category->name }} ({{ $category->posts_count }})</span>
+                                    <a href="{{ route('blog.index', ['category' => $category->slug]) }}" class="public-chip text-decoration-none">{{ $category->name }} ({{ $category->posts_count }})</a>
                                 @endforeach
                             </div>
                         </div>

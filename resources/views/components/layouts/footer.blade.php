@@ -50,6 +50,11 @@
                         <i class="fab fa-youtube"></i>
                     </a>
                 </div>
+
+                <div class="d-flex flex-wrap gap-2 mt-4">
+                    <span class="public-chip">{{ number_format($totalSiteVisits ?? 0) }} site visits</span>
+                    <span class="public-chip">{{ number_format($totalPostViews ?? 0) }} article views</span>
+                </div>
             </section>
 
             {{-- Explore --}}
@@ -99,17 +104,24 @@
                     <p class="site-footer-newsletter-label">
                         <i class="bi bi-send-fill me-2"></i>Stay connected
                     </p>
-                    <form class="site-footer-newsletter-form" action="{{ route('contact.submit') }}" method="POST">
+                    <form class="site-footer-newsletter-form" action="{{ route('newsletter.subscribe') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="_newsletter" value="1">
                         <div class="site-footer-newsletter-row">
                             <input type="email" name="email" placeholder="Your email address"
-                                   class="site-footer-newsletter-input" required autocomplete="email">
+                                   class="site-footer-newsletter-input" value="{{ old('email') }}" required autocomplete="email">
                             <button type="submit" class="site-footer-newsletter-btn" aria-label="Subscribe">
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
-                        <p class="site-footer-newsletter-note">No spam. Ministry updates only.</p>
+                        @if($errors->getBag('newsletterSubscription')->has('email'))
+                            <p class="site-footer-newsletter-note text-danger mb-0 mt-2">
+                                {{ $errors->getBag('newsletterSubscription')->first('email') }}
+                            </p>
+                        @endif
+                        <div class="mt-3">
+                            <x-math-captcha input-class="site-footer-newsletter-input" error-bag="newsletterSubscription" />
+                        </div>
+                        <p class="site-footer-newsletter-note">Solve the quick check to subscribe. New devotionals are mailed when they are published.</p>
                     </form>
                 </div>
             </section>

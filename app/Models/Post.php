@@ -38,6 +38,8 @@ class Post extends Model
         'author',
         'user_id',
         'comments_count',
+        'view_count',
+        'newsletter_sent_at',
         'status',
         'slug',
         'published_at',
@@ -45,6 +47,7 @@ class Post extends Model
 
     protected $casts = [
         'published_at' => 'datetime',
+        'newsletter_sent_at' => 'datetime',
         'featured_image_generation_enabled' => 'boolean',
         'featured_image_options' => 'array',
         'featured_image_generated_at' => 'datetime',
@@ -92,14 +95,20 @@ class Post extends Model
 
     protected function setDetailsAttribute($value)
     {
-        $pattern = '/\*((?:[^*]|\\\*)+)\*/';
-        $value = preg_replace($pattern, '<strong>$1</strong>', $value);
+        if (is_string($value) && !str_contains($value, '<')) {
+            $value = preg_replace('/\*((?:[^*]|\\\*)+)\*/', '<strong>$1</strong>', $value);
+        }
+
         $this->attributes['details'] = $value;
     }
 
     protected function getDetailsAttribute($value)
     {
-        return preg_replace('/\*((?:[^*]|\\\*)+)\*/', '<strong>$1</strong>', $value);
+        if (is_string($value) && !str_contains($value, '<')) {
+            return preg_replace('/\*((?:[^*]|\\\*)+)\*/', '<strong>$1</strong>', $value);
+        }
+
+        return $value;
     }
 
     protected function getTitleAttribute($value)

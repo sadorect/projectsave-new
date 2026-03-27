@@ -34,6 +34,7 @@ class HtmlSanitizer
         'ol'         => [],
         'li'         => [],
         'blockquote' => [],
+        'hr'         => [],
         'h1'         => [],
         'h2'         => [],
         'h3'         => [],
@@ -50,8 +51,13 @@ class HtmlSanitizer
         'td'         => ['colspan', 'rowspan'],
         'span'       => ['class'],
         'div'        => ['class'],
+        'figure'     => ['class'],
+        'figcaption' => ['class'],
         'pre'        => [],
         'code'       => [],
+        'sup'        => [],
+        'sub'        => [],
+        'mark'       => [],
     ];
 
     /**

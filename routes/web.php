@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
@@ -68,6 +69,8 @@ Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('even
 // Contact Routes
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit')->middleware('throttle:10,1');
+Route::post('/newsletter/subscribe', [NewsletterSubscriptionController::class, 'store'])->name('newsletter.subscribe')->middleware('throttle:5,1');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterSubscriptionController::class, 'destroy'])->name('newsletter.unsubscribe');
 Route::get('/captcha/math', fn () => response()->json(MathCaptcha::generate()))->name('math-captcha.refresh');
 
 // Prayer Force volunteer routes
