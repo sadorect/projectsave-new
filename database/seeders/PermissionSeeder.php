@@ -276,6 +276,11 @@ class PermissionSeeder extends Seeder
                 'description' => 'Can edit notification settings and reminder flows.',
             ],
             [
+                'name' => 'Manage AI Image Settings',
+                'slug' => 'manage-ai-image-settings',
+                'description' => 'Can manage AI image providers, review policy, and connection settings.',
+            ],
+            [
                 'name' => 'Manage Files',
                 'slug' => 'manage-files',
                 'description' => 'Can review and manage uploaded files.',

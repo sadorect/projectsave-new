@@ -18,6 +18,11 @@ class Kernel extends ConsoleKernel
 
         // Prune old audit logs daily at 00:10 UTC
         $schedule->command('prune:audit-logs')->dailyAt('00:10')->timezone('UTC');
+
+        $schedule->command('posts:generate-featured-images')
+            ->everyTenMinutes()
+            ->withoutOverlapping()
+            ->timezone('UTC');
     }
 
     /**
@@ -31,8 +36,10 @@ class Kernel extends ConsoleKernel
     }
 
     protected $commands = [
+        Commands\BaselineMigrations::class,
         Commands\OptimizeImages::class,
         Commands\PruneAuditLogs::class,
+        Commands\QueuePublishedPostFeaturedImages::class,
     ];
 }
 

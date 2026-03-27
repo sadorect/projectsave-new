@@ -72,6 +72,7 @@ class RoleSeeder extends Seeder
                 'manage-mail',
                 'manage-mail-templates',
                 'manage-notification-settings',
+                'manage-ai-image-settings',
                 'manage-files',
                 'view-reports',
                 'export-reports',
@@ -108,6 +109,7 @@ class RoleSeeder extends Seeder
                 'edit-content',
                 'delete-content',
                 'publish-content',
+                'manage-ai-image-settings',
             ],
         ],
         'Editor' => [
@@ -132,6 +134,7 @@ class RoleSeeder extends Seeder
                 'create-content',
                 'edit-content',
                 'publish-content',
+                'manage-ai-image-settings',
             ],
         ],
         'Author' => [

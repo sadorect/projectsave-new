@@ -3,26 +3,30 @@
 namespace App\Http\Controllers\Admin;
 
 use Carbon\Carbon;
+use App\Jobs\GeneratePostFeaturedImage;
+use App\Services\AiImages\AiImageSettings;
 use App\Models\Tag;
 use App\Models\Post;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Services\FacebookService;
 use App\Services\FileUploadService;
 use App\Services\HtmlSanitizer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 
 class PostController extends Controller
 {
-    public function __construct()
+    public function __construct(private readonly AiImageSettings $aiImageSettings)
     {
         $this->middleware('can:viewAny,' . Post::class)->only('index');
         $this->middleware('can:create,' . Post::class)->only(['create', 'store']);
-        $this->middleware('can:update,post')->only(['edit', 'update']);
+        $this->middleware('can:update,post')->only(['edit', 'update', 'generateFeaturedImage', 'approveFeaturedImage', 'rejectFeaturedImage']);
         $this->middleware('can:delete,post')->only('destroy');
         $this->middleware('can:bulkManage,' . Post::class)->only('bulkAction');
         $this->middleware('can:manageTaxonomy,' . Post::class)->only('createCategory');
@@ -55,6 +59,24 @@ class PostController extends Controller
         // Filter by author
         if ($request->filled('author_filter')) {
             $query->where('author', 'LIKE', "%{$request->author_filter}%");
+        }
+
+        if ($request->filled('image_source_filter')) {
+            if ($request->image_source_filter === 'none') {
+                $query->whereNull('image')->whereNull('featured_image_candidate_path');
+            } elseif ($request->image_source_filter === 'ai_candidate') {
+                $query->whereNotNull('featured_image_candidate_path');
+            } else {
+                $query->where('featured_image_source', $request->image_source_filter);
+            }
+        }
+
+        if ($request->filled('ai_generation_status_filter')) {
+            $query->where('featured_image_generation_status', $request->ai_generation_status_filter);
+        }
+
+        if ($request->filled('ai_approval_status_filter')) {
+            $query->where('featured_image_approval_status', $request->ai_approval_status_filter);
         }
         
         // Filter by date range
@@ -98,14 +120,60 @@ class PostController extends Controller
             ->sort()
             ->values();
         
-        return view('admin.posts.index', compact('posts', 'categories', 'tags', 'authors'));
+        $imageSourceOptions = [
+            'manual' => 'Manual',
+            'ai' => 'AI Live',
+            'ai_candidate' => 'AI Candidate Awaiting Review',
+            'none' => 'No Image',
+        ];
+
+        $aiGenerationStatusOptions = [
+            'pending' => 'Pending',
+            'processing' => 'Processing',
+            'generated' => 'Generated',
+            'failed' => 'Failed',
+        ];
+
+        $aiApprovalStatusOptions = [
+            'pending' => 'Pending Review',
+            'approved' => 'Approved',
+            'rejected' => 'Rejected',
+        ];
+
+        $aiSettings = [
+            'require_approval' => $this->aiImageSettings->requireApproval(),
+            'default_provider' => $this->aiImageSettings->defaultProvider(),
+            'default_preset' => $this->aiImageSettings->defaultPreset(),
+        ];
+
+        $pendingAiReviewCount = Post::query()
+            ->whereNotNull('featured_image_candidate_path')
+            ->where('featured_image_approval_status', 'pending')
+            ->count();
+
+        return view('admin.posts.index', compact(
+            'posts',
+            'categories',
+            'tags',
+            'authors',
+            'imageSourceOptions',
+            'aiGenerationStatusOptions',
+            'aiApprovalStatusOptions',
+            'aiSettings',
+            'pendingAiReviewCount'
+        ));
     }
 
     public function create()
     {
         $categories = Category::orderBy('name')->get();
         $tags = Tag::orderBy('name')->get();
-        return view('admin.posts.create', compact('categories', 'tags'));
+        $aiProviders = config('ai-images.providers', []);
+        $aiPresets = config('ai-images.presets', []);
+        $defaultAiProvider = $this->aiImageSettings->defaultProvider();
+        $defaultAiPreset = $this->aiImageSettings->defaultPreset();
+
+        return view('admin.posts.create', compact('categories', 'tags', 'aiProviders', 'aiPresets', 'defaultAiProvider', 'defaultAiPreset'));
     }
 
     /**
@@ -255,6 +323,11 @@ class PostController extends Controller
                 'tag_ids' => 'nullable|array',
                 'tag_ids.*' => 'exists:tags,id',
                 'published_at' => 'required|date_format:Y-m-d\TH:i',
+                'featured_image_generation_enabled' => 'nullable|boolean',
+                'featured_image_provider' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.providers', [])))],
+                'featured_image_preset' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.presets', [])))],
+                'featured_image_prompt' => 'nullable|string|max:4000',
+                'featured_image_options' => 'nullable|string',
             ]);
 
             DB::beginTransaction();
@@ -278,7 +351,18 @@ class PostController extends Controller
                     ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                     'image'
                 );
+
+                $validated['featured_image_source'] = 'manual';
+                $validated['featured_image_generation_status'] = null;
+                $validated['featured_image_approval_status'] = null;
+                $validated['featured_image_generation_error'] = null;
+                $validated['featured_image_candidate_path'] = null;
+                $validated['featured_image_reviewed_by'] = null;
+                $validated['featured_image_reviewed_at'] = null;
+                $validated['featured_image_review_notes'] = null;
             }
+
+            $this->syncFeaturedImageGenerationSettings($request, $validated, $request->hasFile('image'));
 
             $post = Post::create($validated);
 
@@ -309,9 +393,14 @@ class PostController extends Controller
                 }
             }
 
+            $this->dispatchFeaturedImageJobIfNeeded($post, $request->boolean('featured_image_generation_enabled'));
+
             DB::commit();
             return redirect()->route('admin.posts.index')->with('success', 'Post created successfully');
 
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error creating post: ' . $e->getMessage());
@@ -327,7 +416,12 @@ class PostController extends Controller
     {
         $categories = Category::all();
         $tags = Tag::all();
-        return view('admin.posts.edit', compact('post', 'categories', 'tags'));
+        $aiProviders = config('ai-images.providers', []);
+        $aiPresets = config('ai-images.presets', []);
+        $defaultAiProvider = $this->aiImageSettings->defaultProvider();
+        $defaultAiPreset = $this->aiImageSettings->defaultPreset();
+
+        return view('admin.posts.edit', compact('post', 'categories', 'tags', 'aiProviders', 'aiPresets', 'defaultAiProvider', 'defaultAiPreset'));
     }
 
     public function update(Request $request, Post $post)
@@ -339,26 +433,43 @@ class PostController extends Controller
             'subtitle' => 'nullable',
             'details' => 'required',
             'action_point' => 'nullable',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'author' => 'nullable',
             'category_ids' => 'array',
             'tag_ids' => 'array',
             'published_at' => 'required|date_format:Y-m-d\TH:i',
-
-
+            'featured_image_generation_enabled' => 'nullable|boolean',
+            'featured_image_provider' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.providers', [])))],
+            'featured_image_preset' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.presets', [])))],
+            'featured_image_prompt' => 'nullable|string|max:4000',
+            'featured_image_options' => 'nullable|string',
         ]);
 
-        //$validated['published_at'] = Carbon::parse($request->published_at);
+        $validated['published_at'] = Carbon::parse($request->published_at);
 
         if ($request->hasFile('image')) {
+            $this->deleteAiImageIfOwned($post->image, (bool) $post->image);
+            $this->deleteAiImageIfOwned($post->featured_image_candidate_path, (bool) $post->featured_image_candidate_path);
+
             $validated['image'] = FileUploadService::uploadImage(
                 $request->file('image'),
                 'posts',
                 'public',
-                ['jpg', 'jpeg', 'png', 'gif'],
+                ['jpg', 'jpeg', 'png', 'gif', 'webp'],
                 'image'
             );
+
+            $validated['featured_image_source'] = 'manual';
+            $validated['featured_image_generation_status'] = null;
+            $validated['featured_image_approval_status'] = null;
+            $validated['featured_image_generation_error'] = null;
+            $validated['featured_image_candidate_path'] = null;
+            $validated['featured_image_reviewed_by'] = null;
+            $validated['featured_image_reviewed_at'] = null;
+            $validated['featured_image_review_notes'] = null;
         }
+
+        $this->syncFeaturedImageGenerationSettings($request, $validated, $request->hasFile('image'));
 
         $validated['details'] = HtmlSanitizer::clean($validated['details']);
         if (isset($validated['bible_text'])) {
@@ -372,12 +483,160 @@ class PostController extends Controller
         $post->categories()->sync($request->category_ids);
         $post->tags()->sync($request->tag_ids);
 
+        $this->dispatchFeaturedImageJobIfNeeded($post->fresh(), $request->boolean('featured_image_generation_enabled'));
+
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully');
+    }
+
+    public function generateFeaturedImage(Post $post)
+    {
+        abort_unless(config('ai-images.enabled'), 403);
+
+        $post->forceFill([
+            'featured_image_generation_enabled' => true,
+            'featured_image_generation_status' => 'pending',
+            'featured_image_generation_error' => null,
+            'featured_image_provider' => $post->featured_image_provider ?: $this->aiImageSettings->defaultProvider(),
+            'featured_image_preset' => $post->featured_image_preset ?: $this->aiImageSettings->defaultPreset(),
+        ])->save();
+
+        GeneratePostFeaturedImage::dispatch($post->getKey(), true);
+
+        return redirect()
+            ->route('admin.posts.edit', $post)
+            ->with('success', 'Featured image generation has been queued.');
+    }
+
+    public function approveFeaturedImage(Post $post)
+    {
+        abort_unless(config('ai-images.enabled'), 403);
+
+        if (!$post->featured_image_candidate_path) {
+            return redirect()
+                ->route('admin.posts.edit', $post)
+                ->with('error', 'There is no generated candidate image to approve.');
+        }
+
+        if ($post->image && $post->image !== $post->featured_image_candidate_path) {
+            $this->deleteAiImageIfOwned($post->image, true);
+        }
+
+        $post->forceFill([
+            'image' => $post->featured_image_candidate_path,
+            'featured_image_candidate_path' => null,
+            'featured_image_source' => 'ai',
+            'featured_image_generation_status' => 'generated',
+            'featured_image_approval_status' => 'approved',
+            'featured_image_reviewed_by' => auth()->id(),
+            'featured_image_reviewed_at' => now(),
+            'featured_image_review_notes' => null,
+        ])->save();
+
+        return redirect()
+            ->route('admin.posts.edit', $post)
+            ->with('success', 'Generated featured image approved and applied to the post.');
+    }
+
+    public function rejectFeaturedImage(Post $post)
+    {
+        abort_unless(config('ai-images.enabled'), 403);
+
+        if (!$post->featured_image_candidate_path) {
+            return redirect()
+                ->route('admin.posts.edit', $post)
+                ->with('error', 'There is no generated candidate image to reject.');
+        }
+
+        $this->deleteAiImageIfOwned($post->featured_image_candidate_path, true);
+
+        $post->forceFill([
+            'featured_image_candidate_path' => null,
+            'featured_image_generation_status' => 'generated',
+            'featured_image_approval_status' => 'rejected',
+            'featured_image_reviewed_by' => auth()->id(),
+            'featured_image_reviewed_at' => now(),
+            'featured_image_review_notes' => null,
+        ])->save();
+
+        return redirect()
+            ->route('admin.posts.edit', $post)
+            ->with('success', 'Generated candidate image rejected.');
     }
 
     public function destroy(Post $post)
     {
         $post->delete();
         return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully');
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    protected function syncFeaturedImageGenerationSettings(Request $request, array &$validated, bool $manualImageUploaded): void
+    {
+        $validated['featured_image_generation_enabled'] = $request->boolean('featured_image_generation_enabled');
+        $validated['featured_image_provider'] = $request->input('featured_image_provider') ?: $this->aiImageSettings->defaultProvider();
+        $validated['featured_image_preset'] = $request->input('featured_image_preset') ?: $this->aiImageSettings->defaultPreset();
+        $validated['featured_image_prompt'] = $request->filled('featured_image_prompt')
+            ? trim((string) $request->input('featured_image_prompt'))
+            : null;
+        $validated['featured_image_options'] = $this->decodeFeaturedImageOptions($request->input('featured_image_options'));
+
+        if ($manualImageUploaded) {
+            return;
+        }
+
+        if ($validated['featured_image_generation_enabled']) {
+            $validated['featured_image_generation_status'] = 'pending';
+            $validated['featured_image_generation_error'] = null;
+        } elseif (empty($validated['image'])) {
+            $validated['featured_image_generation_status'] = null;
+            $validated['featured_image_approval_status'] = null;
+            $validated['featured_image_generation_error'] = null;
+        }
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function decodeFeaturedImageOptions(?string $raw): ?array
+    {
+        if ($raw === null || trim($raw) === '') {
+            return null;
+        }
+
+        $decoded = json_decode($raw, true);
+
+        if (!is_array($decoded)) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'featured_image_options' => 'Featured image options must be valid JSON.',
+            ]);
+        }
+
+        return $decoded;
+    }
+
+    protected function dispatchFeaturedImageJobIfNeeded(Post $post, bool $generationEnabled): void
+    {
+        if (!config('ai-images.enabled') || !$generationEnabled) {
+            return;
+        }
+
+        if ($post->image && $post->featured_image_source === 'manual') {
+            return;
+        }
+
+        if ($post->published_at?->lte(now())) {
+            GeneratePostFeaturedImage::dispatch($post->getKey());
+        }
+    }
+
+    protected function deleteAiImageIfOwned(?string $path, bool $shouldDelete): void
+    {
+        if (!$path || !$shouldDelete) {
+            return;
+        }
+
+        FileUploadService::deleteFile($path, config('ai-images.storage_disk'));
     }
 }

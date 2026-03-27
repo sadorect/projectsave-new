@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminFileController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedController;
@@ -12,7 +11,6 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PartnerController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\AsomPageSettingsController;
 use App\Http\Controllers\AdminUserController;
@@ -24,6 +22,7 @@ use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\PrayerForceController;
 use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\Admin\AiImageSettingsController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\LMS\ExamController;
 use App\Http\Controllers\Admin\VideoReelController;
@@ -243,10 +242,16 @@ Route::prefix('admin')->group(function() {
 // Content Management
 Route::prefix('content')->middleware(['auth', 'verified'])->group(function() {
     Route::middleware('permission:view-posts,create-posts,edit-posts,delete-posts,publish-posts,manage-post-taxonomy,access-content-admin,edit-content,admin')->group(function() {
+        Route::get('ai-images/settings', [AiImageSettingsController::class, 'edit'])->name('admin.ai-images.settings.edit');
+        Route::post('ai-images/settings', [AiImageSettingsController::class, 'update'])->name('admin.ai-images.settings.update');
+        Route::post('ai-images/settings/{provider}/test', [AiImageSettingsController::class, 'testProvider'])->name('admin.ai-images.settings.test');
         Route::resource('posts', PostController::class)->names('admin.posts');
         // Add new routes for enhanced post management
         Route::post('posts/bulk-action', [PostController::class, 'bulkAction'])->name('admin.posts.bulk-action');
         Route::post('posts/create-category', [PostController::class, 'createCategory'])->name('admin.posts.create-category');
+        Route::post('posts/{post}/generate-featured-image', [PostController::class, 'generateFeaturedImage'])->name('admin.posts.generate-featured-image');
+        Route::post('posts/{post}/approve-featured-image', [PostController::class, 'approveFeaturedImage'])->name('admin.posts.approve-featured-image');
+        Route::post('posts/{post}/reject-featured-image', [PostController::class, 'rejectFeaturedImage'])->name('admin.posts.reject-featured-image');
     });
 
     Route::middleware('permission:view-events,create-events,edit-events,delete-events,publish-events,access-content-admin,edit-content,admin')->group(function() {

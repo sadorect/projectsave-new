@@ -87,6 +87,60 @@
                             @enderror
                         </div>
 
+                        <div class="card border-light-subtle mb-3">
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" value="1" id="featuredImageGenerationEnabled" name="featured_image_generation_enabled" {{ old('featured_image_generation_enabled') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="featuredImageGenerationEnabled">Generate featured image automatically with AI</label>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">AI Provider</label>
+                                        <select name="featured_image_provider" class="form-select @error('featured_image_provider') is-invalid @enderror">
+                                            @foreach($aiProviders as $providerKey => $provider)
+                                                <option value="{{ $providerKey }}" {{ old('featured_image_provider', $defaultAiProvider) === $providerKey ? 'selected' : '' }}>
+                                                    {{ $provider['label'] ?? $providerKey }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="form-text">Providers are listed from budget-oriented to premium quality.</div>
+                                        @error('featured_image_provider')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Style Preset</label>
+                                        <select name="featured_image_preset" class="form-select @error('featured_image_preset') is-invalid @enderror">
+                                            @foreach($aiPresets as $presetKey => $preset)
+                                                <option value="{{ $presetKey }}" {{ old('featured_image_preset', $defaultAiPreset) === $presetKey ? 'selected' : '' }}>
+                                                    {{ $preset['label'] ?? $presetKey }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('featured_image_preset')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Prompt Override</label>
+                                        <textarea name="featured_image_prompt" class="form-control @error('featured_image_prompt') is-invalid @enderror" rows="3" placeholder="Optional extra direction for the selected preset">{{ old('featured_image_prompt') }}</textarea>
+                                        @error('featured_image_prompt')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Advanced Options JSON</label>
+                                        <textarea name="featured_image_options" class="form-control @error('featured_image_options') is-invalid @enderror" rows="3" placeholder='Optional provider-specific overrides, e.g. {"size":"1024x1024","quality":"high"}'>{{ old('featured_image_options') }}</textarea>
+                                        <div class="form-text">Presets apply now. You can add provider-specific options later without changing the post schema.</div>
+                                        @error('featured_image_options')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                        <!-- Categories with on-the-fly creation -->
 <div class="mb-3">
     <div class="d-flex justify-content-between align-items-center mb-2">

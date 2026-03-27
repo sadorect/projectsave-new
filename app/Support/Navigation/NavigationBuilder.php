@@ -77,12 +77,15 @@ class NavigationBuilder
         if ($this->canAny($user, ['access-content-admin', 'edit-content', 'view-posts', 'view-events', 'view-faqs', 'manage-forms'])) {
             $contentOpen = request()->routeIs(
                 'admin.posts*', 'admin.events*', 'admin.categories*',
-                'admin.tags*', 'admin.faqs*', 'admin.forms*', 'admin.submissions*', 'news.*', 'videos.*'
+                'admin.tags*', 'admin.faqs*', 'admin.forms*', 'admin.submissions*', 'admin.ai-images.settings*', 'news.*', 'videos.*'
             );
 
             $contentChildren = [];
             if ($this->canAny($user, ['view-posts', 'access-content-admin', 'edit-content'])) {
                 $contentChildren[] = $this->item('posts', 'Posts', 'bi bi-file-text', route('admin.posts.index'), request()->routeIs('admin.posts*'));
+            }
+            if ($this->canAny($user, ['manage-ai-image-settings'])) {
+                $contentChildren[] = $this->item('ai-images', 'AI Images', 'bi bi-stars', route('admin.ai-images.settings.edit'), request()->routeIs('admin.ai-images.settings*'));
             }
             if ($this->canAny($user, ['view-events', 'access-content-admin', 'edit-content'])) {
                 $contentChildren[] = $this->item('events', 'Events', 'bi bi-calendar-event', route('admin.events.index'), request()->routeIs('admin.events*'));
@@ -235,6 +238,12 @@ class NavigationBuilder
             $this->item('tags', 'Tags', 'bi bi-tags', route('admin.tags.index'), request()->routeIs('admin.tags*')),
             $this->item('forms', 'Forms', 'bi bi-ui-checks', route('admin.forms.index'), request()->routeIs('admin.forms*')),
         ];
+
+        if ($this->canAny($user, ['manage-ai-image-settings'])) {
+            array_splice($items, 1, 0, [
+                $this->item('ai-images', 'AI Images', 'bi bi-stars', route('admin.ai-images.settings.edit'), request()->routeIs('admin.ai-images.settings*')),
+            ]);
+        }
 
         return [['label' => 'Content', 'items' => $items]];
     }

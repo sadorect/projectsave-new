@@ -21,6 +21,20 @@ class Post extends Model
         'details',
         'action_point',
         'image',
+        'featured_image_candidate_path',
+        'featured_image_source',
+        'featured_image_generation_enabled',
+        'featured_image_generation_status',
+        'featured_image_approval_status',
+        'featured_image_provider',
+        'featured_image_preset',
+        'featured_image_prompt',
+        'featured_image_options',
+        'featured_image_generated_at',
+        'featured_image_generation_error',
+        'featured_image_reviewed_by',
+        'featured_image_reviewed_at',
+        'featured_image_review_notes',
         'author',
         'user_id',
         'comments_count',
@@ -30,7 +44,11 @@ class Post extends Model
     ];
 
     protected $casts = [
-        'published_at' => 'datetime'
+        'published_at' => 'datetime',
+        'featured_image_generation_enabled' => 'boolean',
+        'featured_image_options' => 'array',
+        'featured_image_generated_at' => 'datetime',
+        'featured_image_reviewed_at' => 'datetime',
     ];
 
     public function author()
@@ -50,6 +68,11 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function featuredImageReviewer()
+    {
+        return $this->belongsTo(User::class, 'featured_image_reviewed_by');
     }
 
     public function scopePublished($query)

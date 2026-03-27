@@ -59,19 +59,64 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Posts @if(request('search')) - Search Results @endif</h1>
-        <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Add New Post
-        </a>
+        <div class="d-flex gap-2">
+            @if(auth()->user()?->hasPermission('manage-ai-image-settings'))
+                <a href="{{ route('admin.ai-images.settings.edit') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-stars"></i> AI Settings
+                </a>
+            @endif
+            <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add New Post
+            </a>
+        </div>
     </div>
 
     @include('components.alerts')
 
+    @if(auth()->user()?->hasPermission('manage-ai-image-settings'))
+        <div class="card mb-4 border-primary-subtle">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-sliders"></i> AI Featured Image Settings</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                    <div>
+                        <div class="fw-semibold mb-1">Review requirement is currently {{ !empty($aiSettings['require_approval']) ? 'ON' : 'OFF' }}</div>
+                        <div class="text-muted small">Default provider: {{ $aiSettings['default_provider'] }} · Default preset: {{ $aiSettings['default_preset'] }}</div>
+                        <div class="text-muted small">Use the AI Settings page to toggle review and add provider API keys.</div>
+                    </div>
+                    <a href="{{ route('admin.ai-images.settings.edit') }}" class="btn btn-primary">
+                        <i class="bi bi-stars"></i> Open AI Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(!empty($aiSettings['require_approval']))
+        <div class="alert {{ $pendingAiReviewCount > 0 ? 'alert-warning' : 'alert-light border' }} d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+            <div>
+                <div class="fw-semibold">AI review queue</div>
+                @if($pendingAiReviewCount > 0)
+                    <div>You have {{ $pendingAiReviewCount }} AI-generated {{ $pendingAiReviewCount === 1 ? 'post image' : 'post images' }} waiting for review.</div>
+                @else
+                    <div>No AI-generated post images are currently waiting for review.</div>
+                @endif
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.posts.index', array_merge(request()->query(), ['image_source_filter' => 'ai_candidate', 'ai_approval_status_filter' => 'pending'])) }}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-stars"></i> View Pending Reviews
+                </a>
+            </div>
+        </div>
+    @endif
+
     <!-- Search and Filter Section -->
-    <div class="card mb-4 {{ request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to', 'sort']) && request('sort') != 'latest' ? 'filter-active' : '' }}">
+    <div class="card mb-4 {{ request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to', 'sort', 'image_source_filter', 'ai_generation_status_filter', 'ai_approval_status_filter']) && request('sort') != 'latest' ? 'filter-active' : '' }}">
         <div class="card-header">
             <h5 class="mb-0">
                 <i class="bi bi-search"></i> Search & Filter Posts
-                @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to']) || (request('sort') && request('sort') != 'latest'))
+                @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to', 'image_source_filter', 'ai_generation_status_filter', 'ai_approval_status_filter']) || (request('sort') && request('sort') != 'latest'))
                     <span class="badge bg-info ms-2">Filtered</span>
                 @endif
                 <button class="btn btn-sm btn-outline-secondary float-end" type="button" data-bs-toggle="collapse" data-bs-target="#searchFilters" aria-expanded="false">
@@ -167,6 +212,36 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Image Source</label>
+                            <select name="image_source_filter" class="form-select form-select-sm">
+                                <option value="">Any Source</option>
+                                @foreach($imageSourceOptions as $value => $label)
+                                    <option value="{{ $value }}" {{ request('image_source_filter') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">AI Generation Status</label>
+                            <select name="ai_generation_status_filter" class="form-select form-select-sm">
+                                <option value="">Any Generation Status</option>
+                                @foreach($aiGenerationStatusOptions as $value => $label)
+                                    <option value="{{ $value }}" {{ request('ai_generation_status_filter') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">AI Review Status</label>
+                            <select name="ai_approval_status_filter" class="form-select form-select-sm">
+                                <option value="">Any Review Status</option>
+                                @foreach($aiApprovalStatusOptions as $value => $label)
+                                    <option value="{{ $value }}" {{ request('ai_approval_status_filter') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     
                     <div class="row mt-3">
                         <div class="col-12">
@@ -181,7 +256,7 @@
     </div>
 
     <!-- Results Info -->
-    @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to']))
+    @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to', 'image_source_filter', 'ai_generation_status_filter', 'ai_approval_status_filter']))
         <div class="alert alert-info">
             <i class="bi bi-info-circle"></i>
             Showing {{ $posts->total() }} result(s) 
@@ -202,6 +277,15 @@
                 @else
                     until {{ request('date_to') }}
                 @endif
+            @endif
+            @if(request('image_source_filter'))
+                with source <strong>{{ $imageSourceOptions[request('image_source_filter')] ?? request('image_source_filter') }}</strong>
+            @endif
+            @if(request('ai_generation_status_filter'))
+                with generation status <strong>{{ $aiGenerationStatusOptions[request('ai_generation_status_filter')] ?? request('ai_generation_status_filter') }}</strong>
+            @endif
+            @if(request('ai_approval_status_filter'))
+                with review status <strong>{{ $aiApprovalStatusOptions[request('ai_approval_status_filter')] ?? request('ai_approval_status_filter') }}</strong>
             @endif
         </div>
     @endif
@@ -274,6 +358,7 @@
                                 </th>
                                 <th>Categories</th>
                                 <th>Tags</th>
+                                <th>Image Status</th>
                                 <th>
                                     Published
                                     @if(request('sort') == 'latest')
@@ -326,6 +411,31 @@
                                         @endforelse
                                     </td>
                                     <td>
+                                        <div class="d-flex flex-column gap-1">
+                                            @if($post->featured_image_source === 'manual')
+                                                <span class="badge bg-dark-subtle text-dark">Manual</span>
+                                            @elseif($post->featured_image_source === 'ai')
+                                                <span class="badge bg-primary">AI Live</span>
+                                            @elseif($post->featured_image_candidate_path)
+                                                <span class="badge bg-warning text-dark">AI Candidate</span>
+                                            @else
+                                                <span class="badge bg-light text-dark border">None</span>
+                                            @endif
+
+                                            @if($post->featured_image_generation_status)
+                                                <span class="badge {{ $post->featured_image_generation_status === 'failed' ? 'bg-danger' : ($post->featured_image_generation_status === 'processing' ? 'bg-info text-dark' : 'bg-secondary') }}">
+                                                    {{ ucfirst($post->featured_image_generation_status) }}
+                                                </span>
+                                            @endif
+
+                                            @if($post->featured_image_approval_status)
+                                                <span class="badge {{ $post->featured_image_approval_status === 'approved' ? 'bg-success' : ($post->featured_image_approval_status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $post->featured_image_approval_status)) }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
                                         @if($post->published_at)
                                             <div>{{ $post->published_at->format('M d, Y') }}</div>
                                             <small class="text-muted">{{ $post->published_at->format('H:i') }}</small>
@@ -335,6 +445,11 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
+                                            @if($post->featured_image_candidate_path && $post->featured_image_approval_status === 'pending')
+                                                <a href="{{ route('admin.posts.edit', $post) }}#ai-review" class="btn btn-sm btn-warning" title="Review AI Candidate">
+                                                    <i class="bi bi-stars"></i> Review AI
+                                                </a>
+                                            @endif
                                             <a href="{{ route('admin.posts.edit', $post) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
@@ -359,13 +474,13 @@
                     <i class="bi bi-inbox display-1 text-muted"></i>
                     <h4 class="text-muted mt-3">No Posts Found</h4>
                     <p class="text-muted">
-                        @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to']))
+                        @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to', 'image_source_filter', 'ai_generation_status_filter', 'ai_approval_status_filter']))
                             No posts match your current search criteria. Try adjusting your filters.
                         @else
                             You haven't created any posts yet.
                         @endif
                     </p>
-                    @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to']))
+                    @if(request()->hasAny(['search', 'category_filter', 'author_filter', 'date_from', 'date_to', 'image_source_filter', 'ai_generation_status_filter', 'ai_approval_status_filter']))
                         <button type="button" class="btn btn-outline-primary" onclick="clearSearch()">
                             <i class="bi bi-arrow-clockwise"></i> Clear Filters
                         </button>
@@ -455,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Auto-submit on filter changes
-    document.querySelectorAll('select[name="category_filter"], select[name="author_filter"], select[name="sort"], input[name="date_from"], input[name="date_to"]').forEach(element => {
+    document.querySelectorAll('select[name="category_filter"], select[name="author_filter"], select[name="sort"], select[name="image_source_filter"], select[name="ai_generation_status_filter"], select[name="ai_approval_status_filter"], input[name="date_from"], input[name="date_to"]').forEach(element => {
         element.addEventListener('change', function() {
             searchForm.submit();
         });
@@ -467,6 +582,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('select[name="category_filter"]').value = '';
         document.querySelector('select[name="author_filter"]').value = '';
         document.querySelector('select[name="sort"]').value = 'latest';
+        document.querySelector('select[name="image_source_filter"]').value = '';
+        document.querySelector('select[name="ai_generation_status_filter"]').value = '';
+        document.querySelector('select[name="ai_approval_status_filter"]').value = '';
         document.querySelector('input[name="date_from"]').value = '';
         document.querySelector('input[name="date_to"]').value = '';
         searchForm.submit();

@@ -6,6 +6,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -17,7 +18,7 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissionQuery = Permission::query()->with(['roles' => fn (Builder $query) => $this->applyRoleGuard($query)]);
+        $permissionQuery = Permission::query()->with(['roles' => fn (BelongsToMany $query) => $this->applyRoleGuard($query)]);
 
         if ($this->permissionHasColumn('guard_name')) {
             $permissionQuery->where('guard_name', $this->defaultGuardName());
@@ -166,7 +167,7 @@ class PermissionController extends Controller
         return $query;
     }
 
-    private function applyRoleGuard(Builder $query): Builder
+    private function applyRoleGuard(Builder|BelongsToMany $query): Builder|BelongsToMany
     {
         if ($this->roleHasColumn('guard_name')) {
             $query->where('guard_name', $this->defaultGuardName());

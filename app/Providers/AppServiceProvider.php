@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\AiImages\AiImageProviderManager;
+use App\Services\AiImages\AiImageSettings;
 use App\Contracts\ScansUploadedFiles;
 use App\Services\MalwareScanner;
 use App\Support\Navigation\NavigationBuilder;
@@ -17,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ScansUploadedFiles::class, MalwareScanner::class);
+        $this->app->singleton(AiImageProviderManager::class, AiImageProviderManager::class);
+        $this->app->singleton(AiImageSettings::class, AiImageSettings::class);
     }
 
     /**
