@@ -8,12 +8,20 @@ Alpine.start();
 
 /* ─── Admin sidebar nav group toggles ──────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
-    const richTextElements = document.querySelectorAll("[data-rich-text-editor]");
+    const richTextElements = document.querySelectorAll(
+        "[data-rich-text-editor], [data-admin-rich-text]",
+    );
 
     if (typeof window.ClassicEditor !== "undefined" && richTextElements.length) {
         richTextElements.forEach((element) => {
             if (element.dataset.editorReady === "true") {
                 return;
+            }
+
+            const isRequired = element.hasAttribute("required");
+            if (isRequired) {
+                element.dataset.richTextRequired = "true";
+                element.removeAttribute("required");
             }
 
             window.ClassicEditor.create(element, {
@@ -47,10 +55,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then((editor) => {
                     element.dataset.editorReady = "true";
                     const form = element.closest("form");
+                    const feedback =
+                        element.parentElement?.querySelector(".invalid-feedback");
+
+                    const syncEditorState = () => {
+                        editor.updateSourceElement();
+
+                        if (element.dataset.richTextRequired !== "true") {
+                            return true;
+                        }
+
+                        const plainText = editor
+                            .getData()
+                            .replace(/<[^>]*>/g, " ")
+                            .replace(/&nbsp;/gi, " ")
+                            .trim();
+                        const isEmpty = plainText === "";
+
+                        if (feedback) {
+                            feedback.style.display = isEmpty ? "block" : "";
+                        }
+
+                        const editorElement = editor.ui.view.editable.element;
+                        if (editorElement) {
+                            editorElement.classList.toggle("is-invalid", isEmpty);
+                        }
+
+                        return !isEmpty;
+                    };
+
+                    syncEditorState();
+                    editor.model.document.on("change:data", syncEditorState);
 
                     if (form) {
-                        form.addEventListener("submit", () => {
-                            editor.updateSourceElement();
+                        form.addEventListener("submit", (event) => {
+                            const isValid = syncEditorState();
+                            if (!isValid) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
                         });
                     }
                 })

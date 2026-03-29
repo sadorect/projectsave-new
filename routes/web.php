@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MinistryReportController;
 use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\AdminController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Admin\MailController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\PrayerForceController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\LMS\ExamController;
 use App\Http\Controllers\Admin\VideoReelController;
 use App\Http\Controllers\Admin\AdminEventController;
+use App\Http\Controllers\Admin\MinistryReportController as AdminMinistryReportController;
 use App\Http\Controllers\Admin\NewsUpdateController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\AdminLessonController;
@@ -65,6 +68,8 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 // Event Routes
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('events.show');
+Route::get('/reports', [MinistryReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/{report:slug}', [MinistryReportController::class, 'show'])->name('reports.show');
 
 // Contact Routes
 Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
@@ -269,6 +274,7 @@ Route::prefix('content')->middleware(['auth', 'verified'])->group(function() {
     Route::middleware('permission:access-content-admin,edit-content,admin')->group(function() {
         Route::resource('news', NewsUpdateController::class);
         Route::resource('videos', VideoReelController::class);
+        Route::resource('reports', AdminMinistryReportController::class)->except('show')->names('admin.reports');
     });
 
     Route::middleware('permission:view-faqs,create-faqs,edit-faqs,delete-faqs,publish-faqs,access-content-admin,edit-content,admin')->group(function() {
@@ -283,6 +289,8 @@ Route::middleware(['auth', 'verified', 'permission:access-admin-dashboard,admin'
         Route::get('/mail/compose', [MailController::class, 'compose'])->name('mail.compose');
         Route::post('/mail/send', [MailController::class, 'send'])->name('mail.send');
         Route::post('/mail/preview/{template?}', [MailController::class, 'preview'])->name('mail.preview');
+        Route::get('/newsletter-subscribers', [NewsletterSubscriberController::class, 'index'])->name('newsletter-subscribers.index');
+        Route::get('/newsletter-subscribers/{newsletterSubscriber}', [NewsletterSubscriberController::class, 'show'])->name('newsletter-subscribers.show');
     });
 
     Route::middleware('permission:manage-mail-templates,admin')->group(function () {

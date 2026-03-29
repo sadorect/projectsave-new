@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
+use App\Models\MinistryReport;
 use App\Models\Post;
 use App\Models\Event;
 
@@ -33,6 +34,22 @@ class GenerateImageSitemap extends Command
                         ->addImage(asset('storage/' . $event->image), $event->title)
                 );
             }
+        });
+
+        MinistryReport::published()->get()->each(function (MinistryReport $report) use ($sitemap) {
+            if ($report->featured_image) {
+                $sitemap->add(
+                    Url::create(asset('storage/' . $report->featured_image))
+                        ->addImage(asset('storage/' . $report->featured_image), $report->title)
+                );
+            }
+
+            collect($report->gallery ?? [])->each(function (string $imagePath) use ($sitemap, $report) {
+                $sitemap->add(
+                    Url::create(asset('storage/' . $imagePath))
+                        ->addImage(asset('storage/' . $imagePath), $report->title)
+                );
+            });
         });
 
         $sitemap->writeToFile(public_path('image-sitemap.xml'));

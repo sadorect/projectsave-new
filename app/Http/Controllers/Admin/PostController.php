@@ -309,6 +309,9 @@ class PostController extends Controller
     public function store(Request $request)
     {
         try {
+            $submitAction = (string) $request->input('submit_action', 'publish');
+            $isDraft = $submitAction === 'draft';
+
             $validated = $request->validate([
                 'title' => 'required|max:255',
                 'scripture' => 'nullable|string|max:500',
@@ -320,9 +323,8 @@ class PostController extends Controller
                 'author' => 'nullable|string|max:255',
                 'category_ids' => 'nullable|array',
                 'category_ids.*' => 'exists:categories,id',
-                'tag_ids' => 'nullable|array',
-                'tag_ids.*' => 'exists:tags,id',
-                'published_at' => 'required|date_format:Y-m-d\TH:i',
+                'tag_names' => 'nullable|string|max:2000',
+                'published_at' => [$isDraft ? 'nullable' : 'required', 'date_format:Y-m-d\TH:i'],
                 'featured_image_generation_enabled' => 'nullable|boolean',
                 'featured_image_provider' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.providers', [])))],
                 'featured_image_preset' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.presets', [])))],
@@ -334,7 +336,9 @@ class PostController extends Controller
 
             $validated['slug'] = Str::slug($validated['title']);
             $validated['user_id'] = auth()->id();
-            $validated['published_at'] = Carbon::parse($request->published_at);
+            $validated['published_at'] = $isDraft || !$request->filled('published_at')
+                ? null
+                : Carbon::parse($request->published_at);
             $validated['details'] = HtmlSanitizer::clean($validated['details']);
             if (isset($validated['bible_text'])) {
                 $validated['bible_text'] = HtmlSanitizer::clean($validated['bible_text']);
@@ -374,9 +378,7 @@ class PostController extends Controller
             
             $post->categories()->sync($categoryIds);
             
-            if ($request->tag_ids) {
-                $post->tags()->sync($request->tag_ids);
-            }
+            $this->syncTagsByName($post, $request->input('tag_names'));
 
             if ($request->has('share_to_facebook')) {
                 try {
@@ -396,7 +398,7 @@ class PostController extends Controller
             $this->dispatchFeaturedImageJobIfNeeded($post, $request->boolean('featured_image_generation_enabled'));
 
             DB::commit();
-            return redirect()->route('admin.posts.index')->with('success', 'Post created successfully');
+            return redirect()->route('admin.posts.index')->with('success', $isDraft ? 'Post saved as draft successfully' : 'Post created successfully');
 
         } catch (ValidationException $e) {
             DB::rollBack();
@@ -426,6 +428,9 @@ class PostController extends Controller
 
     public function update(Request $request, Post $post)
     {
+        $submitAction = (string) $request->input('submit_action', 'publish');
+        $isDraft = $submitAction === 'draft';
+
         $validated = $request->validate([
             'title' => 'required|max:255',
             'scripture' => 'nullable',
@@ -436,8 +441,8 @@ class PostController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'author' => 'nullable',
             'category_ids' => 'array',
-            'tag_ids' => 'array',
-            'published_at' => 'required|date_format:Y-m-d\TH:i',
+            'tag_names' => 'nullable|string|max:2000',
+            'published_at' => [$isDraft ? 'nullable' : 'required', 'date_format:Y-m-d\TH:i'],
             'featured_image_generation_enabled' => 'nullable|boolean',
             'featured_image_provider' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.providers', [])))],
             'featured_image_preset' => ['nullable', 'string', Rule::in(array_keys(config('ai-images.presets', [])))],
@@ -445,7 +450,9 @@ class PostController extends Controller
             'featured_image_options' => 'nullable|string',
         ]);
 
-        $validated['published_at'] = Carbon::parse($request->published_at);
+        $validated['published_at'] = $isDraft || !$request->filled('published_at')
+            ? null
+            : Carbon::parse($request->published_at);
 
         if ($request->hasFile('image')) {
             $this->deleteAiImageIfOwned($post->image, (bool) $post->image);
@@ -481,11 +488,11 @@ class PostController extends Controller
 
         $post->update($validated);
         $post->categories()->sync($request->category_ids);
-        $post->tags()->sync($request->tag_ids);
+        $this->syncTagsByName($post, $request->input('tag_names'));
 
         $this->dispatchFeaturedImageJobIfNeeded($post->fresh(), $request->boolean('featured_image_generation_enabled'));
 
-        return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully');
+        return redirect()->route('admin.posts.index')->with('success', $isDraft ? 'Post saved as draft successfully' : 'Post updated successfully');
     }
 
     public function generateFeaturedImage(Post $post)
@@ -638,5 +645,40 @@ class PostController extends Controller
         }
 
         FileUploadService::deleteFile($path, config('ai-images.storage_disk'));
+    }
+
+    protected function syncTagsByName(Post $post, ?string $tagNames): void
+    {
+        $names = collect(preg_split('/[\r\n,]+/', (string) $tagNames))
+            ->map(function (string $name): string {
+                return trim(strip_tags($name));
+            })
+            ->filter()
+            ->unique(fn (string $name) => Str::lower($name))
+            ->values();
+
+        if ($names->isEmpty()) {
+            $post->tags()->sync([]);
+            return;
+        }
+
+        $tagIds = $names->map(function (string $name): int {
+            $existingTag = Tag::query()
+                ->whereRaw('LOWER(name) = ?', [Str::lower($name)])
+                ->first();
+
+            if ($existingTag) {
+                return $existingTag->id;
+            }
+
+            $tag = Tag::create([
+                'name' => $name,
+                'slug' => Str::slug($name),
+            ]);
+
+            return $tag->id;
+        });
+
+        $post->tags()->sync($tagIds->all());
     }
 }

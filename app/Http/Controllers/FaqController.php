@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Faq;
+use App\Services\HtmlSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -85,6 +86,7 @@ class FaqController extends Controller
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
+        $validated['details'] = HtmlSanitizer::clean($validated['details']);
 
         Faq::create($validated);
 
@@ -105,6 +107,7 @@ class FaqController extends Controller
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
+        $validated['details'] = HtmlSanitizer::clean($validated['details']);
 
         $faq->update($validated);
 

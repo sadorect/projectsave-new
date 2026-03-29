@@ -4,6 +4,7 @@
         ['label' => 'Home', 'route' => 'home', 'patterns' => ['home']],
         ['label' => 'About', 'route' => 'about', 'patterns' => ['about']],
         ['label' => 'Events', 'route' => 'events.index', 'patterns' => ['events.*']],
+        ['label' => 'Reports', 'route' => 'reports.index', 'patterns' => ['reports.*']],
         ['label' => 'Devotionals', 'route' => 'blog.index', 'patterns' => ['blog.*', 'posts.show']],
         ['label' => 'FAQs', 'route' => 'faqs.list', 'patterns' => ['faqs.*']],
         ['label' => 'Contact', 'route' => 'contact.show', 'patterns' => ['contact.*']],
@@ -69,11 +70,9 @@
                 </a>
 
                 <div class="d-flex align-items-center gap-2 ms-auto d-lg-none">
-                    @guest
-                        <a href="{{ route('login') }}" class="site-account-link site-mobile-cta">Login</a>
-                    @else
+                    @auth
                         <a href="{{ $dashboardRoute }}" class="site-account-link site-mobile-cta">Dashboard</a>
-                    @endguest
+                    @endauth
 
                     <button
                         class="site-navbar-toggle"
@@ -101,7 +100,7 @@
                                 type="search"
                                 name="q"
                                 value="{{ request('q') }}"
-                                placeholder="Search devotionals, FAQs, and events"
+                                placeholder="Search devotionals, reports, FAQs, and events"
                             >
                             <button class="site-search-button" type="submit">
                                 <i class="fas fa-search"></i>
@@ -124,9 +123,7 @@
                                 <span>Partner</span>
                             </a>
 
-                            @guest
-                                <a href="{{ route('login') }}" class="site-account-link">Login</a>
-                            @else
+                            @auth
                                 <a href="{{ $dashboardRoute }}" class="site-account-link">
                                     <i class="fas fa-th-large" style="font-size:0.75rem;opacity:0.7;"></i>
                                     Dashboard
@@ -135,7 +132,7 @@
                                     @csrf
                                     <button type="submit" class="surface-button-ghost">Logout</button>
                                 </form>
-                            @endguest
+                            @endauth
                         </div>
                     </div>
                 </div>

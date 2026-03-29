@@ -20,6 +20,26 @@
                                 <label class="custom-control-label" for="emailEnabled">Enable Email Notifications</label>
                             </div>
                         </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Newsletter Sending</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="custom-control custom-switch">
+                                    <input
+                                        type="checkbox"
+                                        class="custom-control-input"
+                                        id="newsletterEnabled"
+                                        name="newsletter_enabled"
+                                        value="1"
+                                        {{ data_get($settings, 'newsletter.enabled', true) ? 'checked' : '' }}
+                                    >
+                                    <label class="custom-control-label" for="newsletterEnabled">Send newly published devotionals to newsletter subscribers</label>
+                                </div>
+                                <p class="text-muted small mt-3 mb-0">Turn this off if you want articles to publish without triggering subscriber emails.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-md-6">

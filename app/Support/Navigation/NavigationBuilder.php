@@ -28,9 +28,9 @@ class NavigationBuilder
             $this->item('asom', 'ASOM', null, route('asom'), request()->routeIs('asom')),
             $this->item('devotional', 'Devotional', null, route('blog.index'), request()->routeIs('blog*', 'posts*')),
             $this->item('events', 'Events', null, route('events.index'), request()->routeIs('events*')),
+            $this->item('reports', 'Reports', null, route('reports.index'), request()->routeIs('reports*')),
             $this->item('contact', 'Contact', null, route('contact.show'), request()->routeIs('contact*')),
             $this->item('faqs', 'FAQs', null, route('faqs.list'), request()->routeIs('faqs*')),
-            $this->item('volunteer', 'Get Involved', null, route('volunteer.prayer-force'), request()->routeIs('volunteer*', 'partners*')),
         ];
 
         return [['label' => null, 'items' => $items]];
@@ -77,7 +77,7 @@ class NavigationBuilder
         if ($this->canAny($user, ['access-content-admin', 'edit-content', 'view-posts', 'view-events', 'view-faqs', 'manage-forms'])) {
             $contentOpen = request()->routeIs(
                 'admin.posts*', 'admin.events*', 'admin.categories*',
-                'admin.tags*', 'admin.faqs*', 'admin.forms*', 'admin.submissions*', 'admin.ai-images.settings*', 'news.*', 'videos.*'
+                'admin.tags*', 'admin.faqs*', 'admin.forms*', 'admin.submissions*', 'admin.ai-images.settings*', 'admin.reports*', 'news.*', 'videos.*'
             );
 
             $contentChildren = [];
@@ -89,6 +89,9 @@ class NavigationBuilder
             }
             if ($this->canAny($user, ['view-events', 'access-content-admin', 'edit-content'])) {
                 $contentChildren[] = $this->item('events', 'Events', 'bi bi-calendar-event', route('admin.events.index'), request()->routeIs('admin.events*'));
+            }
+            if ($this->canAny($user, ['access-content-admin', 'edit-content'])) {
+                $contentChildren[] = $this->item('reports', 'Reports', 'bi bi-journal-richtext', route('admin.reports.index'), request()->routeIs('admin.reports*'));
             }
             if ($this->canAny($user, ['view-faqs', 'create-faqs', 'edit-faqs', 'delete-faqs', 'publish-faqs', 'access-content-admin', 'edit-content'])) {
                 $contentChildren[] = $this->item('faqs', 'FAQs', 'bi bi-patch-question', route('admin.faqs.index'), request()->routeIs('admin.faqs*'));
@@ -179,6 +182,7 @@ class NavigationBuilder
 
             if ($this->canAny($user, ['manage-mail'])) {
                 $mailChildren[] = $this->item('mail-compose', 'Compose', 'bi bi-pencil', route('admin.mail.compose'), request()->routeIs('admin.mail.compose'));
+                $mailChildren[] = $this->item('newsletter-subscribers', 'Subscribers', 'bi bi-people', route('admin.newsletter-subscribers.index'), request()->routeIs('admin.newsletter-subscribers*'));
             }
             if ($this->canAny($user, ['manage-mail-templates'])) {
                 $mailChildren[] = $this->item('mail-templates', 'Templates', 'bi bi-file-earmark-text', route('admin.mail-templates.index'), request()->routeIs('admin.mail-templates*'));
@@ -234,6 +238,7 @@ class NavigationBuilder
         $items = [
             $this->item('posts', 'Posts', 'bi bi-file-text', route('admin.posts.index'), request()->routeIs('admin.posts*')),
             $this->item('events', 'Events', 'bi bi-calendar-event', route('admin.events.index'), request()->routeIs('admin.events*')),
+            $this->item('reports', 'Reports', 'bi bi-journal-richtext', route('admin.reports.index'), request()->routeIs('admin.reports*')),
             $this->item('categories', 'Categories', 'bi bi-tag', route('admin.categories.index'), request()->routeIs('admin.categories*')),
             $this->item('tags', 'Tags', 'bi bi-tags', route('admin.tags.index'), request()->routeIs('admin.tags*')),
             $this->item('forms', 'Forms', 'bi bi-ui-checks', route('admin.forms.index'), request()->routeIs('admin.forms*')),

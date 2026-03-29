@@ -144,3 +144,47 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleHolyGhost();
     }
 });
+
+/* ─── Home video reels click-to-play ────────────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("[data-video-card]").forEach((card) => {
+        const trigger = card.querySelector("[data-video-embed]");
+        const frame = card.querySelector("[data-video-frame]");
+
+        if (!trigger || !frame) {
+            return;
+        }
+
+        const playVideo = () => {
+            if (frame.dataset.videoPlaying === "true") {
+                return;
+            }
+
+            const youtubeId = trigger.getAttribute("data-video-embed");
+            if (!youtubeId) {
+                return;
+            }
+
+            const title =
+                trigger.getAttribute("aria-label") || "Play ministry reel";
+
+            frame.dataset.videoPlaying = "true";
+            frame.innerHTML = `
+                <iframe
+                    src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0"
+                    title="${title}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                ></iframe>
+            `;
+        };
+
+        trigger.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            playVideo();
+        });
+
+        card.addEventListener("click", playVideo);
+    });
+});

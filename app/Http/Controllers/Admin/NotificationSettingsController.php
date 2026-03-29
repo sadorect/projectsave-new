@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\AppSetting;
 use App\Models\Event;
 use App\Models\User;
 use App\Models\ReminderLog;
@@ -23,6 +24,7 @@ class NotificationSettingsController extends Controller
         'sms_provider' => config('services.sms.provider', 'twilio'),
         'twilio' => config('services.twilio', []),
         'africas_talking' => config('services.africas_talking', []),
+        'newsletter' => AppSetting::get('newsletter_sending', ['enabled' => true]),
     ];
 
         return view('admin.prayer-force.notification-settings', compact('settings'));
@@ -38,10 +40,14 @@ class NotificationSettingsController extends Controller
         'at_username' => 'required_if:sms_provider,africas_talking',
         'at_api_key' => 'required_if:sms_provider,africas_talking',
         'at_from' => 'required_if:sms_provider,africas_talking',
+        'newsletter_enabled' => 'nullable|boolean',
     ]);
 
     $data = array_merge(['sms_provider' => 'twilio'], $validated);
     $this->updateEnvironmentFile($data);
+    AppSetting::set('newsletter_sending', [
+        'enabled' => $request->boolean('newsletter_enabled'),
+    ]);
 
         return redirect()->back()->with('success', 'Notification settings updated successfully');
     }

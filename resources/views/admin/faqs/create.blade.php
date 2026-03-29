@@ -4,50 +4,23 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="card">
-        <div class="card-header">
-            <h3>Create New FAQ</h3>
+    @include('components.alerts')
+
+    <form action="{{ route('admin.faqs.store') }}" method="POST">
+        @csrf
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-1">Create FAQ</h1>
+                <p class="text-muted mb-0">Write a clear answer, structure it with rich text, and choose whether it should go live immediately.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.faqs.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Create FAQ</button>
+            </div>
         </div>
-        <div class="card-body">
-            <form action="{{ route('admin.faqs.store') }}" method="POST">
-                @csrf
-                <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                           id="title" name="title" value="{{ old('title') }}" required>
-                    @error('title')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
 
-                <div class="mb-3">
-                    <label for="details" class="form-label">Details</label>
-                    <textarea
-                        class="form-control @error('details') is-invalid @enderror"
-                        id="details"
-                        name="details"
-                        rows="8"
-                        data-admin-rich-text
-                    >{{ old('details') }}</textarea>
-                    @error('details')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select class="form-select" id="status" name="status">
-                        <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="published" {{ old('status') === 'published' ? 'selected' : '' }}>Published</option>
-                    </select>
-                </div>
-
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Create FAQ</button>
-                </div>
-            </form>
-        </div>
-    </div>
+        @include('admin.faqs._form')
+    </form>
 </div>
-
 @endsection

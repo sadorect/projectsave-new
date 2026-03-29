@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Event;
 use App\Models\Faq;
+use App\Models\MinistryReport;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
@@ -18,6 +19,7 @@ class SearchController extends Controller
                 'posts' => collect(),
                 'events' => collect(),
                 'faqs' => collect(),
+                'reports' => collect(),
                 'query' => $query,
             ]);
         }
@@ -42,7 +44,16 @@ class SearchController extends Controller
                     ->orWhere('details', 'like', "%{$query}%");
             })
             ->get();
+
+        $reports = MinistryReport::published()
+            ->where(function ($builder) use ($query) {
+                $builder->where('title', 'like', "%{$query}%")
+                    ->orWhere('summary', 'like', "%{$query}%")
+                    ->orWhere('details', 'like', "%{$query}%")
+                    ->orWhere('location', 'like', "%{$query}%");
+            })
+            ->get();
             
-        return view('search.index', compact('posts', 'events', 'query', 'faqs'));
+        return view('search.index', compact('posts', 'events', 'query', 'faqs', 'reports'));
     }
 }

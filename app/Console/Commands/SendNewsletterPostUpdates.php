@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Mail\NewsletterPostPublished;
+use App\Models\AppSetting;
 use App\Models\Post;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use App\Models\NewsletterSubscriber;
 
 class SendNewsletterPostUpdates extends Command
@@ -16,6 +18,15 @@ class SendNewsletterPostUpdates extends Command
 
     public function handle(): int
     {
+        if (Schema::hasTable('app_settings')) {
+            $newsletterSettings = AppSetting::get('newsletter_sending', ['enabled' => true]);
+            if (!data_get($newsletterSettings, 'enabled', true)) {
+                $this->info('Newsletter sending is currently disabled.');
+
+                return self::SUCCESS;
+            }
+        }
+
         $posts = Post::query()
             ->published()
             ->whereNull('newsletter_sent_at')

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Spatie\Sitemap\SitemapGenerator;
+use App\Models\MinistryReport;
 use App\Models\Post;
 use App\Models\Event;
 
@@ -31,6 +32,10 @@ class GenerateSitemap extends Command
 
         Event::all()->each(function ($event) use ($sitemap) {
             $sitemap->add(route('events.show', $event));
+        });
+
+        MinistryReport::published()->get()->each(function ($report) use ($sitemap) {
+            $sitemap->add(route('reports.show', $report));
         });
 
         $sitemap->writeToFile(public_path('sitemap.xml'));

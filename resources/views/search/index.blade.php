@@ -1,13 +1,13 @@
 <x-layouts.app
     :title="$query !== '' ? 'Search results for ' . $query : 'Search Projectsave'"
-    :meta-description="$query !== '' ? 'Search Projectsave devotionals, events, and FAQs for ' . $query : 'Search Projectsave devotionals, events, and FAQs.'"
+    :meta-description="$query !== '' ? 'Search Projectsave devotionals, ministry reports, events, and FAQs for ' . $query : 'Search Projectsave devotionals, ministry reports, events, and FAQs.'"
 >
-    @php($totalResults = $posts->count() + $events->count() + $faqs->count())
+    @php($totalResults = $posts->count() + $events->count() + $faqs->count() + $reports->count())
 
     <x-ui.public-page-hero
         eyebrow="Search"
         :title="$query !== '' ? 'Results for \"' . $query . '\"' : 'Search the ministry site'"
-        :subtitle="$query !== '' ? $totalResults . ' result' . ($totalResults === 1 ? '' : 's') . ' across devotionals, events, and FAQs.' : 'Use a keyword to search devotionals, events, and FAQs from one place.'"
+        :subtitle="$query !== '' ? $totalResults . ' result' . ($totalResults === 1 ? '' : 's') . ' across devotionals, reports, events, and FAQs.' : 'Use a keyword to search devotionals, reports, events, and FAQs from one place.'"
     />
 
     <section class="surface-section pt-2">
@@ -63,6 +63,33 @@
                     </div>
                 @endif
 
+                @if($reports->isNotEmpty())
+                    <div class="mb-5">
+                        <x-ui.public-section-heading
+                            eyebrow="Ministry Reports"
+                            title="Field updates and outreach reports"
+                        />
+
+                        <div class="row g-3 mt-1">
+                            @foreach($reports as $report)
+                                <div class="col-lg-6">
+                                    <article class="public-results-card">
+                                        <div class="public-chip mb-3">{{ $report->report_type }}</div>
+                                        <h3 class="h5 mb-2">
+                                            <a href="{{ route('reports.show', $report) }}" class="text-decoration-none">{{ $report->title }}</a>
+                                        </h3>
+                                        <div class="public-meta-list mb-3">
+                                            <span><i class="bi bi-geo-alt me-2 text-brand-700"></i>{{ $report->location ?: 'Multiple locations' }}</span>
+                                            <span><i class="bi bi-calendar-event me-2 text-brand-700"></i>{{ optional($report->report_date)->format('M d, Y') }}</span>
+                                        </div>
+                                        <p class="mb-0 text-muted">{{ \Illuminate\Support\Str::limit(strip_tags($report->summary), 150) }}</p>
+                                    </article>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 @if($events->isNotEmpty())
                     <div>
                         <x-ui.public-section-heading
@@ -97,6 +124,7 @@
                 >
                     <x-slot:actions>
                         <a href="{{ route('blog.index') }}" class="surface-button-secondary">Browse devotionals</a>
+                        <a href="{{ route('reports.index') }}" class="surface-button-secondary">Browse reports</a>
                         <a href="{{ route('events.index') }}" class="surface-button-secondary">Browse events</a>
                     </x-slot:actions>
                 </x-ui.empty-state>

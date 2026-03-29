@@ -4,199 +4,27 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Create New Post</h5>
-                </div>
-                <div class="card-body">
-                    @include('components.alerts')
-                    
-                    <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Title</label>
-                            <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required>
-                            @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+    @include('components.alerts')
 
-                        <div class="mb-3">
-                            <label class="form-label">Scripture</label>
-                            <input type="text" name="scripture" class="form-control @error('scripture') is-invalid @enderror" value="{{ old('scripture') }}">
-                            @error('scripture')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+    <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
 
-                        <div class="mb-3">
-                            <label class="form-label">Bible Text</label>
-                            <textarea name="bible_text" class="form-control @error('bible_text') is-invalid @enderror" rows="3" data-rich-text-editor>{{ old('bible_text') }}</textarea>
-                            @error('bible_text')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Subtitle</label>
-                            <input type="text" name="subtitle" class="form-control @error('subtitle') is-invalid @enderror" value="{{ old('subtitle') }}">
-                            @error('subtitle')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                      
-<div class="mb-3">
-    <label class="form-label">Details</label>
-    <textarea id="details" name="details" class="form-control @error('details') is-invalid @enderror" rows="5" data-rich-text-editor>{{ old('details') }}</textarea>
-    @error('details')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Action Point</label>
-                            <textarea name="action_point" class="form-control @error('action_point') is-invalid @enderror" rows="3" data-rich-text-editor>{{ old('action_point') }}</textarea>
-                            @error('action_point')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Author</label>
-                            <input type="text" name="author" class="form-control @error('author') is-invalid @enderror" value="{{ old('author') }}">
-                            @error('author')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-<div class="mb-3">
-    <label class="form-label">Publication Date & Time</label>
-    <input type="datetime-local" name="published_at" class="form-control @error('published_at') is-invalid @enderror" value="{{ old('published_at', now()->format('Y-m-d\TH:i')) }}">
-    @error('published_at')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-</div>
-                        <div class="mb-3">
-                            <label class="form-label">Featured Image</label>
-                            <input type="file" name="image" class="form-control @error('image') is-invalid @enderror">
-                            @error('image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="card border-light-subtle mb-3">
-                            <div class="card-body">
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" value="1" id="featuredImageGenerationEnabled" name="featured_image_generation_enabled" {{ old('featured_image_generation_enabled') ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="featuredImageGenerationEnabled">Generate featured image automatically with AI</label>
-                                </div>
-
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">AI Provider</label>
-                                        <select name="featured_image_provider" class="form-select @error('featured_image_provider') is-invalid @enderror">
-                                            @foreach($aiProviders as $providerKey => $provider)
-                                                <option value="{{ $providerKey }}" {{ old('featured_image_provider', $defaultAiProvider) === $providerKey ? 'selected' : '' }}>
-                                                    {{ $provider['label'] ?? $providerKey }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <div class="form-text">Providers are listed from budget-oriented to premium quality.</div>
-                                        @error('featured_image_provider')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Style Preset</label>
-                                        <select name="featured_image_preset" class="form-select @error('featured_image_preset') is-invalid @enderror">
-                                            @foreach($aiPresets as $presetKey => $preset)
-                                                <option value="{{ $presetKey }}" {{ old('featured_image_preset', $defaultAiPreset) === $presetKey ? 'selected' : '' }}>
-                                                    {{ $preset['label'] ?? $presetKey }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('featured_image_preset')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Prompt Override</label>
-                                        <textarea name="featured_image_prompt" class="form-control @error('featured_image_prompt') is-invalid @enderror" rows="3" placeholder="Optional extra direction for the selected preset">{{ old('featured_image_prompt') }}</textarea>
-                                        @error('featured_image_prompt')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Advanced Options JSON</label>
-                                        <textarea name="featured_image_options" class="form-control @error('featured_image_options') is-invalid @enderror" rows="3" placeholder='Optional provider-specific overrides, e.g. {"size":"1024x1024","quality":"high"}'>{{ old('featured_image_options') }}</textarea>
-                                        <div class="form-text">Presets apply now. You can add provider-specific options later without changing the post schema.</div>
-                                        @error('featured_image_options')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                       <!-- Categories with on-the-fly creation -->
-<div class="mb-3">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <label class="form-label">Categories</label>
-        <button type="button" class="btn btn-sm btn-outline-primary" id="add-category-btn">
-            <i class="bi bi-plus"></i> Add New
-        </button>
-    </div>
-    <div id="categories-container" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
-        @forelse($categories as $category)
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="category_ids[]" 
-                       value="{{ $category->id }}" id="category_{{ $category->id }}"
-                       {{ in_array($category->id, old('category_ids', [])) ? 'checked' : '' }}>
-                <label class="form-check-label" for="category_{{ $category->id }}">
-                    {{ $category->name }}
-                </label>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-1">Create Post</h1>
+                <p class="text-muted mb-0">Write the devotional, set its publication time, and prepare its featured image and taxonomy in one place.</p>
             </div>
-        @empty
-            <p class="text-muted mb-0">No categories available.</p>
-        @endforelse
-    </div>
-    @error('category_ids')
-        <div class="text-danger small mt-1">{{ $message }}</div>
-    @enderror
-</div>
-
-<div class="mb-3">
-    <label class="form-label">Tags</label>
-    <select name="tag_ids[]" class="form-select" multiple size="5">
-        @foreach($tags as $tag)
-            <option value="{{ $tag->id }}" {{ in_array($tag->id, old('tag_ids', [])) ? 'selected' : '' }}>
-                {{ $tag->name }}
-            </option>
-        @endforeach
-    </select>
-</div>
-
-                        <div class="form-group">
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="shareToFacebook" name="share_to_facebook">
-                                <label class="custom-control-label" for="shareToFacebook">Share to Facebook</label>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <a href="{{ route('admin.posts.index') }}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Create Post</button>
-                        </div>
-                    </form>
-                </div>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.posts.index') }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" name="submit_action" value="draft" class="btn btn-outline-primary">Save Draft</button>
+                <button type="submit" name="submit_action" value="publish" class="btn btn-primary">Create Post</button>
             </div>
         </div>
-    </div>
+
+        @include('admin.posts._form', ['allowCategoryCreation' => true])
+    </form>
 </div>
 
-<!-- Add Category Modal -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -233,27 +61,29 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const addCategoryBtn = document.getElementById('add-category-btn');
-    const addCategoryModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+    const addCategoryModalEl = document.getElementById('addCategoryModal');
     const createCategoryForm = document.getElementById('create-category-form');
     const saveCategoryBtn = document.getElementById('save-category-btn');
     const categoriesContainer = document.getElementById('categories-container');
 
-    // Open modal
+    if (!addCategoryBtn || !addCategoryModalEl || !createCategoryForm || !saveCategoryBtn || !categoriesContainer) {
+        return;
+    }
+
+    const addCategoryModal = new bootstrap.Modal(addCategoryModalEl);
+
     addCategoryBtn.addEventListener('click', function() {
         addCategoryModal.show();
         document.getElementById('new_category_name').focus();
     });
 
-    // Save category
     saveCategoryBtn.addEventListener('click', function() {
         const formData = new FormData(createCategoryForm);
         const spinner = this.querySelector('.spinner-border');
-        
-        // Show loading state
+
         this.disabled = true;
         spinner.classList.remove('d-none');
-        
-        // Clear previous errors
+
         document.getElementById('new_category_name').classList.remove('is-invalid');
         document.getElementById('category-name-error').textContent = '';
 
@@ -261,89 +91,52 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content || formData.get('_token')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Add new category to the list
-                const newCategoryHtml = `
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="category_ids[]" 
-                               value="${data.category.id}" id="category_${data.category.id}" checked>
-                        <label class="form-check-label" for="category_${data.category.id}">
-                            ${data.category.name}
-                        </label>
-                    </div>
-                `;
-                
-                // Remove "No categories available" message if it exists
-                const noCategories = categoriesContainer.querySelector('p.text-muted');
-                if (noCategories) {
-                    noCategories.remove();
-                }
-                
-                categoriesContainer.insertAdjacentHTML('beforeend', newCategoryHtml);
-                
-                // Close modal and reset form
-                addCategoryModal.hide();
-                createCategoryForm.reset();
-                
-                // Show success message
-                showAlert('Category created successfully!', 'success');
-            } else {
-                // Show validation errors
-                if (data.errors && data.errors.name) {
-                    document.getElementById('new_category_name').classList.add('is-invalid');
-                    document.getElementById('category-name-error').textContent = data.errors.name[0];
-                }
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 422) {
+                const error = body.errors?.name?.[0] ?? 'Unable to create category.';
+                document.getElementById('new_category_name').classList.add('is-invalid');
+                document.getElementById('category-name-error').textContent = error;
+                return;
             }
+
+            if (!body.success || !body.category) {
+                throw new Error(body.message || 'Unable to create category.');
+            }
+
+            const category = body.category;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'form-check';
+            wrapper.innerHTML = `
+                <input class="form-check-input" type="checkbox" name="category_ids[]" value="${category.id}" id="category_${category.id}" checked>
+                <label class="form-check-label" for="category_${category.id}">${category.name}</label>
+            `;
+            categoriesContainer.appendChild(wrapper);
+
+            createCategoryForm.reset();
+            addCategoryModal.hide();
         })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('An error occurred while creating the category.', 'danger');
+        .catch(() => {
+            document.getElementById('new_category_name').classList.add('is-invalid');
+            document.getElementById('category-name-error').textContent = 'Failed to create category. Please try again.';
         })
         .finally(() => {
-            // Reset loading state
-            saveCategoryBtn.disabled = false;
+            this.disabled = false;
             spinner.classList.add('d-none');
         });
     });
 
-    // Allow Enter key to submit category form
     document.getElementById('new_category_name').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             saveCategoryBtn.click();
         }
     });
-
-    // Helper function to show alerts
-    function showAlert(message, type) {
-        const alertHtml = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-        
-        // Insert alert at the top of the card body
-        const cardBody = document.querySelector('.card-body');
-        cardBody.insertAdjacentHTML('afterbegin', alertHtml);
-        
-        // Auto-dismiss after 5 seconds
-        setTimeout(() => {
-            const alert = cardBody.querySelector('.alert');
-            if (alert) {
-                bootstrap.Alert.getOrCreateInstance(alert).close();
-            }
-        }, 5000);
-    }
 });
 </script>
 @endpush
-
 @endsection
-

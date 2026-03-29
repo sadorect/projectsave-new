@@ -63,6 +63,7 @@
                 <nav class="site-footer-link-list">
                     <a href="{{ route('about') }}" class="site-footer-link">About the ministry</a>
                     <a href="{{ route('events.index') }}" class="site-footer-link">Events &amp; gatherings</a>
+                    <a href="{{ route('reports.index') }}" class="site-footer-link">Ministry reports</a>
                     <a href="{{ route('blog.index') }}" class="site-footer-link">Devotionals</a>
                     <a href="{{ route('lms.courses.index') }}" class="site-footer-link">ASOM courses</a>
                     <a href="{{ route('faqs.list') }}" class="site-footer-link">FAQs</a>
@@ -78,6 +79,9 @@
                     <a href="{{ route('partners.create', ['type' => 'ground']) }}" class="site-footer-link">Serve on the ground</a>
                     <a href="{{ route('partners.create', ['type' => 'skilled']) }}" class="site-footer-link">Partner with skills</a>
                     <a href="{{ route('volunteer.prayer-force') }}" class="site-footer-link">Volunteer</a>
+                    @guest
+                        <a href="{{ route('login') }}" class="site-footer-link">Login</a>
+                    @endguest
                 </nav>
             </section>
 

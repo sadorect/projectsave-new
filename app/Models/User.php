@@ -176,6 +176,7 @@ public function preferredBackofficeRoute(): ?string
         'admin.notification-settings.edit' => ['manage-notification-settings'],
         'admin.forms.index' => ['manage-forms'],
         'admin.mail.compose' => ['manage-mail'],
+        'admin.newsletter-subscribers.index' => ['manage-mail'],
         'admin.mail-templates.index' => ['manage-mail-templates'],
         'admin.courses.index' => ['manage-courses'],
         'admin.lessons.index' => ['manage-lessons'],
