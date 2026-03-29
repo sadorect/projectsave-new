@@ -2,6 +2,21 @@
     title="About Projectsave International | Our Story, Beliefs & Mission"
     meta-description="Learn the story, core beliefs, and ministry channels behind Projectsave International — a Christ-centred ministry for evangelism, discipleship, and ministry formation."
 >
+    @php
+        $beliefs = [
+            ['icon' => 'bi bi-book-fill', 'title' => 'The Bible', 'body' => 'We believe the Bible is the inspired and only authoritative written Word of God.'],
+            ['icon' => 'bi bi-triangle-fill', 'title' => 'The Trinity', 'body' => 'We believe in one God, eternally existent in three persons: Father, Son, and Holy Spirit.'],
+            ['icon' => 'bi bi-cross-fill', 'title' => 'Jesus Christ', 'body' => 'We believe in the deity of Jesus Christ — His virgin birth, sinless life, miracles, atoning death, and bodily resurrection.'],
+            ['icon' => 'bi bi-wind', 'title' => 'The Holy Spirit', 'body' => 'We believe in the Holy Spirit as essential for personal salvation and empowerment for Christian life and ministry.'],
+            ['icon' => 'bi bi-heart-fill', 'title' => 'Salvation', 'body' => 'We believe in cleansing from sin through the precious blood of Jesus Christ shed for our redemption.'],
+            ['icon' => 'bi bi-globe2', 'title' => 'Mission', 'body' => 'We believe in evangelistic mission to reach the unreached and unsaved with the message of salvation.'],
+            ['icon' => 'bi bi-star-fill', 'title' => 'Blessed Hope', 'body' => 'We believe in the blessed hope — the rapture of the Church and the visible return of Jesus Christ.'],
+            ['icon' => 'bi bi-shield-fill-check', 'title' => 'Divine Healing', 'body' => 'The redemptive work of Christ provides healing for the body in response to believing prayer and faith.'],
+            ['icon' => 'bi bi-fire', 'title' => 'Holy Spirit Baptism', 'body' => 'The baptism in the Holy Spirit is given to believers who ask for it, with the evidence of speaking in tongues.'],
+            ['icon' => 'bi bi-gift-fill', 'title' => 'Spiritual Gifts', 'body' => 'We believe in the gifts of the Holy Spirit and the five-fold ministry gifts for the building up of the Church.'],
+            ['icon' => 'bi bi-infinity', 'title' => 'Eternal Life', 'body' => 'We believe in eternal life for the saved and that hell and eternal damnation is the lot of everyone that is unsaved.'],
+        ];
+    @endphp
 
     {{-- ═══════════════════════════════════════════════════
          HERO — Cinematic (matches homepage style)
@@ -147,11 +162,11 @@
                     <div class="about-story-pillars">
                         <div class="about-story-pillar">
                             <strong>Mission</strong>
-                            <span>Reach the lost, build believers, and strengthen workers for Gospel ministry.</span>
+                            <span>{{ $siteSettings['mission_statement'] ?? 'Reach the lost, build believers, and strengthen workers for Gospel ministry.' }}</span>
                         </div>
                         <div class="about-story-pillar">
                             <strong>Vision</strong>
-                            <span>Christ-centred communities transformed through evangelism, discipleship, and service.</span>
+                            <span>{{ $siteSettings['vision_statement'] ?? 'Christ-centred communities transformed through evangelism, discipleship, and service.' }}</span>
                         </div>
                     </div>
                 </div>
@@ -175,73 +190,13 @@
             </div>
 
             <div class="about-beliefs-grid">
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-book-fill"></i></div>
-                    <h3>The Bible</h3>
-                    <p>We believe the Bible is the inspired and only authoritative written Word of God.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-triangle-fill"></i></div>
-                    <h3>The Trinity</h3>
-                    <p>We believe in one God, eternally existent in three persons: Father, Son, and Holy Spirit.</p>
-                </div>
-
-                <div class="about-belief-card about-belief-card--featured">
-                    <div class="about-belief-icon"><i class="bi bi-cross-fill"></i></div>
-                    <h3>Jesus Christ</h3>
-                    <p>We believe in the deity of Jesus Christ — His virgin birth, sinless life, miracles, atoning death, and bodily resurrection.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-wind"></i></div>
-                    <h3>The Holy Spirit</h3>
-                    <p>We believe in the Holy Spirit as essential for personal salvation and empowerment for Christian life and ministry.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-heart-fill"></i></div>
-                    <h3>Salvation</h3>
-                    <p>We believe in cleansing from sin through the precious blood of Jesus Christ shed for our redemption.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-globe2"></i></div>
-                    <h3>Mission</h3>
-                    <p>We believe in evangelistic mission to reach the unreached and unsaved with the message of salvation.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-star-fill"></i></div>
-                    <h3>Blessed Hope</h3>
-                    <p>We believe in the blessed hope — the rapture of the Church and the visible return of Jesus Christ.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-shield-fill-check"></i></div>
-                    <h3>Divine Healing</h3>
-                    <p>The redemptive work of Christ provides healing for the body in response to believing prayer and faith.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-fire"></i></div>
-                    <h3>Holy Spirit Baptism</h3>
-                    <p>The baptism in the Holy Spirit is given to believers who ask for it, with the evidence of speaking in tongues.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-gift-fill"></i></div>
-                    <h3>Spiritual Gifts</h3>
-                    <p>We believe in the gifts of the Holy Spirit and the five-fold ministry gifts for the building up of the Church.</p>
-                </div>
-
-                <div class="about-belief-card">
-                    <div class="about-belief-icon"><i class="bi bi-infinity"></i></div>
-                    <h3>Eternal Life</h3>
-                    <p>We believe in eternal life for the saved and that hell and eternal damnation is the lot of everyone that is unsaved.</p>
-                </div>
-
+                @foreach($beliefs as $belief)
+                    <div class="about-belief-card">
+                        <div class="about-belief-icon"><i class="{{ $belief['icon'] }}"></i></div>
+                        <h3>{{ $belief['title'] }}</h3>
+                        <p>{{ $belief['body'] }}</p>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>

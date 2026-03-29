@@ -2,6 +2,11 @@
     title="Privacy Policy | Projectsave International"
     meta-description="Review how Projectsave International collects, uses, protects, and deletes personal information."
 >
+    @php
+        $privacyEmail = $siteSettings['privacy_email'] ?: ($siteSettings['contact_email'] ?? null);
+        $contactPhone = $siteSettings['contact_phone'] ?? null;
+        $contactAddress = $siteSettings['contact_address'] ?? null;
+    @endphp
     <x-ui.public-page-hero
         eyebrow="Privacy policy"
         title="How we handle your information"
@@ -54,7 +59,7 @@
                             <p>You may request deletion of your personal data from our systems.</p>
                             <ol>
                                 <li>Log into your account and review any self-service deletion options available in account settings.</li>
-                                <li>Or send a deletion request to privacy@projectsaveng.org with enough detail for us to identify your record.</li>
+                                <li>Or send a deletion request to {{ $privacyEmail ?: 'our privacy contact' }} with enough detail for us to identify your record.</li>
                                 <li>We aim to process confirmed requests within 30 days, subject to legal or legitimate operational retention needs.</li>
                             </ol>
 
@@ -75,18 +80,24 @@
                             />
 
                             <div class="public-contact-list mt-4 text-muted">
-                                <div class="d-flex gap-3">
-                                    <i class="bi bi-envelope-fill text-brand-700 mt-1"></i>
-                                    <span>privacy@projectsaveng.org</span>
-                                </div>
-                                <div class="d-flex gap-3">
-                                    <i class="bi bi-telephone-fill text-brand-700 mt-1"></i>
-                                    <span>(+234) 07080100893</span>
-                                </div>
-                                <div class="d-flex gap-3">
-                                    <i class="bi bi-geo-alt-fill text-brand-700 mt-1"></i>
-                                    <span>P.O.Box 358, Ota, Ogun State, Nigeria.</span>
-                                </div>
+                                @if(filled($privacyEmail))
+                                    <div class="d-flex gap-3">
+                                        <i class="bi bi-envelope-fill text-brand-700 mt-1"></i>
+                                        <span>{{ $privacyEmail }}</span>
+                                    </div>
+                                @endif
+                                @if(filled($contactPhone))
+                                    <div class="d-flex gap-3">
+                                        <i class="bi bi-telephone-fill text-brand-700 mt-1"></i>
+                                        <span>{{ $contactPhone }}</span>
+                                    </div>
+                                @endif
+                                @if(filled($contactAddress))
+                                    <div class="d-flex gap-3">
+                                        <i class="bi bi-geo-alt-fill text-brand-700 mt-1"></i>
+                                        <span>{{ $contactAddress }}</span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 

@@ -222,6 +222,9 @@ class NavigationBuilder
             $systemItems[] = $this->item('admin-files', 'File Manager', 'bi bi-folder', route('admin.files.index'), request()->routeIs('admin.files*'));
             $systemItems[] = $this->item('admin-files-analysis', 'Storage Analysis', 'bi bi-pie-chart', route('admin.files.analysis'), request()->routeIs('admin.files.analysis'));
         }
+        if ($this->canAny($user, ['manage-settings'])) {
+            $systemItems[] = $this->item('site-settings', 'Site Settings', 'bi bi-sliders2', route('admin.site-settings.edit'), request()->routeIs('admin.site-settings*'));
+        }
 
         if (! empty($systemItems)) {
             $sections[] = ['label' => 'System', 'items' => $systemItems];

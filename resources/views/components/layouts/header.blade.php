@@ -1,4 +1,14 @@
 @php
+    $siteName = $siteSettings['site_name'] ?? 'Projectsave International';
+    $siteShortName = $siteSettings['site_short_name'] ?? 'Projectsave';
+    $siteTagline = $siteSettings['site_tagline'] ?? 'Winning the lost. Building the saints.';
+    $logoUrl = $siteSettings['logo_url'] ?? null;
+    $contactPhone = $siteSettings['contact_phone'] ?? null;
+    $contactPhoneHref = $siteSettings['contact_phone_href'] ?? null;
+    $contactEmail = $siteSettings['contact_email'] ?? null;
+    $contactEmailHref = $siteSettings['contact_email_href'] ?? null;
+    $socialLinks = collect($siteSettings['social_links'] ?? []);
+    $brandInitial = strtoupper(substr($siteShortName ?: $siteName, 0, 1));
     $navigationItems = collect($publicNavigation ?? [])->flatMap(fn (array $section) => $section['items'] ?? []);
     $fallbackNavigationItems = collect([
         ['label' => 'Home', 'route' => 'home', 'patterns' => ['home']],
@@ -34,23 +44,28 @@
                 </div>
 
                 <div class="site-topbar-links">
-                    <a href="tel:+2347080100893" class="site-topbar-link">
-                        <i class="fas fa-phone-alt text-brand-400"></i>
-                        <span>(+234) 07080100893</span>
-                    </a>
-                    <a href="mailto:info@projectsaveng.org" class="site-topbar-link">
-                        <i class="fas fa-envelope text-brand-400"></i>
-                        <span>info@projectsaveng.org</span>
-                    </a>
+                    @if(filled($contactPhone) && filled($contactPhoneHref))
+                        <a href="{{ $contactPhoneHref }}" class="site-topbar-link">
+                            <i class="fas fa-phone-alt text-brand-400"></i>
+                            <span>{{ $contactPhone }}</span>
+                        </a>
+                    @endif
+                    @if(filled($contactEmail) && filled($contactEmailHref))
+                        <a href="{{ $contactEmailHref }}" class="site-topbar-link">
+                            <i class="fas fa-envelope text-brand-400"></i>
+                            <span>{{ $contactEmail }}</span>
+                        </a>
+                    @endif
 
-                    <div class="site-social-links" aria-label="Social media links">
-                        <a href="https://facebook.com/projectsave02" class="site-social-link" aria-label="Projectsave on Facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="https://instagram.com/projectsave_ministries" class="site-social-link" aria-label="Projectsave on Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                    </div>
+                    @if($socialLinks->isNotEmpty())
+                        <div class="site-social-links" aria-label="Social media links">
+                            @foreach($socialLinks as $socialLink)
+                                <a href="{{ $socialLink['url'] }}" class="site-social-link" aria-label="{{ $siteShortName }} on {{ $socialLink['label'] }}" rel="noopener noreferrer" target="_blank">
+                                    <i class="{{ $socialLink['icon'] }}"></i>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -61,11 +76,15 @@
             <nav class="navbar navbar-expand-lg p-0" aria-label="Primary">
                 <a href="{{ route('home') }}" class="site-brand-mark">
                     <span class="site-brand-badge">
-                        <img src="{{ asset('frontend/img/psave_logo.png') }}" alt="Projectsave International" class="h-8 w-8 rounded-xl object-cover">
+                        @if(filled($logoUrl))
+                            <img src="{{ $logoUrl }}" alt="{{ $siteName }}" class="h-8 w-8 rounded-xl object-cover">
+                        @else
+                            <span class="d-inline-flex align-items-center justify-content-center h-100 w-100 fw-bold text-brand-700">{{ $brandInitial }}</span>
+                        @endif
                     </span>
                     <span class="site-brand-copy">
-                        <strong>Projectsave International</strong>
-                        <span>Winning the lost. Building the saints.</span>
+                        <strong>{{ $siteName }}</strong>
+                        <span>{{ $siteTagline }}</span>
                     </span>
                 </a>
 

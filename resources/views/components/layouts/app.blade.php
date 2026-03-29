@@ -3,27 +3,52 @@
     'metaDescription' => 'Projectsave International Ministry - winning the lost and building the saints through evangelism, discipleship, and ministry training.',
 ])
 
+@php
+    $siteSettings = $siteSettings ?? app(\App\Support\SiteSettings::class)->publicData();
+    $defaultTitle = $siteSettings['site_name'] ?? config('app.name', 'Projectsave International');
+    $defaultDescription = $siteSettings['site_description'] ?? 'Projectsave International Ministry - winning the lost and building the saints through evangelism, discipleship, and ministry training.';
+    $documentTitle = filled($title) ? $title : $defaultTitle;
+    $documentDescription = filled($metaDescription) ? $metaDescription : $defaultDescription;
+    $logoUrl = $siteSettings['logo_url'] ?? asset('frontend/img/psave_logo.png');
+    $faviconUrl = $siteSettings['favicon_url'] ?? $logoUrl;
+    $structuredData = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Organization',
+        'name' => $siteSettings['site_name'] ?? 'Projectsave International',
+        'url' => config('app.url'),
+        'logo' => $logoUrl,
+        'contactPoint' => array_filter([
+            '@type' => 'ContactPoint',
+            'telephone' => $siteSettings['contact_phone'] ?? null,
+            'email' => $siteSettings['contact_email'] ?? null,
+            'contactType' => 'customer service',
+        ]),
+    ];
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="description" content="{{ $metaDescription }}">
+        <meta name="description" content="{{ $documentDescription }}">
         <meta name="format-detection" content="telephone=no">
         <meta name="robots" content="index, follow">
-        <meta property="og:title" content="{{ $title }}">
-        <meta property="og:description" content="{{ $metaDescription }}">
-        <meta property="og:image" content="{{ asset('frontend/img/psave_logo.png') }}">
+        <meta property="og:title" content="{{ $documentTitle }}">
+        <meta property="og:description" content="{{ $documentDescription }}">
+        <meta property="og:image" content="{{ $logoUrl }}">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:type" content="website">
         <link rel="canonical" href="{{ url()->current() }}">
-        <link rel="icon" href="{{ asset('frontend/img/psave_logo.png') }}">
+        @if(filled($faviconUrl))
+            <link rel="icon" href="{{ $faviconUrl }}">
+        @endif
         <link rel="alternate" type="application/rss+xml" title="Projectsave International Feed" href="{{ route('feed') }}">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        <title>{{ $title }}</title>
+        <title>{{ $documentTitle }}</title>
 
         @stack('styles')
 
@@ -80,19 +105,7 @@
         @stack('scripts')
 
         <script type="application/ld+json">
-            {
-                "@@context": "https://schema.org",
-                "@@type": "Organization",
-                "name": "Projectsave International",
-                "url": "{{ config('app.url') }}",
-                "logo": "{{ asset('frontend/img/psave_logo.png') }}",
-                "contactPoint": {
-                    "@@type": "ContactPoint",
-                    "telephone": "+234-07080100893",
-                    "email": "info@projectsaveng.org",
-                    "contactType": "customer service"
-                }
-            }
+            {!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
         </script>
     </body>
 </html>

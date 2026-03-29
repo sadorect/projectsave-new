@@ -170,6 +170,7 @@ public function preferredBackofficeRoute(): ?string
         'admin.users.index' => ['manage-users', 'view-users', 'create-users', 'edit-users', 'delete-users', 'verify-users', 'manage-user-roles'],
         'admin.sessions.index' => ['manage-user-sessions'],
         'admin.audit.index' => ['view-audit-log', 'manage-audit-log'],
+        'admin.site-settings.edit' => ['manage-settings'],
         'admin.partners.index' => ['manage-partners'],
         'admin.prayer-force.index' => ['manage-prayer-force'],
         'admin.celebrations.statistics' => ['view-reports'],

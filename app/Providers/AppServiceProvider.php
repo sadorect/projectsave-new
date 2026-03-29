@@ -9,6 +9,7 @@ use App\Services\AiImages\AiImageSettings;
 use App\Contracts\ScansUploadedFiles;
 use App\Services\MalwareScanner;
 use App\Support\Navigation\NavigationBuilder;
+use App\Support\SiteSettings;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ScansUploadedFiles::class, MalwareScanner::class);
         $this->app->singleton(AiImageProviderManager::class, AiImageProviderManager::class);
         $this->app->singleton(AiImageSettings::class, AiImageSettings::class);
+        $this->app->singleton(SiteSettings::class, SiteSettings::class);
     }
 
     /**
@@ -33,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrap();
         View::addNamespace('mail', resource_path('views/emails'));
+        View::share('siteSettings', app(SiteSettings::class)->publicData());
 
         View::composer('admin.layouts.sidebar', function ($view) {
             $view->with(

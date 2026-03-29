@@ -42,6 +42,7 @@ use App\Http\Controllers\Admin\DeletionRequestController;
 use App\Http\Controllers\Admin\LMS\ExamAttemptController;
 use App\Http\Controllers\Admin\AdminPrayerForceController;
 use App\Http\Controllers\Admin\NotificationSettingsController;
+use App\Http\Controllers\Admin\SiteSettingsController;
 use App\Http\Controllers\FormController;
 use App\Services\MathCaptcha;
 /*
@@ -194,6 +195,10 @@ Route::prefix('admin')->group(function() {
             Route::delete('audit-logs/{id}', [\App\Http\Controllers\Admin\AuditLogController::class, 'destroy'])->name('admin.audit.destroy');
             Route::post('audit-logs/bulk-delete', [\App\Http\Controllers\Admin\AuditLogController::class, 'bulkDestroy'])->name('admin.audit.bulkDestroy');
             Route::post('audit-logs/toggle', [\App\Http\Controllers\Admin\AuditLogController::class, 'toggleErrorAudit'])->name('admin.audit.toggle');
+        });
+        Route::middleware('permission:manage-settings,admin')->group(function () {
+            Route::get('/site-settings', [SiteSettingsController::class, 'edit'])->name('admin.site-settings.edit');
+            Route::patch('/site-settings', [SiteSettingsController::class, 'update'])->name('admin.site-settings.update');
         });
         Route::middleware('permission:manage-users,admin')->group(function () {
             Route::get('/deletion-requests', [DeletionRequestController::class, 'index'])->name('admin.deletion-requests.index');

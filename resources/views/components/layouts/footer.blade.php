@@ -1,3 +1,17 @@
+@php
+    $siteName = $siteSettings['site_name'] ?? 'Projectsave International';
+    $siteShortName = $siteSettings['site_short_name'] ?? 'Projectsave';
+    $siteTagline = $siteSettings['site_tagline'] ?? 'Winning the lost. Building the saints.';
+    $siteDescription = $siteSettings['site_description'] ?? null;
+    $logoUrl = $siteSettings['logo_url'] ?? null;
+    $contactPhone = $siteSettings['contact_phone'] ?? null;
+    $contactPhoneHref = $siteSettings['contact_phone_href'] ?? null;
+    $contactEmail = $siteSettings['contact_email'] ?? null;
+    $contactEmailHref = $siteSettings['contact_email_href'] ?? null;
+    $contactAddress = $siteSettings['contact_address'] ?? null;
+    $socialLinks = collect($siteSettings['social_links'] ?? []);
+@endphp
+
 <footer class="site-footer">
 
     {{-- Scripture band --}}
@@ -16,19 +30,20 @@
             {{-- Brand panel --}}
             <section class="site-footer-brand-panel" aria-label="About Projectsave">
                 <div class="site-footer-brand-mark">
-                    <img src="{{ asset('images/psave_logo.png') }}" alt="Projectsave International" width="42" height="42" onerror="this.style.display='none'">
+                    @if(filled($logoUrl))
+                        <img src="{{ $logoUrl }}" alt="{{ $siteName }}" width="42" height="42">
+                    @endif
                     <div>
-                        <strong class="site-footer-brand-name">Projectsave</strong>
-                        <span class="site-footer-brand-sub">International</span>
+                        <strong class="site-footer-brand-name">{{ $siteShortName }}</strong>
+                        <span class="site-footer-brand-sub">{{ str($siteName)->replaceFirst($siteShortName, '')->trim() ?: 'International' }}</span>
                     </div>
                 </div>
 
-                <p class="site-footer-tagline">Winning the lost &middot; Building the saints</p>
+                <p class="site-footer-tagline">{{ str_replace('. ', ' · ', $siteTagline) }}</p>
 
-                <p class="site-footer-copy">
-                    A non-denominational Christian ministry devoted to preaching the Gospel, building believers
-                    through biblical teaching, and equipping men and women for kingdom service across nations.
-                </p>
+                @if(filled($siteDescription))
+                    <p class="site-footer-copy">{{ $siteDescription }}</p>
+                @endif
 
                 <div class="site-footer-cta-row">
                     <a href="{{ route('partners.create', ['type' => 'ground']) }}" class="home-btn-primary">
@@ -39,17 +54,15 @@
                     </a>
                 </div>
 
-                <div class="site-footer-socials mt-4">
-                    <a href="https://facebook.com/projectsave02" class="site-footer-social-icon" aria-label="Facebook" rel="noopener noreferrer" target="_blank">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="https://instagram.com/projectsave_ministries" class="site-footer-social-icon" aria-label="Instagram" rel="noopener noreferrer" target="_blank">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://youtube.com" class="site-footer-social-icon" aria-label="YouTube" rel="noopener noreferrer" target="_blank">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                </div>
+                @if($socialLinks->isNotEmpty())
+                    <div class="site-footer-socials mt-4">
+                        @foreach($socialLinks as $socialLink)
+                            <a href="{{ $socialLink['url'] }}" class="site-footer-social-icon" aria-label="{{ $socialLink['label'] }}" rel="noopener noreferrer" target="_blank">
+                                <i class="{{ $socialLink['icon'] }}"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
 
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <span class="public-chip">{{ number_format($totalSiteVisits ?? 0) }} site visits</span>
@@ -90,18 +103,24 @@
                 <h3 class="site-footer-heading">Reach us</h3>
 
                 <div class="site-footer-contact-list">
-                    <div class="site-footer-contact-item">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        <span>P.O.Box 358, Ota, Ogun State, Nigeria</span>
-                    </div>
-                    <div class="site-footer-contact-item">
-                        <i class="bi bi-telephone-fill"></i>
-                        <a href="tel:+23407080100893" class="site-footer-link">(+234) 07080100893</a>
-                    </div>
-                    <div class="site-footer-contact-item">
-                        <i class="bi bi-envelope-fill"></i>
-                        <a href="mailto:info@projectsaveng.org" class="site-footer-link">info@projectsaveng.org</a>
-                    </div>
+                    @if(filled($contactAddress))
+                        <div class="site-footer-contact-item">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span>{{ $contactAddress }}</span>
+                        </div>
+                    @endif
+                    @if(filled($contactPhone) && filled($contactPhoneHref))
+                        <div class="site-footer-contact-item">
+                            <i class="bi bi-telephone-fill"></i>
+                            <a href="{{ $contactPhoneHref }}" class="site-footer-link">{{ $contactPhone }}</a>
+                        </div>
+                    @endif
+                    @if(filled($contactEmail) && filled($contactEmailHref))
+                        <div class="site-footer-contact-item">
+                            <i class="bi bi-envelope-fill"></i>
+                            <a href="{{ $contactEmailHref }}" class="site-footer-link">{{ $contactEmail }}</a>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="site-footer-newsletter mt-4">
@@ -136,7 +155,7 @@
     {{-- Bottom bar --}}
     <div class="site-footer-bottom">
         <div class="surface-frame site-footer-bottom-inner">
-            <p class="mb-0">&copy; {{ now()->year }} Projectsave International. All rights reserved.</p>
+            <p class="mb-0">&copy; {{ now()->year }} {{ $siteName }}. All rights reserved.</p>
             <nav class="site-footer-bottom-links">
                 <a href="{{ route('privacy') }}" class="site-footer-link">Privacy policy</a>
                 <a href="{{ route('faqs.list') }}" class="site-footer-link">FAQs</a>

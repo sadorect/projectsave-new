@@ -2,15 +2,24 @@
     title="Contact Projectsave International"
     meta-description="Reach the Projectsave team for ministry questions, event information, partnership interest, and support."
 >
+    @php
+        $contactEmail = $siteSettings['contact_email'] ?? null;
+        $contactEmailHref = $siteSettings['contact_email_href'] ?? null;
+        $contactPhone = $siteSettings['contact_phone'] ?? null;
+        $contactPhoneHref = $siteSettings['contact_phone_href'] ?? null;
+        $contactAddress = $siteSettings['contact_address'] ?? null;
+    @endphp
     <x-ui.public-page-hero
         eyebrow="Contact"
         title="Get in touch with the ministry team"
         subtitle="Reach out for partnership questions, event information, ministry support, or general enquiries. We review every message."
     >
         <x-slot:actions>
-            <a href="mailto:info@projectsaveng.org" class="surface-button-primary">
-                <i class="fas fa-envelope me-2"></i>Email us directly
-            </a>
+            @if(filled($contactEmail) && filled($contactEmailHref))
+                <a href="{{ $contactEmailHref }}" class="surface-button-primary">
+                    <i class="fas fa-envelope me-2"></i>Email us directly
+                </a>
+            @endif
             <a href="{{ route('events.index') }}" class="surface-button-secondary">See upcoming events</a>
         </x-slot:actions>
     </x-ui.public-page-hero>
@@ -81,7 +90,7 @@
                                 <div class="contact-info-icon"><i class="bi bi-geo-alt-fill"></i></div>
                                 <div>
                                     <div class="contact-info-label">Mailing address</div>
-                                    <div class="contact-info-value">P.O.Box 358, Ota, Ogun State, Nigeria</div>
+                                    <div class="contact-info-value">{{ $contactAddress ?: 'Address details will be updated soon.' }}</div>
                                 </div>
                             </div>
 
@@ -90,7 +99,11 @@
                                 <div>
                                     <div class="contact-info-label">Phone</div>
                                     <div class="contact-info-value">
-                                        <a href="tel:+2347080100893" style="color:#0f172a;text-decoration:none;font-weight:500;">(+234) 07080100893</a>
+                                        @if(filled($contactPhone) && filled($contactPhoneHref))
+                                            <a href="{{ $contactPhoneHref }}" style="color:#0f172a;text-decoration:none;font-weight:500;">{{ $contactPhone }}</a>
+                                        @else
+                                            <span>Phone details will be updated soon.</span>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +113,11 @@
                                 <div>
                                     <div class="contact-info-label">Email</div>
                                     <div class="contact-info-value">
-                                        <a href="mailto:info@projectsaveng.org" style="color:#c1121f;text-decoration:none;font-weight:500;">info@projectsaveng.org</a>
+                                        @if(filled($contactEmail) && filled($contactEmailHref))
+                                            <a href="{{ $contactEmailHref }}" style="color:#c1121f;text-decoration:none;font-weight:500;">{{ $contactEmail }}</a>
+                                        @else
+                                            <span>Email details will be updated soon.</span>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
