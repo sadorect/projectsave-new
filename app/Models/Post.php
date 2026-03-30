@@ -89,7 +89,9 @@ class Post extends Model
         parent::boot();
 
         static::creating(function ($post) {
-            $post->slug = Str::slug($post->title);
+            if (blank($post->slug)) {
+                $post->slug = Str::slug($post->title);
+            }
         });
     }
 

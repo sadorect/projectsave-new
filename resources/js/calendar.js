@@ -96,29 +96,164 @@ function getTargetMonth(month, year, direction) {
     };
 }
 
+function compareMonthYear(leftMonth, leftYear, rightMonth, rightYear) {
+    if (Number(leftYear) !== Number(rightYear)) {
+        return Number(leftYear) - Number(rightYear);
+    }
+
+    return Number(leftMonth) - Number(rightMonth);
+}
+
+function clampTargetMonth(month, year, range) {
+    if (
+        compareMonthYear(month, year, range.startMonth, range.startYear) < 0
+    ) {
+        return {
+            month: range.startMonth,
+            year: range.startYear,
+        };
+    }
+
+    if (compareMonthYear(month, year, range.endMonth, range.endYear) > 0) {
+        return {
+            month: range.endMonth,
+            year: range.endYear,
+        };
+    }
+
+    return {
+        month: Number(month),
+        year: Number(year),
+    };
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("[data-blog-calendar]").forEach((calendar) => {
         const prevButton = calendar.querySelector("[data-calendar-previous]");
         const nextButton = calendar.querySelector("[data-calendar-next]");
         const monthLabel = calendar.querySelector("[data-calendar-month-label]");
         const body = calendar.querySelector("[data-calendar-body]");
+        const monthSelect = calendar.querySelector("[data-calendar-month-select]");
+        const yearSelect = calendar.querySelector("[data-calendar-year-select]");
+        const jumpButton = calendar.querySelector("[data-calendar-jump]");
         const endpointTemplate = calendar.dataset.calendarEndpointTemplate;
+        const range = {
+            startMonth: Number(calendar.dataset.calendarStartMonth || 1),
+            startYear: Number(calendar.dataset.calendarStartYear || new Date().getFullYear()),
+            endMonth: Number(calendar.dataset.calendarEndMonth || 12),
+            endYear: Number(calendar.dataset.calendarEndYear || new Date().getFullYear()),
+        };
 
         if (!prevButton || !nextButton || !monthLabel || !body || !endpointTemplate) {
             return;
         }
 
-        const toggleLoadingState = (isLoading) => {
-            prevButton.disabled = isLoading;
-            nextButton.disabled = isLoading;
-            calendar.classList.toggle("is-loading", isLoading);
+        const isLoading = () => calendar.classList.contains("is-loading");
+
+        const updateMonthOptionAvailability = () => {
+            if (!monthSelect || !yearSelect) {
+                return;
+            }
+
+            const selectedYear = Number(yearSelect.value);
+
+            Array.from(monthSelect.options).forEach((option) => {
+                const optionMonth = Number(option.value);
+                const beforeArchiveStart =
+                    selectedYear === range.startYear &&
+                    optionMonth < range.startMonth;
+                const afterArchiveEnd =
+                    selectedYear === range.endYear &&
+                    optionMonth > range.endMonth;
+
+                option.disabled = beforeArchiveStart || afterArchiveEnd;
+            });
+
+            const selectedOption = monthSelect.selectedOptions[0];
+
+            if (selectedOption?.disabled) {
+                const firstEnabledOption = Array.from(monthSelect.options).find(
+                    (option) => !option.disabled,
+                );
+
+                if (firstEnabledOption) {
+                    monthSelect.value = firstEnabledOption.value;
+                }
+            }
         };
 
-        const loadCalendar = async (direction) => {
-            const { month, year } = getTargetMonth(
-                calendar.dataset.calendarMonth,
-                calendar.dataset.calendarYear,
-                direction,
+        const updateJumpAvailability = () => {
+            if (!jumpButton || !monthSelect || !yearSelect) {
+                return;
+            }
+
+            jumpButton.disabled =
+                isLoading() ||
+                (Number(monthSelect.value) ===
+                    Number(calendar.dataset.calendarMonth) &&
+                    Number(yearSelect.value) ===
+                        Number(calendar.dataset.calendarYear));
+        };
+
+        const updateNavigationAvailability = () => {
+            const currentMonth = Number(calendar.dataset.calendarMonth);
+            const currentYear = Number(calendar.dataset.calendarYear);
+            const atStart =
+                compareMonthYear(
+                    currentMonth,
+                    currentYear,
+                    range.startMonth,
+                    range.startYear,
+                ) <= 0;
+            const atEnd =
+                compareMonthYear(
+                    currentMonth,
+                    currentYear,
+                    range.endMonth,
+                    range.endYear,
+                ) >= 0;
+
+            prevButton.disabled = isLoading() || atStart;
+            nextButton.disabled = isLoading() || atEnd;
+        };
+
+        const syncPickerState = () => {
+            if (monthSelect) {
+                monthSelect.value = String(calendar.dataset.calendarMonth);
+            }
+
+            if (yearSelect) {
+                yearSelect.value = String(calendar.dataset.calendarYear);
+            }
+
+            updateMonthOptionAvailability();
+            updateJumpAvailability();
+        };
+
+        const toggleLoadingState = (isLoading) => {
+            calendar.classList.toggle("is-loading", isLoading);
+
+            if (monthSelect) {
+                monthSelect.disabled = isLoading;
+            }
+
+            if (yearSelect) {
+                yearSelect.disabled = isLoading;
+            }
+
+            if (jumpButton) {
+                jumpButton.disabled = isLoading;
+            }
+
+            updateNavigationAvailability();
+            updateJumpAvailability();
+        };
+
+        const loadCalendar = async (requestedMonth, requestedYear) => {
+            const { month, year } = clampTargetMonth(
+                requestedMonth,
+                requestedYear,
+                range,
             );
 
             const endpoint = endpointTemplate
@@ -143,8 +278,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 calendar.dataset.calendarMonth = String(payload.month);
                 calendar.dataset.calendarYear = String(payload.year);
+                calendar.dataset.calendarStartMonth = String(payload.startMonth ?? range.startMonth);
+                calendar.dataset.calendarStartYear = String(payload.startYear ?? range.startYear);
+                calendar.dataset.calendarEndMonth = String(payload.endMonth ?? range.endMonth);
+                calendar.dataset.calendarEndYear = String(payload.endYear ?? range.endYear);
                 monthLabel.textContent = payload.currentMonth;
                 body.innerHTML = renderCalendarBody(payload);
+                range.startMonth = Number(payload.startMonth ?? range.startMonth);
+                range.startYear = Number(payload.startYear ?? range.startYear);
+                range.endMonth = Number(payload.endMonth ?? range.endMonth);
+                range.endYear = Number(payload.endYear ?? range.endYear);
+                syncPickerState();
             } catch (error) {
                 console.error("Unable to load blog calendar month.", error);
             } finally {
@@ -152,12 +296,49 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
 
-        prevButton.addEventListener("click", () => loadCalendar(-1));
-        nextButton.addEventListener("click", () => loadCalendar(1));
+        prevButton.addEventListener("click", () => {
+            const { month, year } = getTargetMonth(
+                calendar.dataset.calendarMonth,
+                calendar.dataset.calendarYear,
+                -1,
+            );
+
+            loadCalendar(month, year);
+        });
+
+        nextButton.addEventListener("click", () => {
+            const { month, year } = getTargetMonth(
+                calendar.dataset.calendarMonth,
+                calendar.dataset.calendarYear,
+                1,
+            );
+
+            loadCalendar(month, year);
+        });
+
+        if (yearSelect) {
+            yearSelect.addEventListener("change", () => {
+                updateMonthOptionAvailability();
+                updateJumpAvailability();
+            });
+        }
+
+        if (monthSelect) {
+            monthSelect.addEventListener("change", updateJumpAvailability);
+        }
+
+        if (jumpButton && monthSelect && yearSelect) {
+            jumpButton.addEventListener("click", () => {
+                loadCalendar(monthSelect.value, yearSelect.value);
+            });
+        }
 
         const headerRow = calendar.querySelector("thead tr");
         if (headerRow && !headerRow.children.length) {
             headerRow.innerHTML = weekdayLabels.map((day) => `<th>${day}</th>`).join("");
         }
+
+        syncPickerState();
+        updateNavigationAvailability();
     });
 });

@@ -90,6 +90,10 @@ class BlogController extends Controller
             'currentMonth' => $currentMonth,
             'calendarMonth' => $calendarMonth,
             'calendarYear' => $calendarYear,
+            'calendarStartMonth' => $calendarStartMonth,
+            'calendarStartYear' => $calendarStartYear,
+            'calendarEndMonth' => $calendarEndMonth,
+            'calendarEndYear' => $calendarEndYear,
             'postCalendarDays' => $postCalendarDays,
         ] = $this->buildCalendarPayload(
             $calendarDate->month,
@@ -104,6 +108,10 @@ class BlogController extends Controller
             'currentMonth',
             'calendarMonth',
             'calendarYear',
+            'calendarStartMonth',
+            'calendarStartYear',
+            'calendarEndMonth',
+            'calendarEndYear',
             'postCalendarDays',
             'selectedDate',
             'selectedCategory',
@@ -207,6 +215,10 @@ class BlogController extends Controller
             'currentMonth' => $currentMonth,
             'calendarMonth' => $calendarMonth,
             'calendarYear' => $calendarYear,
+            'calendarStartMonth' => $calendarStartMonth,
+            'calendarStartYear' => $calendarStartYear,
+            'calendarEndMonth' => $calendarEndMonth,
+            'calendarEndYear' => $calendarEndYear,
             'postCalendarDays' => $postCalendarDays,
         ] = $this->buildCalendarPayload(
             $post->published_at?->month ?? now()->month,
@@ -232,6 +244,10 @@ class BlogController extends Controller
             'currentMonth',
             'calendarMonth',
             'calendarYear',
+            'calendarStartMonth',
+            'calendarStartYear',
+            'calendarEndMonth',
+            'calendarEndYear',
             'postCalendarDays',
             'previous',
             'next'
@@ -313,8 +329,34 @@ class BlogController extends Controller
 
     private function buildCalendarPayload(?int $month = null, ?int $year = null): array
     {
-        $calendarMonth = $month ?? now()->month;
-        $calendarYear = $year ?? now()->year;
+        $publishedBounds = Post::published()
+            ->selectRaw('MIN(published_at) as first_published_at')
+            ->first();
+
+        $firstPublishedAt = $publishedBounds?->first_published_at
+            ? Carbon::parse($publishedBounds->first_published_at)
+            : now();
+
+        $calendarStartMonth = $firstPublishedAt->month;
+        $calendarStartYear = $firstPublishedAt->year;
+        $calendarEndMonth = now()->month;
+        $calendarEndYear = now()->year;
+
+        $requestedMonth = $month ?? now()->month;
+        $requestedYear = $year ?? now()->year;
+        $requestedDate = Carbon::createFromDate($requestedYear, $requestedMonth, 1)->startOfMonth();
+        $minimumDate = Carbon::createFromDate($calendarStartYear, $calendarStartMonth, 1)->startOfMonth();
+        $maximumDate = Carbon::createFromDate($calendarEndYear, $calendarEndMonth, 1)->startOfMonth();
+        $normalizedDate = $requestedDate;
+
+        if ($requestedDate->lt($minimumDate)) {
+            $normalizedDate = $minimumDate;
+        } elseif ($requestedDate->gt($maximumDate)) {
+            $normalizedDate = $maximumDate;
+        }
+
+        $calendarMonth = $normalizedDate->month;
+        $calendarYear = $normalizedDate->year;
         $calendar = $this->generateCalendar($calendarMonth, $calendarYear);
         $currentMonth = Carbon::createFromDate($calendarYear, $calendarMonth, 1)->format('F Y');
 
@@ -343,6 +385,10 @@ class BlogController extends Controller
             'currentMonth',
             'calendarMonth',
             'calendarYear',
+            'calendarStartMonth',
+            'calendarStartYear',
+            'calendarEndMonth',
+            'calendarEndYear',
             'postCalendarDays'
         );
     }
@@ -414,6 +460,10 @@ class BlogController extends Controller
             'currentMonth' => $currentMonth,
             'month' => $calendarMonth,
             'year' => $calendarYear,
+            'startMonth' => $calendarStartMonth,
+            'startYear' => $calendarStartYear,
+            'endMonth' => $calendarEndMonth,
+            'endYear' => $calendarEndYear,
             'postCalendarDays' => $postCalendarDays,
         ]);
     }

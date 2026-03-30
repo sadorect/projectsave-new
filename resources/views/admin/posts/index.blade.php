@@ -65,6 +65,11 @@
                     <i class="bi bi-stars"></i> AI Settings
                 </a>
             @endif
+            @can('manageTaxonomy', \App\Models\Post::class)
+                <a href="{{ route('admin.posts.import.create') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-upload"></i> Import Devotionals
+                </a>
+            @endcan
             <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-lg"></i> Add New Post
             </a>
@@ -72,6 +77,103 @@
     </div>
 
     @include('components.alerts')
+
+    @if(session('devotionalImportSummary'))
+        @php($importSummary = session('devotionalImportSummary'))
+        <div class="card mb-4 border-success-subtle">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-check2-circle"></i> Latest Devotional Import Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-2 col-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="text-muted small">Detected</div>
+                            <div class="fs-4 fw-semibold">{{ number_format($importSummary['detected'] ?? 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="text-muted small">Created</div>
+                            <div class="fs-4 fw-semibold text-success">{{ number_format($importSummary['created'] ?? 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="text-muted small">Updated</div>
+                            <div class="fs-4 fw-semibold text-primary">{{ number_format($importSummary['updated'] ?? 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="text-muted small">Skipped</div>
+                            <div class="fs-4 fw-semibold text-secondary">{{ number_format($importSummary['skipped'] ?? 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="text-muted small">Failed</div>
+                            <div class="fs-4 fw-semibold text-danger">{{ number_format($importSummary['failed'] ?? 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="text-muted small">New Categories</div>
+                            <div class="fs-4 fw-semibold">{{ count($importSummary['created_categories'] ?? []) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                @if(!empty($importSummary['created_categories']))
+                    <div class="mb-3">
+                        <div class="small text-muted mb-2">Newly created categories</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($importSummary['created_categories'] as $createdCategory)
+                                <span class="badge bg-light text-dark border">{{ $createdCategory }}</span>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if(!empty($importSummary['category_counts']))
+                    <div class="mb-3">
+                        <div class="small text-muted mb-2">Assigned categories in this run</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach($importSummary['category_counts'] as $categoryName => $count)
+                                <span class="badge bg-primary-subtle text-primary">{{ $categoryName }} ({{ $count }})</span>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                @if(!empty($importSummary['failures']))
+                    <div>
+                        <div class="small text-muted mb-2">First failed entries</div>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Published</th>
+                                        <th>Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(collect($importSummary['failures'])->take(10) as $failure)
+                                        <tr>
+                                            <td>{{ $failure['title'] ?? 'Untitled devotional' }}</td>
+                                            <td>{{ $failure['published_at'] ?? 'Unknown' }}</td>
+                                            <td class="text-danger">{{ $failure['reason'] ?? 'Unknown error' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
 
     @if(auth()->user()?->hasPermission('manage-ai-image-settings'))
         <div class="card mb-4 border-primary-subtle">

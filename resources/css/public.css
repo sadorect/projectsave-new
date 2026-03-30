@@ -4292,38 +4292,179 @@
    ══════════════════════════════════════════════════════════════════ */
 .devotional-calendar {
     padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(193, 18, 31, 0.08),
+            transparent 34%
+        ),
+        linear-gradient(180deg, rgba(248, 250, 252, 0.9), #ffffff 55%);
+}
+
+.devotional-calendar::before {
+    content: "";
+    position: absolute;
+    inset: auto -2.5rem -2.5rem auto;
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    background: rgba(188, 111, 44, 0.08);
+    pointer-events: none;
+}
+
+.devotional-calendar > * {
+    position: relative;
+    z-index: 1;
+}
+
+.devotional-calendar-toolbar {
+    align-items: center;
+}
+
+.devotional-calendar-nav {
+    flex-shrink: 0;
+}
+
+.devotional-calendar-jump {
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(255, 255, 255, 0.88);
+    padding: 1rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .devotional-calendar-month {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    color: #8b0a13;
+}
+
+.devotional-calendar-range {
+    font-size: 0.82rem;
     color: #64748b;
-    margin-bottom: 0.5rem;
+    line-height: 1.55;
+}
+
+.devotional-calendar-jump-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.devotional-calendar-select-shell {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: #ffffff;
+    padding: 0.8rem 0.95rem;
+    box-shadow: 0 14px 28px -24px rgba(15, 23, 42, 0.22);
+}
+
+.devotional-calendar-select-shell:focus-within {
+    border-color: rgba(193, 18, 31, 0.32);
+    box-shadow:
+        0 0 0 4px rgba(193, 18, 31, 0.08),
+        0 14px 28px -24px rgba(15, 23, 42, 0.22);
+}
+
+.devotional-calendar-select-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(193, 18, 31, 0.08);
+    color: #8b0a13;
+    font-size: 0.86rem;
+}
+
+.devotional-calendar-select {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: #111827;
+    font-size: 0.92rem;
+    font-weight: 600;
+    appearance: none;
+    cursor: pointer;
+    padding-right: 0.5rem;
+}
+
+.devotional-calendar-select:focus {
+    outline: none;
+}
+
+.devotional-calendar-jump-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 100%;
+    border: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #c1121f, #8b0a13);
+    color: #ffffff;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 0.95rem 1.1rem;
+    box-shadow: 0 18px 32px -24px rgba(193, 18, 31, 0.7);
+    transition:
+        transform 180ms ease,
+        opacity 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.devotional-calendar-jump-button:hover {
+    transform: translateY(-1px);
+    opacity: 0.94;
+    box-shadow: 0 20px 36px -22px rgba(193, 18, 31, 0.76);
 }
 
 .calendar-nav-button {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 2.2rem;
+    height: 2.2rem;
     border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.92);
     color: #374151;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
+    font-size: 0.82rem;
     cursor: pointer;
     transition:
         background 150ms,
-        border-color 150ms;
+        border-color 150ms,
+        transform 150ms;
 }
 
 .calendar-nav-button:hover {
     background: rgba(193, 18, 31, 0.06);
     border-color: rgba(193, 18, 31, 0.22);
     color: #c1121f;
+    transform: translateY(-1px);
+}
+
+.calendar-nav-button:disabled,
+.devotional-calendar-jump-button:disabled,
+.devotional-calendar-select:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.devotional-calendar.is-loading {
+    opacity: 0.78;
 }
 
 .devotional-calendar-table {
@@ -4331,20 +4472,22 @@
     border-collapse: collapse;
     table-layout: fixed;
     font-size: 0.78rem;
+    border-spacing: 0;
 }
 
 .devotional-calendar-table th {
     text-align: center;
-    padding: 0.3rem 0;
+    padding: 0.45rem 0;
     font-weight: 700;
     color: #94a3b8;
     font-size: 0.68rem;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .devotional-calendar-cell {
     text-align: center;
-    padding: 0.18rem;
+    padding: 0.22rem;
     position: relative;
 }
 
@@ -4352,9 +4495,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 1.9rem;
-    height: 1.9rem;
-    border-radius: 50%;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.9rem;
     margin-inline: auto;
     text-decoration: none;
     color: #374151;
@@ -4362,18 +4505,22 @@
     position: relative;
     transition:
         background 150ms,
-        color 150ms;
+        color 150ms,
+        transform 150ms,
+        box-shadow 150ms;
 }
 
 a.devotional-calendar-link:hover {
     background: rgba(193, 18, 31, 0.08);
     color: #c1121f;
+    transform: translateY(-1px);
 }
 
 .devotional-calendar-cell.is-today .devotional-calendar-link {
     background: rgba(193, 18, 31, 0.1);
     color: #8b0a13;
     font-weight: 700;
+    box-shadow: inset 0 0 0 1px rgba(193, 18, 31, 0.14);
 }
 
 .devotional-calendar-cell.is-outside .devotional-calendar-link {
@@ -4381,9 +4528,10 @@ a.devotional-calendar-link:hover {
 }
 
 .devotional-calendar-cell.has-post .devotional-calendar-link {
-    background: #c1121f;
+    background: linear-gradient(135deg, #c1121f, #8b0a13);
     color: #ffffff;
     font-weight: 700;
+    box-shadow: 0 14px 28px -20px rgba(193, 18, 31, 0.75);
 }
 
 .devotional-calendar-cell.has-post .devotional-calendar-link:hover {
@@ -4401,6 +4549,22 @@ a.devotional-calendar-link:hover {
 /* The post-count badge — hidden visually, preserved for the title tooltip */
 .devotional-calendar-count {
     display: none;
+}
+
+.devotional-calendar-note {
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #64748b;
+}
+
+@media (max-width: 575.98px) {
+    .devotional-calendar-jump-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .devotional-calendar-jump-button {
+        width: 100%;
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

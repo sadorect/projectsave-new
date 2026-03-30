@@ -137,6 +137,10 @@
                             :current-month="$currentMonth"
                             :calendar-month="$calendarMonth"
                             :calendar-year="$calendarYear"
+                            :calendar-start-month="$calendarStartMonth"
+                            :calendar-start-year="$calendarStartYear"
+                            :calendar-end-month="$calendarEndMonth"
+                            :calendar-end-year="$calendarEndYear"
                             :post-calendar-days="$postCalendarDays"
                         />
 

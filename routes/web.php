@@ -19,6 +19,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Admin\MailController;
 use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\PostImportController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\NewsletterSubscriberController;
 use App\Http\Controllers\FileManagerController;
@@ -258,6 +259,9 @@ Route::prefix('content')->middleware(['auth', 'verified'])->group(function() {
         Route::get('ai-images/settings', [AiImageSettingsController::class, 'edit'])->name('admin.ai-images.settings.edit');
         Route::post('ai-images/settings', [AiImageSettingsController::class, 'update'])->name('admin.ai-images.settings.update');
         Route::post('ai-images/settings/{provider}/test', [AiImageSettingsController::class, 'testProvider'])->name('admin.ai-images.settings.test');
+        Route::get('posts/import', [PostImportController::class, 'create'])->name('admin.posts.import.create');
+        Route::post('posts/import', [PostImportController::class, 'store'])->name('admin.posts.import.store');
+        Route::post('posts/import/{session}/resume', [PostImportController::class, 'resume'])->name('admin.posts.import.resume');
         Route::resource('posts', PostController::class)->names('admin.posts');
         // Add new routes for enhanced post management
         Route::post('posts/bulk-action', [PostController::class, 'bulkAction'])->name('admin.posts.bulk-action');
