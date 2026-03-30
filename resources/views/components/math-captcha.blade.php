@@ -9,7 +9,7 @@
     Validate server-side with: 'math_captcha' => ['required', new \App\Rules\MathCaptchaRule]
 --}}
 @php
-    $captchaErrors = $errors->getBag($errorBag ?: 'default');
+    $captchaErrors = isset($errors) ? $errors->getBag($errorBag ?: 'default') : new \Illuminate\Support\MessageBag;
     $inputId = 'math_captcha_' . str_replace('-', '_', $captchaKey);
     $hintId = $inputId . '_hint';
 @endphp
