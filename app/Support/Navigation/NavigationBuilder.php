@@ -111,7 +111,7 @@ class NavigationBuilder
 
             if (! empty($contentChildren)) {
                 $sections[] = [
-                    'label' => 'Content',
+                    'label' => null,
                     'items' => [
                         $this->item('content-group', 'Content', 'bi bi-newspaper', null, $contentOpen, null, $contentOpen, $contentChildren),
                     ],
@@ -163,7 +163,7 @@ class NavigationBuilder
         if ($this->canAny($user, ['view-reports'])) {
             $celebrationsOpen = request()->routeIs('admin.celebrations*', 'admin.dashboard.celebrants*');
             $sections[] = [
-                'label' => 'Celebrations',
+                'label' => null,
                 'items' => [
                     $this->item('celebrations', 'Celebrations', 'bi bi-balloon', null, $celebrationsOpen, null, $celebrationsOpen, [
                         $this->item('celebrants', 'Celebrants', 'bi bi-people', route('admin.dashboard.celebrants'), request()->routeIs('admin.dashboard.celebrants*')),
@@ -195,7 +195,7 @@ class NavigationBuilder
 
             if (! empty($mailChildren)) {
                 $sections[] = [
-                    'label' => 'Communications',
+                    'label' => null,
                     'items' => [
                         $this->item('mail-group', 'Communications', 'bi bi-envelope', null, $mailOpen, null, $mailOpen, $mailChildren),
                     ],

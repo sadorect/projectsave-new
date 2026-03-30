@@ -136,7 +136,7 @@
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </div>
-                        @if($errors->getBag('newsletterSubscription')->has('email'))
+                        @if(isset($errors) && $errors->getBag('newsletterSubscription')->has('email'))
                             <p class="site-footer-newsletter-note text-danger mb-0 mt-2">
                                 {{ $errors->getBag('newsletterSubscription')->first('email') }}
                             </p>

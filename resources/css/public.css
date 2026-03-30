@@ -4388,6 +4388,22 @@
     font-size: 0.86rem;
 }
 
+.devotional-calendar-select-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.devotional-calendar-select-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.045em;
+    line-height: 1;
+}
+
 .devotional-calendar-select {
     width: 100%;
     min-width: 0;

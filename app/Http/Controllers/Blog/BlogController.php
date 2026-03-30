@@ -452,6 +452,10 @@ class BlogController extends Controller
             'currentMonth' => $currentMonth,
             'calendarMonth' => $calendarMonth,
             'calendarYear' => $calendarYear,
+            'calendarStartMonth' => $calendarStartMonth,
+            'calendarStartYear' => $calendarStartYear,
+            'calendarEndMonth' => $calendarEndMonth,
+            'calendarEndYear' => $calendarEndYear,
             'postCalendarDays' => $postCalendarDays,
         ] = $this->buildCalendarPayload((int) $month, (int) $year);
             

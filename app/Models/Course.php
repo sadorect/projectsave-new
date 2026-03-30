@@ -131,9 +131,15 @@ public function users()
     public function getFeaturedImageUrlAttribute(): string
     {
         if ($this->featured_image) {
-            return $this->featured_image;
+            // Already a full URL (legacy records stored via Storage::url())
+            if (str_starts_with($this->featured_image, 'http://') || str_starts_with($this->featured_image, 'https://')) {
+                return $this->featured_image;
+            }
+
+            // Raw S3 key — generate the public URL
+            return Storage::disk('s3')->url($this->featured_image);
         }
-        
+
         return asset('frontend/img/course-placeholder.jpg');
     }
 

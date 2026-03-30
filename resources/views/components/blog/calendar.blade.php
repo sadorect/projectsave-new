@@ -50,35 +50,41 @@
 
         <div class="devotional-calendar-jump-grid mt-3">
             <label class="devotional-calendar-select-shell" for="calendar-month-select-{{ $attributes->get('id', 'archive') }}">
-                <span class="devotional-calendar-select-icon"><i class="bi bi-calendar3"></i></span>
-                <select
-                    id="calendar-month-select-{{ $attributes->get('id', 'archive') }}"
-                    class="devotional-calendar-select"
-                    data-calendar-month-select
-                    aria-label="Select archive month"
-                >
+                <!--span class="devotional-calendar-select-icon"><i class="bi bi-calendar3"></i></span-->
+                <div class="devotional-calendar-select-inner">
+                    <span class="devotional-calendar-select-label">Month</span>
+                    <select
+                        id="calendar-month-select-{{ $attributes->get('id', 'archive') }}"
+                        class="devotional-calendar-select"
+                        data-calendar-month-select
+                        aria-label="Select archive month"
+                    >
                     @foreach(range(1, 12) as $monthNumber)
-                        <option value="{{ $monthNumber }}" @selected((int) $calendarMonth === $monthNumber)>
-                            {{ \Carbon\Carbon::createFromDate(2000, $monthNumber, 1)->format('F') }}
-                        </option>
-                    @endforeach
-                </select>
+                            <option value="{{ $monthNumber }}" @selected((int) $calendarMonth === $monthNumber)>
+                                {{ \Carbon\Carbon::createFromDate(2000, $monthNumber, 1)->format('F') }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </label>
 
             <label class="devotional-calendar-select-shell" for="calendar-year-select-{{ $attributes->get('id', 'archive') }}">
-                <span class="devotional-calendar-select-icon"><i class="bi bi-clock-history"></i></span>
-                <select
-                    id="calendar-year-select-{{ $attributes->get('id', 'archive') }}"
-                    class="devotional-calendar-select"
-                    data-calendar-year-select
-                    aria-label="Select archive year"
-                >
+                <!--span class="devotional-calendar-select-icon"><i class="bi bi-clock-history"></i></span-->
+                <div class="devotional-calendar-select-inner">
+                    <span class="devotional-calendar-select-label">Year</span>
+                    <select
+                        id="calendar-year-select-{{ $attributes->get('id', 'archive') }}"
+                        class="devotional-calendar-select"
+                        data-calendar-year-select
+                        aria-label="Select archive year"
+                    >
                     @foreach(range((int) $calendarEndYear, (int) $calendarStartYear) as $yearNumber)
-                        <option value="{{ $yearNumber }}" @selected((int) $calendarYear === $yearNumber)>
-                            {{ $yearNumber }}
-                        </option>
-                    @endforeach
-                </select>
+                            <option value="{{ $yearNumber }}" @selected((int) $calendarYear === $yearNumber)>
+                                {{ $yearNumber }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </label>
 
             <button type="button" class="devotional-calendar-jump-button" data-calendar-jump>
