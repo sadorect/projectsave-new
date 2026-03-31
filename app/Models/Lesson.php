@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\LessonProgress;
+use App\Models\VideoInteraction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -47,6 +48,11 @@ class Lesson extends Model
     public function progress()
     {
         return $this->hasMany(LessonProgress::class);
+    }
+
+    public function videoInteractions()
+    {
+        return $this->hasMany(VideoInteraction::class);
     }
 
     public function isCompleted($user)

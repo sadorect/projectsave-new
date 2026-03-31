@@ -44,7 +44,7 @@
                         @error('source_file')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">Accepted format: plain-text `.txt` files up to 20MB.</div>
+                        <div class="form-text">Accepted format: plain-text `.txt` files up to 20MB. Server upload limit: <strong>{{ ini_get('upload_max_filesize') }}</strong>.</div>
                     </div>
 
                     <div class="mb-0">

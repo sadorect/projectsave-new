@@ -59,6 +59,8 @@ class PostImportController extends Controller
         $validated = $request->validate([
             'source_file' => 'required|file|mimes:txt|max:20480',
             'duplicate_strategy' => 'required|in:update,skip',
+        ], [
+            'source_file.uploaded' => 'The file could not be uploaded — the server rejected it before it arrived (PHP upload_max_filesize is ' . ini_get('upload_max_filesize') . ' and post_max_size is ' . ini_get('post_max_size') . '). Ask your hosting provider to raise these limits.',
         ]);
 
         $uploadedFile = $request->file('source_file');
