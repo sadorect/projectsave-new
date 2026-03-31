@@ -603,6 +603,19 @@
     color: #ffffff;
 }
 
+/* Secondary button on the dark progress-actions bar */
+.surface-lms .progress-actions .surface-button-secondary {
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.surface-lms .progress-actions .surface-button-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.38);
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+}
+
 .surface-lms .site-footer-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(0, 0, 0, 0.12);
@@ -1573,8 +1586,13 @@
     gap: 1rem;
     padding: 1.25rem 1.5rem;
     border-radius: 24px;
-    background: rgba(248, 250, 252, 0.92);
-    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.94),
+        rgba(30, 41, 59, 0.92)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 24px -4px rgba(15, 23, 42, 0.18);
 }
 
 .surface-lms .mark-complete-btn,
@@ -1718,7 +1736,7 @@
 .surface-lms .custom-video-controls {
     position: absolute;
     inset: auto 0 0 0;
-    z-index: 24;
+    z-index: 50;
     display: flex;
     align-items: center;
     gap: 0.65rem;
@@ -1737,11 +1755,51 @@
     height: 0.35rem;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.2);
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
+    cursor: pointer;
+    transition: height 120ms ease;
+}
+
+.surface-lms .progress-container:hover {
+    height: 0.55rem;
 }
 
 .surface-lms .progress-bar {
     height: 100%;
+    border-radius: 999px;
+    background: var(--surface-brand, #c1121f);
+    position: relative;
+    pointer-events: none;
+}
+
+.surface-lms .progress-thumb {
+    position: absolute;
+    right: -0.45rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+    display: block;
+}
+
+.surface-lms .progress-container:hover .progress-thumb {
+    opacity: 1;
+}
+
+.surface-lms .video-time {
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    min-width: 5.5rem;
+    text-align: center;
 }
 
 .surface-lms .video-block-overlay {
@@ -1784,6 +1842,23 @@
     min-height: 240px;
     background: rgba(248, 250, 252, 0.95);
     padding: 1.5rem;
+}
+
+.surface-lms .video-meta-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.65rem 1rem;
+    margin-top: 0.5rem;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.06);
+    font-size: 0.82rem;
+    color: #475569;
+}
+
+.surface-lms .video-meta-item {
+    display: inline-flex;
+    align-items: center;
 }
 
 .surface-lms .exam-card,

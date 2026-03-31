@@ -120,7 +120,7 @@ class StudentWorkspaceBuilder
                     'lesson_count'        => $lessonCount,
                     'completed_lessons'   => $completedLessons,
                     'progress'            => $progress,
-                    'instructor_name'     => $course->instructor?->name ?? 'ASOM Faculty',
+                    'instructor_name'     => $course->instructor_name ?: ($course->instructor?->name ?? 'ASOM Faculty'),
                     'next_lesson_url'     => $nextLesson
                         ? route('lms.lessons.show', [$course->slug, $nextLesson->slug])
                         : null,
@@ -142,7 +142,7 @@ class StudentWorkspaceBuilder
                 'featured_image_url'  => $course->featured_image_url,
                 'lesson_count'        => $course->lessons->count(),
                 'exam_count'          => $course->exams->count(),
-                'instructor_name'     => $course->instructor?->name ?? 'ASOM Faculty',
+                'instructor_name'     => $course->instructor_name ?: ($course->instructor?->name ?? 'ASOM Faculty'),
                 'course_url'          => route('lms.courses.show', $course->slug),
             ])
             ->values();

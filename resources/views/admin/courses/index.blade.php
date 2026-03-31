@@ -22,6 +22,7 @@
                         <tr>
                             <th>Title</th>
                             <th>Instructor</th>
+                            <th>Lessons</th>
                             <th>Status</th>
                             <th>Created</th>
                             <th>Actions</th>
@@ -31,7 +32,12 @@
                         @forelse($courses as $course)
                             <tr>
                                 <td>{{ $course->title }}</td>
-                                <td>{{ $course->instructor->name }}</td>
+                                <td>{{ $course->instructor_name ?: ($course->instructor->name ?? '—') }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        {{ $course->lessons_count ?? 0 }}
+                                    </span>
+                                </td>
                                 <td>
                                     <span class="badge bg-{{ $course->status === 'published' ? 'success' : ($course->status === 'draft' ? 'warning' : 'secondary') }}">
                                         {{ ucfirst($course->status) }}
@@ -58,7 +64,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center">No courses found</td>
+                                <td colspan="6" class="text-center">No courses found</td>
                             </tr>
                         @endforelse
                     </tbody>

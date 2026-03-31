@@ -25,7 +25,7 @@
                         @foreach($enrollments as $course)
                             <tr>
                                 <td>{{ $course->title }}</td>
-                                <td>{{ $course->instructor->name }}</td>
+                                <td>{{ $course->instructor_name ?: ($course->instructor->name ?? '—') }}</td>
                                 <td>
                                     <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#studentsModal{{ $course->id }}">
                                         {{ $course->users->count() }} Students

@@ -2023,6 +2023,69 @@
     box-shadow: 0 8px 28px rgba(193, 18, 31, 0.65);
 }
 
+/* YouTube corner link shown after iframe is injected */
+.home-reel-yt-link--corner {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 1rem;
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+.home-reel-yt-link--corner:hover {
+    opacity: 1;
+    color: #ff0000;
+}
+
+/* Fallback shown when YouTube blocks embedding */
+.home-reel-restricted {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    height: 100%;
+    min-height: 160px;
+    background: #0f0f0f;
+    color: #aaa;
+    text-align: center;
+    padding: 1.5rem;
+}
+.home-reel-restricted i {
+    font-size: 2rem;
+    color: #ff0000;
+}
+.home-reel-restricted p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+.home-reel-yt-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    background: #ff0000;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+.home-reel-yt-link:hover {
+    background: #cc0000;
+    color: #fff;
+}
+
 .home-reel-caption {
     padding: 1rem 1.25rem;
 }

@@ -321,7 +321,7 @@ class CourseController extends Controller
                 'title' => $course->title,
                 'description_excerpt' => Str::limit(trim(strip_tags((string) $course->description)), 140),
                 'featured_image_url' => $course->featured_image_url,
-                'instructor_name' => $course->instructor?->name ?? 'ASOM Team',
+                'instructor_name' => $course->instructor_name ?: ($course->instructor?->name ?? 'ASOM Team'),
                 'lessons_count' => $course->lessons_count,
                 'active_exams_count' => $course->active_exams_count,
                 'is_enrolled' => $enrollment !== null,

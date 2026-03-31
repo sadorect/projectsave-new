@@ -147,6 +147,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ─── Home video reels click-to-play ────────────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
+    // Listen for YouTube IFrame API postMessage errors (codes 150/151 = embedding
+    // restricted; code 101 = playback not allowed in embedded players).
+    window.addEventListener("message", (e) => {
+        let data;
+        try {
+            data = JSON.parse(e.data);
+        } catch (_) {
+            return;
+        }
+
+        const restrictedCodes = [100, 101, 150, 151];
+        if (data.event !== "onError" || !restrictedCodes.includes(data.info)) {
+            return;
+        }
+
+        // Find the frame that owns the iframe this message came from.
+        document.querySelectorAll("[data-video-frame]").forEach((frame) => {
+            const iframeEl = frame.querySelector("iframe");
+            if (!iframeEl || iframeEl.contentWindow !== e.source) {
+                return;
+            }
+            const youtubeId = frame.dataset.videoYoutubeId;
+            if (!youtubeId) {
+                return;
+            }
+
+            frame.innerHTML = `
+                <div class="home-reel-restricted">
+                    <i class="bi bi-youtube"></i>
+                    <p>This video can't be played here.</p>
+                    <a href="https://www.youtube.com/watch?v=${youtubeId}"
+                       target="_blank" rel="noopener noreferrer"
+                       class="home-reel-yt-link">
+                        Watch on YouTube
+                    </a>
+                </div>`;
+        });
+    });
+
     document.querySelectorAll("[data-video-card]").forEach((card) => {
         const trigger = card.querySelector("[data-video-embed]");
         const frame = card.querySelector("[data-video-frame]");
@@ -168,14 +207,23 @@ document.addEventListener("DOMContentLoaded", () => {
             const title =
                 trigger.getAttribute("aria-label") || "Play ministry reel";
 
+            // Store id on the frame so the error handler above can find it.
             frame.dataset.videoPlaying = "true";
+            frame.dataset.videoYoutubeId = youtubeId;
+
             frame.innerHTML = `
                 <iframe
-                    src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0"
+                    src="https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&enablejsapi=1"
                     title="${title}"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen
                 ></iframe>
+                <a class="home-reel-yt-link home-reel-yt-link--corner"
+                   href="https://www.youtube.com/watch?v=${youtubeId}"
+                   target="_blank" rel="noopener noreferrer"
+                   title="Watch on YouTube">
+                    <i class="bi bi-youtube"></i>
+                </a>
             `;
         };
 

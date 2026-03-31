@@ -27,25 +27,36 @@
                         {{ auth()->user()->email }} • {{ now()->format('Y-m-d') }}
                     </div>
 
-                    <div class="custom-video-controls">
-                        <button id="play-pause-{{ $lesson->id }}" class="control-button">
-                            <i class="fas fa-pause"></i>
-                        </button>
-                        <div class="progress-container">
-                            <div class="progress-bar" id="progress-{{ $lesson->id }}"></div>
-                        </div>
-                        <div class="volume-container">
-                            <button id="mute-{{ $lesson->id }}" class="control-button">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
-                        </div>
-                    </div>
-
                     <div id="manual-play-{{ $lesson->id }}" class="manual-play-button">
                         <button class="btn btn-primary btn-lg">
                             <i class="fas fa-play me-2"></i>Click to Play
                         </button>
                     </div>
+                </div>
+
+                {{-- Controls sit OUTSIDE the secure-video-wrapper so the
+                     privacy overlays can never block pointer events. --}}
+                <div class="custom-video-controls" id="controls-{{ $lesson->id }}">
+                    <button id="play-pause-{{ $lesson->id }}" class="control-button">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <div class="progress-container" id="seek-bar-{{ $lesson->id }}">
+                        <div class="progress-bar" id="progress-{{ $lesson->id }}">
+                            <span class="progress-thumb"></span>
+                        </div>
+                    </div>
+                    <div class="video-time" id="video-time-{{ $lesson->id }}">0:00 / 0:00</div>
+                    <div class="volume-container">
+                        <button id="mute-{{ $lesson->id }}" class="control-button">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="video-meta-bar" id="video-meta-{{ $lesson->id }}">
+                    <span class="video-meta-item" id="video-duration-label-{{ $lesson->id }}">
+                        <i class="fas fa-clock me-1"></i> <span id="video-duration-{{ $lesson->id }}">Loading duration…</span>
+                    </span>
                 </div>
 
                 <script>
@@ -61,8 +72,11 @@
                         const secureVideoWrapper = container.querySelector('.secure-video-wrapper');
                         const playPauseBtn = document.getElementById('play-pause-{{ $lesson->id }}');
                         const progressBar = document.getElementById('progress-{{ $lesson->id }}');
+                        const seekBar     = document.getElementById('seek-bar-{{ $lesson->id }}');
+                        const timeDisplay = document.getElementById('video-time-{{ $lesson->id }}');
                         const muteBtn = document.getElementById('mute-{{ $lesson->id }}');
                         const manualPlayBtn = document.getElementById('manual-play-{{ $lesson->id }}');
+                        const durationLabel = document.getElementById('video-duration-{{ $lesson->id }}');
 
                         window.onYouTubeIframeAPIReady = function() {
                             try {
@@ -98,7 +112,8 @@
                             }
                         });
 
-                        playPauseBtn.addEventListener('click', function() {
+                        playPauseBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
                             if (!player || typeof player.getPlayerState !== 'function') {
                                 return;
                             }
@@ -112,7 +127,8 @@
                             }
                         });
 
-                        muteBtn.addEventListener('click', function() {
+                        muteBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
                             if (!player || typeof player.isMuted !== 'function') {
                                 return;
                             }
@@ -133,6 +149,54 @@
                             }
                         });
 
+                        // ── Seek bar ──────────────────────────────────────
+                        function formatTime(s) {
+                            s = Math.floor(s || 0);
+                            const m = Math.floor(s / 60);
+                            const sec = String(s % 60).padStart(2, '0');
+                            return m + ':' + sec;
+                        }
+
+                        function seekToPosition(clientX) {
+                            if (!player || typeof player.getDuration !== 'function') return;
+                            const rect = seekBar.getBoundingClientRect();
+                            const fraction = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+                            const seekTime = fraction * player.getDuration();
+                            player.seekTo(seekTime, true);
+                            // Update the bar immediately so it feels responsive
+                            const percent = fraction * 100;
+                            progressBar.style.width = percent + '%';
+                            timeDisplay.textContent = formatTime(seekTime) + ' / ' + formatTime(player.getDuration());
+                        }
+
+                        seekBar.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            seekToPosition(e.clientX);
+                        });
+
+                        let _seeking = false;
+                        seekBar.addEventListener('mousedown', function(e) {
+                            e.stopPropagation();
+                            _seeking = true;
+                            seekToPosition(e.clientX);
+                        });
+                        document.addEventListener('mousemove', function(e) {
+                            if (_seeking) {
+                                e.preventDefault();
+                                seekToPosition(e.clientX);
+                            }
+                        });
+                        document.addEventListener('mouseup', function() { _seeking = false; });
+
+                        seekBar.addEventListener('touchstart', function(e) {
+                            e.stopPropagation();
+                            seekToPosition(e.touches[0].clientX);
+                        }, { passive: false });
+                        seekBar.addEventListener('touchmove', function(e) {
+                            e.stopPropagation();
+                            seekToPosition(e.touches[0].clientX);
+                        }, { passive: false });
+
                         function onPlayerReady() {
                             setTimeout(function() {
                                 try {
@@ -143,6 +207,21 @@
                             }, 1000);
 
                             setInterval(updateProgressBar, 1000);
+
+                            // Populate the duration label below the player.
+                            // YouTube may return 0 until the video metadata loads,
+                            // so we poll briefly until it reports a real value.
+                            let durationPoll = setInterval(function() {
+                                if (player && typeof player.getDuration === 'function') {
+                                    const dur = player.getDuration();
+                                    if (dur > 0) {
+                                        const mins = Math.floor(dur / 60);
+                                        const secs = String(Math.floor(dur % 60)).padStart(2, '0');
+                                        durationLabel.textContent = mins + ':' + secs + ' min';
+                                        clearInterval(durationPoll);
+                                    }
+                                }
+                            }, 500);
 
                             setTimeout(function() {
                                 if (player && typeof player.getPlayerState === 'function' && player.getPlayerState() !== 1) {
@@ -158,6 +237,7 @@
                                     const duration = player.getDuration();
                                     const percent = duration > 0 ? (currentTime / duration) * 100 : 0;
                                     progressBar.style.width = percent + '%';
+                                    timeDisplay.textContent = formatTime(currentTime) + ' / ' + formatTime(duration);
                                     @this.call('logWatchTime', currentTime);
                                 } catch (error) {
                                     console.error('Error updating progress bar:', error);

@@ -8,6 +8,18 @@
 </div>
 
 <div class="form-group mb-3">
+    <label for="instructor_name">Instructor Name</label>
+    <input type="text" name="instructor_name" id="instructor_name"
+           class="form-control @error('instructor_name') is-invalid @enderror"
+           value="{{ old('instructor_name', $course->instructor_name ?? '') }}"
+           placeholder="e.g. Rev. John Adebayo">
+    <small class="text-muted">The name displayed publicly on the course. Leave blank to use the account name of the person who created the course.</small>
+    @error('instructor_name')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
+<div class="form-group mb-3">
     <label for="description">Description</label>
     <textarea name="description" id="description" rows="5" 
               class="form-control @error('description') is-invalid @enderror"

@@ -26,6 +26,7 @@ class AdminCourseController extends Controller
     public function index()
     {
         $courses = Course::with('instructor')
+                        ->withCount('lessons')
                         ->latest()
                         ->paginate(10);
                         
@@ -45,6 +46,7 @@ class AdminCourseController extends Controller
         'objectives' => 'required',
         'outcomes' => 'required',
         'evaluation' => 'required',
+        'instructor_name' => 'nullable|string|max:255',
         'recommended_books' => 'nullable',
         'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         'documents.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
@@ -117,6 +119,7 @@ class AdminCourseController extends Controller
         'objectives' => 'required',
         'outcomes' => 'required',
         'evaluation' => 'required',
+        'instructor_name' => 'nullable|string|max:255',
         'recommended_books' => 'nullable',
         'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         'documents.*' => 'nullable|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
